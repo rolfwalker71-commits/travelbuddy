@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>TravelBuddy</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>de</string>
+	</array>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>ch.rolfwalker.travelbuddy</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>travelbuddy</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Zum Scannen von Reiseunterlagen und Belegen.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Zeigt deine Umgebung auf der Reisekarte.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Zum Anhängen von Fotos und Belegen an Ereignisse.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/Barlow-Regular.ttf</string>
+		<string>Fonts/Barlow-Medium.ttf</string>
+		<string>Fonts/Barlow-SemiBold.ttf</string>
+		<string>Fonts/Barlow-Bold.ttf</string>
+		<string>Fonts/BarlowSemiCondensed-Medium.ttf</string>
+		<string>Fonts/BarlowSemiCondensed-SemiBold.ttf</string>
+		<string>Fonts/BarlowSemiCondensed-Bold.ttf</string>
+		<string>Fonts/IBMPlexMono-Regular.ttf</string>
+		<string>Fonts/IBMPlexMono-Medium.ttf</string>
+		<string>Fonts/IBMPlexMono-SemiBold.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array/>
+</dict>
+</plist>

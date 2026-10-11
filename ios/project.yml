@@ -1,0 +1,265 @@
+name: TravelBuddy
+options:
+  bundleIdPrefix: ch.rolfwalker
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  developmentLanguage: de
+settings:
+  base:
+    DEVELOPMENT_TEAM: 9XZWUZ7Z26
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: targeted
+    TARGETED_DEVICE_FAMILY: "1,2"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+
+targets:
+  TravelBuddy:
+    type: application
+    platform: iOS
+    sources:
+      # Schriften als Ordnerreferenz, damit `UIAppFonts` (`Fonts/…`) im Bundle aufloest.
+      - path: TravelBuddy
+        excludes:
+          - "Resources/Fonts/**"
+      - path: TravelBuddy/Resources/Fonts
+        type: folder
+      - path: Shared
+      # Ein Katalog, eine Quelle: gebuendelte Kopie von shared/event-types.json (Fallback offline).
+      - path: ../shared/event-types.json
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ch.rolfwalker.travelbuddy
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # Folgt `VERSION` im Repo (SemVer); Build-Nummer = CURRENT_PROJECT_VERSION.
+        MARKETING_VERSION: "0.1.0"
+    entitlements:
+      path: Config/TravelBuddy.entitlements
+      properties:
+        aps-environment: development
+        com.apple.security.application-groups: [group.ch.rolfwalker.travelbuddy]
+        keychain-access-groups: ["$(AppIdentifierPrefix)ch.rolfwalker.travelbuddy"]
+        com.apple.developer.usernotifications.time-sensitive: true
+    info:
+      path: Config/TravelBuddy-Info.plist
+      properties:
+        CFBundleDisplayName: TravelBuddy
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        CFBundleLocalizations: [de]
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UIBackgroundModes: [remote-notification]
+        NSSupportsLiveActivities: true
+        NSSupportsLiveActivitiesFrequentUpdates: true
+        ITSAppUsesNonExemptEncryption: false
+        NSLocationWhenInUseUsageDescription: "Zeigt deine Umgebung auf der Reisekarte."
+        NSCameraUsageDescription: "Zum Scannen von Reiseunterlagen und Belegen."
+        NSPhotoLibraryUsageDescription: "Zum Anhängen von Fotos und Belegen an Ereignisse."
+        CFBundleURLTypes:
+          - CFBundleURLName: ch.rolfwalker.travelbuddy
+            CFBundleURLSchemes: [travelbuddy]
+        UTExportedTypeDeclarations: []
+        UIAppFonts:
+          - Fonts/Barlow-Regular.ttf
+          - Fonts/Barlow-Medium.ttf
+          - Fonts/Barlow-SemiBold.ttf
+          - Fonts/Barlow-Bold.ttf
+          - Fonts/BarlowSemiCondensed-Medium.ttf
+          - Fonts/BarlowSemiCondensed-SemiBold.ttf
+          - Fonts/BarlowSemiCondensed-Bold.ttf
+          - Fonts/IBMPlexMono-Regular.ttf
+          - Fonts/IBMPlexMono-Medium.ttf
+          - Fonts/IBMPlexMono-SemiBold.ttf
+    dependencies:
+      - target: TravelBuddyWidgets
+      - target: TravelBuddyShare
+      - target: TravelBuddyNotificationService
+      - target: TravelBuddyNotificationContent
+
+  TravelBuddyWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TravelBuddyWidgets
+      - path: Shared
+      - path: TravelBuddy/Resources/Fonts
+        type: folder
+        optional: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ch.rolfwalker.travelbuddy.widgets
+        SKIP_INSTALL: YES
+    entitlements:
+      path: Config/TravelBuddyWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.ch.rolfwalker.travelbuddy]
+        keychain-access-groups: ["$(AppIdentifierPrefix)ch.rolfwalker.travelbuddy"]
+    info:
+      path: Config/TravelBuddyWidgets-Info.plist
+      properties:
+        CFBundleDisplayName: TravelBuddy
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        UIAppFonts:
+          - Fonts/Barlow-Regular.ttf
+          - Fonts/Barlow-Medium.ttf
+          - Fonts/Barlow-SemiBold.ttf
+          - Fonts/Barlow-Bold.ttf
+          - Fonts/BarlowSemiCondensed-Medium.ttf
+          - Fonts/BarlowSemiCondensed-SemiBold.ttf
+          - Fonts/BarlowSemiCondensed-Bold.ttf
+          - Fonts/IBMPlexMono-Regular.ttf
+          - Fonts/IBMPlexMono-Medium.ttf
+          - Fonts/IBMPlexMono-SemiBold.ttf
+
+  TravelBuddyShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TravelBuddyShare
+      - path: Shared
+      - path: TravelBuddy/Resources/Fonts
+        type: folder
+        optional: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ch.rolfwalker.travelbuddy.share
+        SKIP_INSTALL: YES
+    entitlements:
+      path: Config/TravelBuddyShare.entitlements
+      properties:
+        com.apple.security.application-groups: [group.ch.rolfwalker.travelbuddy]
+        keychain-access-groups: ["$(AppIdentifierPrefix)ch.rolfwalker.travelbuddy"]
+    info:
+      path: Config/TravelBuddyShare-Info.plist
+      properties:
+        CFBundleDisplayName: In TravelBuddy ablegen
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UIAppFonts:
+          - Fonts/Barlow-Regular.ttf
+          - Fonts/Barlow-Medium.ttf
+          - Fonts/Barlow-SemiBold.ttf
+          - Fonts/Barlow-Bold.ttf
+          - Fonts/BarlowSemiCondensed-Medium.ttf
+          - Fonts/BarlowSemiCondensed-SemiBold.ttf
+          - Fonts/BarlowSemiCondensed-Bold.ttf
+          - Fonts/IBMPlexMono-Regular.ttf
+          - Fonts/IBMPlexMono-Medium.ttf
+          - Fonts/IBMPlexMono-SemiBold.ttf
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsFileWithMaxCount: 10
+              NSExtensionActivationSupportsImageWithMaxCount: 10
+              NSExtensionActivationSupportsText: false
+              NSExtensionActivationSupportsWebURLWithMaxCount: 0
+
+  TravelBuddyNotificationService:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TravelBuddyNotificationService
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ch.rolfwalker.travelbuddy.notificationservice
+        SKIP_INSTALL: YES
+    entitlements:
+      path: Config/TravelBuddyNotificationService.entitlements
+      properties:
+        com.apple.security.application-groups: [group.ch.rolfwalker.travelbuddy]
+        keychain-access-groups: ["$(AppIdentifierPrefix)ch.rolfwalker.travelbuddy"]
+    info:
+      path: Config/TravelBuddyNotificationService-Info.plist
+      properties:
+        CFBundleDisplayName: TravelBuddy Mitteilungen
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.usernotifications.service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationService
+
+  TravelBuddyNotificationContent:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TravelBuddyNotificationContent
+      - path: Shared
+      - path: TravelBuddy/Resources/Fonts
+        type: folder
+        optional: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ch.rolfwalker.travelbuddy.notificationcontent
+        SKIP_INSTALL: YES
+    entitlements:
+      path: Config/TravelBuddyNotificationContent.entitlements
+      properties:
+        com.apple.security.application-groups: [group.ch.rolfwalker.travelbuddy]
+        keychain-access-groups: ["$(AppIdentifierPrefix)ch.rolfwalker.travelbuddy"]
+    info:
+      path: Config/TravelBuddyNotificationContent-Info.plist
+      properties:
+        CFBundleDisplayName: TravelBuddy Mitteilungsansicht
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UIAppFonts:
+          - Fonts/Barlow-Regular.ttf
+          - Fonts/Barlow-Medium.ttf
+          - Fonts/Barlow-SemiBold.ttf
+          - Fonts/Barlow-Bold.ttf
+          - Fonts/BarlowSemiCondensed-Medium.ttf
+          - Fonts/BarlowSemiCondensed-SemiBold.ttf
+          - Fonts/BarlowSemiCondensed-Bold.ttf
+          - Fonts/IBMPlexMono-Regular.ttf
+          - Fonts/IBMPlexMono-Medium.ttf
+          - Fonts/IBMPlexMono-SemiBold.ttf
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.usernotifications.content-extension
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationViewController
+          NSExtensionAttributes:
+            UNNotificationExtensionCategory: [trip.today, trip.depart, trip.stay, trip.pickup, trip.deadline, trip.review]
+            UNNotificationExtensionInitialContentSizeRatio: 0.62
+            UNNotificationExtensionDefaultContentHidden: true
+            UNNotificationExtensionUserInteractionEnabled: true
+
+  TravelBuddyTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: TravelBuddyTests
+    dependencies:
+      - target: TravelBuddy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ch.rolfwalker.travelbuddy.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  TravelBuddy:
+    build:
+      targets:
+        TravelBuddy: all
+    test:
+      targets: [TravelBuddyTests]
+    run:
+      config: Debug
+    archive:
+      config: Release
