@@ -11,9 +11,9 @@ AuthKey_*
 *.key
 secrets/
 
-# Echte Daten (Reisen, Belege, PDFs, Bilder) gehoeren nie ins Repo
-data/
-server/data/
+# Echte Daten (Reisen, Belege, PDFs, Bilder) gehoeren nie ins Repo (nur die Ordner im Wurzelverzeichnis, nicht web/src/data)
+/data/
+/server/data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
