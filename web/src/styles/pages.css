@@ -1,8 +1,16 @@
 /* Seiten: Reise, Plan, Heute, Erfassen, Dokumente, Detail. Farben nur über Tokens. */
 
 /* ───────────── Reisen ───────────── */
-.tripgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-@media (max-width: 479px) { .tripgrid { grid-template-columns: minmax(0, 1fr); } }
+.tripgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 20px; }
+@media (max-width: 559px) { .tripgrid { grid-template-columns: minmax(0, 1fr); } }
+/* Reise-Kacheln: grösser und breiter (Titel, Bild, Kennzahlen) */
+.tripgrid .ticket__body { padding: 18px 20px 20px; gap: 12px; }
+.tripgrid .ticket__title { font-size: 1.5rem; }
+.tripgrid .ticket__main small { font-size: 1rem; }
+.tripgrid .ticket .media--map,
+.tripgrid .coverill--thumb { height: 200px; }
+.tripgrid .ticket__stub { padding: 12px 20px; gap: 10px 16px; }
+.tripgrid .tripstat { font-size: 0.9375rem; }
 .tripstat { display: inline-flex; align-items: center; gap: 5px; font-size: 0.8125rem; color: var(--mute); min-width: 0; }
 .tripstat--next { color: var(--ink); flex-basis: 100%; }
 .ticket .media--map { margin-top: 4px; height: 110px; }
