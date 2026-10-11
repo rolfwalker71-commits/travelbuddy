@@ -39,6 +39,8 @@ struct TicketContent: Equatable {
     var lat: Double?
     var lon: Double?
     var isProposal = false
+    /// `true`, wenn die Beschriftung vom Server (`displayLabel`) stammt und nicht überschrieben wird.
+    var hasServerLabel = false
 
     // MARK: Aufbau aus der Mitteilung
 
@@ -74,16 +76,19 @@ struct TicketContent: Equatable {
             timeText = SharedFormat.time(at, in: tz)
             dateText = SharedFormat.weekdayShortDate(SharedFormat.isoDay(at, in: tz))
         } else {
-            timeText = SharedFormat.time(t.startTime)
+            // `displayTime` (Rolle am Tag) hat Vorrang; bei `middle` gibt es keine Uhrzeit.
+            let shownTime = t.dayRole == "middle" ? nil : (t.displayTime ?? t.startTime)
+            timeText = SharedFormat.time(shownTime)
             dateText = t.startDate.map { SharedFormat.weekdayShortDate($0) }
-            startAt = SharedFormat.moment(date: t.startDate, time: t.startTime, tz: tz)
+            startAt = SharedFormat.moment(date: t.startDate, time: shownTime, tz: tz)
         }
         if kind == TravelNotificationKind.today, let at = t.startAt ?? startAt {
             dateText = SharedFormat.weekdayDate(SharedFormat.isoDay(at, in: tz))
         } else if kind == TravelNotificationKind.today, let d = t.startDate {
             dateText = SharedFormat.weekdayDate(d)
         }
-        kicker = Self.kicker(kind: kind, type: type, title: title)
+        kicker = t.displayLabel ?? Self.kicker(kind: kind, type: type, title: title)
+        hasServerLabel = t.displayLabel != nil
         applyKindDefaults(type: type)
     }
 
@@ -147,7 +152,11 @@ struct TicketContent: Equatable {
             if reference == nil { reference = e.bookingReference }
             if facts.isEmpty { facts = e.summary }
             if timeText == nil { timeText = e.timeText }
-            if dateText == nil, e.startDate != nil { dateText = SharedFormat.weekdayShortDate(e.startDate) }
+            if dateText == nil, e.shownDate != nil { dateText = SharedFormat.weekdayShortDate(e.shownDate) }
+            if !hasServerLabel, kind != TravelNotificationKind.today, let label = e.roleLabel {
+                kicker = label
+                hasServerLabel = true
+            }
             if startAt == nil { startAt = e.start(fallback: zone) }
             if address == nil { address = e.address }
             if lat == nil { lat = e.lat; lon = e.lon }
@@ -161,20 +170,25 @@ struct TicketContent: Equatable {
         if kind == TravelNotificationKind.today || rows.isEmpty && kind == TravelNotificationKind.today {
             let day = SharedFormat.isoDay(now, in: zone)
             let events = summary.nextEvents
-                .filter { $0.startDate == day && !$0.isProposal && ($0.tripId == nil || trip == nil || $0.tripId == trip?.id) }
-                .sorted { ($0.startTime ?? "") < ($1.startTime ?? "") }
+                .filter { $0.appears(on: day) && !$0.isProposal && ($0.tripId == nil || trip == nil || $0.tripId == trip?.id) }
+                .sorted { a, b in
+                    if a.isMiddle != b.isMiddle { return !a.isMiddle }   // mehrtägige «middle» unten
+                    return (a.timeText ?? "00:00") < (b.timeText ?? "00:00")
+                }
             if rows.isEmpty {
                 let next = events.first { ($0.start(fallback: zone) ?? .distantFuture) >= now }
                 rows = events.prefix(5).map {
-                    Row(time: $0.timeText, title: $0.title, icon: $0.iconName, color: $0.colorKey, isNext: $0.id == next?.id)
+                    Row(time: $0.timeText ?? $0.roleLabel, title: $0.title, icon: $0.iconName, color: $0.colorKey,
+                        isNext: $0.id == next?.id && $0.hasTime)
                 }
                 if startAt == nil, let next { startAt = next.start(fallback: zone) }
             }
             segments = events.compactMap { e in
-                guard let hm = SharedFormat.hm(e.startTime) else { return nil }
+                guard let hm = SharedFormat.hm(e.timeText) else { return nil }
                 let start = hm.h * 60 + hm.m
                 var end: Int?
-                if let et = SharedFormat.hm(e.endTime), et.h * 60 + et.m > start { end = et.h * 60 + et.m }
+                if e.dayRole == nil || e.dayRole == "single",
+                   let et = SharedFormat.hm(e.endTime), et.h * 60 + et.m > start { end = et.h * 60 + et.m }
                 return TBDayBand.Segment(startMinute: start, endMinute: end, colorKey: e.colorKey)
             }
             if dayCaption == nil {
@@ -238,6 +252,7 @@ struct TicketContent: Equatable {
             content.title = "Check-in heute"
             content.body = "Hotel Avenida ab 15:00"
             ticket = ["type": "Hotel", "title": "Hotel Avenida", "startAt": iso(95), "tz": "Europe/Lisbon", "place": "Avenida da Liberdade 12, Lissabon",
+                      "dayRole": "start", "displayTime": "15:00", "displayLabel": "Check-in",
                       "reference": "AV55120", "tripTitle": "Lissabon im Herbst",
                       "facts": [["label": "Zimmer", "value": "Doppel"], ["label": "Nächte", "value": "4"]]]
         case TravelNotificationKind.pickup:

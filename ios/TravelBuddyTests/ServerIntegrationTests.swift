@@ -84,6 +84,38 @@ struct ServerIntegrationTests {
         try? await c.deleteTrip(id: id)
     }
 
+    @Test("Tagesrolle: die App-Regeln (offline) stimmen mit den Serverfeldern überein")
+    func dayRolesMatchServer() async throws {
+        let c = try await api()
+        let catalog = EventCatalogLoader.bundled()
+        let trip = try await c.createTrip(CreateTripRequest(title: "Tagesrollen", destination: nil, startDate: "2026-11-02",
+                                                            endDate: "2026-11-06", summary: nil, homeCurrency: "CHF",
+                                                            timezone: "Europe/Zurich", travelers: []))
+        let id = trip.trip.id
+        defer { Task { try? await c.deleteTrip(id: id) } }
+        _ = try await c.createEvent(tripID: id, EventBody([
+            "type": "Hotel", "title": "Hotel Test", "startDate": "2026-11-02", "startTime": "15:00",
+            "endDate": "2026-11-05", "endTime": "11:00"]))
+        _ = try await c.createEvent(tripID: id, EventBody([
+            "type": "Mietauto", "title": "Auto", "startDate": "2026-11-03", "startTime": "09:00",
+            "endDate": "2026-11-04", "endTime": "18:00"]))
+        _ = try await c.createEvent(tripID: id, EventBody([
+            "type": "Restaurant", "title": "Essen", "startDate": "2026-11-03", "startTime": "20:00"]))
+        let detail = try await c.trip(id: id)
+        for day in ["2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05"] {
+            let server = try await c.day(tripID: id, date: day)
+            for e in server.events {
+                let local = try #require(DayRules.display(for: e, on: day, catalog: catalog), "kein Rolle für \(e.title) am \(day)")
+                #expect(e.dayRole == local.role, "\(e.title) \(day): Rolle \(String(describing: e.dayRole)) gegen \(local.role)")
+                #expect(e.displayTime == local.time, "\(e.title) \(day): Zeit")
+                #expect(e.displayLabel == local.label, "\(e.title) \(day): Label \(String(describing: e.displayLabel)) gegen \(String(describing: local.label))")
+            }
+            // Dieselben Ereignisse, die die App offline ableiten würde.
+            let offline = TodayPlanner.response(from: detail, now: Fixture.date(day, "12:00", "Europe/Zurich"), catalog: catalog)
+            #expect(Set(offline.events.map(\.id)) == Set(server.events.map(\.id)), "Ereignisse am \(day)")
+        }
+    }
+
     @Test func airportsAndTimezone() async throws {
         let c = try await api()
         let a = try await c.airports(query: "mia")

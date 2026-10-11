@@ -76,17 +76,24 @@ struct SharedSummary: Codable, Equatable {
         var lat: Double?
         var lon: Double?
         var summary: [KeyValue]
+        /// Tagesrolle mehrtägiger Ereignisse (Vertrag): `single` | `start` | `middle` | `end`; `nil` bei älteren Servern.
+        var dayRole: String?
+        var displayTime: String?
+        var displayLabel: String?
 
         private enum CodingKeys: String, CodingKey {
             case id, tripId, type, title, startDate, startTime, startTz, endDate, endTime, endTz, location, address
             case provider, bookingReference, icon, color, status, lat, lon, summary
+            case dayRole, displayTime, displayLabel
         }
 
         init(id: Int, tripId: Int? = nil, type: String, title: String, startDate: String? = nil,
              startTime: String? = nil, startTz: String? = nil, endDate: String? = nil, endTime: String? = nil,
              endTz: String? = nil, location: String? = nil, address: String? = nil, provider: String? = nil,
              bookingReference: String? = nil, icon: String? = nil, color: String? = nil, status: String? = nil,
-             lat: Double? = nil, lon: Double? = nil, summary: [KeyValue] = []) {
+             lat: Double? = nil, lon: Double? = nil, summary: [KeyValue] = [],
+             dayRole: String? = nil, displayTime: String? = nil, displayLabel: String? = nil) {
+            self.dayRole = dayRole; self.displayTime = displayTime; self.displayLabel = displayLabel
             self.id = id; self.tripId = tripId; self.type = type; self.title = title
             self.startDate = startDate; self.startTime = startTime; self.startTz = startTz
             self.endDate = endDate; self.endTime = endTime; self.endTz = endTz
@@ -111,6 +118,9 @@ struct SharedSummary: Codable, Equatable {
             icon = c.tbString(.icon); color = c.tbString(.color); status = c.tbString(.status)
             lat = c.tbDouble(.lat); lon = c.tbDouble(.lon)
             summary = c.tbArray(.summary, of: KeyValue.self)
+            dayRole = c.tbString(.dayRole)
+            displayTime = c.tbString(.displayTime)
+            displayLabel = c.tbString(.displayLabel)
         }
 
         // Ableitungen
@@ -119,17 +129,58 @@ struct SharedSummary: Codable, Equatable {
         var iconName: String { SharedTypeCatalog.icon(type: type, override: icon) }
         var colorKey: String { SharedTypeCatalog.color(type: type, override: color) }
         var isProposal: Bool { status == "proposed" || status == "needs_review" }
-        var hasTime: Bool { SharedFormat.time(startTime) != nil }
-        var timeText: String? { SharedFormat.time(startTime) }
-        var dateText: String { SharedFormat.date(startDate) }
+        var isMiddle: Bool { dayRole == "middle" }
+
+        /// Angezeigte Uhrzeit: mit Rolle `displayTime` (bei `middle` keine), sonst `startTime`.
+        var timeText: String? {
+            dayRole != nil ? SharedFormat.time(displayTime) : SharedFormat.time(startTime)
+        }
+        var hasTime: Bool { timeText != nil }
+
+        /// Tag der Anzeige: bei `end` das Enddatum, sonst der Beginn.
+        var shownDate: String? { dayRole == "end" ? (endDate ?? startDate) : startDate }
+        var dateText: String { SharedFormat.date(shownDate) }
+
+        /// Beschriftung der Rolle («Check-in», «Check-out», «Aufenthalt», «Unterwegs»); ohne Server-Angabe aus dem Katalog.
+        var roleLabel: String? {
+            if let displayLabel, !displayLabel.isEmpty { return displayLabel }
+            switch dayRole {
+            case "start": return catalog.startLabel.isEmpty ? nil : catalog.startLabel
+            case "end": return catalog.endLabel.isEmpty ? nil : catalog.endLabel
+            case "middle": return catalog.icon == "bed" ? "Aufenthalt" : "Unterwegs"
+            default: return nil
+            }
+        }
+
+        /// Liegt dieses Ereignis am lokalen Tag `day` an (angezeigter Tag, `middle` an allen Tagen dazwischen)?
+        func appears(on day: String) -> Bool {
+            if isMiddle {
+                guard let s = startDate else { return false }
+                return s <= day && day <= (endDate ?? s)
+            }
+            return shownDate == day
+        }
 
         func startZone(fallback: TimeZone) -> TimeZone {
             if let startTz, let tz = TimeZone(identifier: startTz) { return tz }
             return fallback
         }
 
+        /// Zeitpunkt der Anzeige: bei `end` das Ende (Check-out, Ortszeit des Endes), bei `middle` keiner,
+        /// sonst der Beginn.
         func start(fallback: TimeZone = .current) -> Date? {
-            SharedFormat.moment(date: startDate, time: startTime, tz: startZone(fallback: fallback))
+            switch dayRole {
+            case "middle":
+                return nil
+            case "end":
+                var tz = startZone(fallback: fallback)
+                if let endTz, let z = TimeZone(identifier: endTz) { tz = z }
+                return SharedFormat.moment(date: endDate ?? startDate, time: displayTime ?? endTime, tz: tz)
+            case .some:
+                return SharedFormat.moment(date: startDate, time: displayTime ?? startTime, tz: startZone(fallback: fallback))
+            case .none:
+                return SharedFormat.moment(date: startDate, time: startTime, tz: startZone(fallback: fallback))
+            }
         }
 
         func end(fallback: TimeZone = .current) -> Date? {
@@ -393,11 +444,40 @@ struct SharedTripDetail: Decodable {
     func summary(now: Date = Date(), keeping limit: Int = 40) -> SharedSummary {
         let zone = trip.zone
         let day = SharedFormat.isoDay(now, in: zone)
-        let sorted = events
-            .filter { $0.startDate != nil && !$0.isProposal }
-            .map { e -> SharedSummary.Event in var e = e; e.tripId = e.tripId ?? trip.id; return e }
-            .sorted { ($0.startDate ?? "", $0.startTime ?? "99:99") < ($1.startDate ?? "", $1.startTime ?? "99:99") }
-        let upcoming = sorted.filter { ($0.startDate ?? "") >= day || ($0.endDate ?? "") >= day }
+        let multiDay: Set<String> = ["Hotel", "Unterkunft", "Mietauto", "Visum"]
+        var upcoming: [SharedSummary.Event] = []
+        for original in events where original.startDate != nil && !original.isProposal {
+            var e = original
+            e.tripId = e.tripId ?? trip.id
+            let start = e.startDate ?? day
+            let end = e.endDate ?? start
+            let isMulti = end > start && multiDay.contains(SharedTypeCatalog.info(for: e.type).id)
+            guard isMulti else {
+                if e.dayRole == nil { e.dayRole = "single" }
+                if e.displayTime == nil { e.displayTime = e.startTime }
+                if end >= day || start >= day { upcoming.append(e) }
+                continue
+            }
+            let info = SharedTypeCatalog.info(for: e.type)
+            if start >= day {
+                var s = e; s.dayRole = "start"; s.displayTime = e.startTime; s.displayLabel = info.startLabel
+                upcoming.append(s)
+            }
+            if start < day && day <= end && end > day {
+                var m = e; m.dayRole = "middle"; m.displayTime = nil
+                m.displayLabel = info.icon == "bed" ? "Aufenthalt" : "Unterwegs"
+                upcoming.append(m)
+            }
+            if end >= day {
+                var x = e; x.dayRole = "end"; x.displayTime = e.endTime; x.displayLabel = info.endLabel
+                upcoming.append(x)
+            }
+        }
+        upcoming.sort { a, b in
+            let ka = (a.isMiddle ? day : (a.shownDate ?? ""), a.isMiddle ? "99:99" : (a.timeText ?? "00:00"))
+            let kb = (b.isMiddle ? day : (b.shownDate ?? ""), b.isMiddle ? "99:99" : (b.timeText ?? "00:00"))
+            return ka < kb
+        }
         var t = trip
         t.phase = trip.phase(on: day)
         let progress = trip.dayProgress(on: day)

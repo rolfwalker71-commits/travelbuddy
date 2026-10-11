@@ -334,6 +334,21 @@ struct TripEvent: Codable, Equatable, Hashable, Sendable, Identifiable {
     var fieldsMeta: [String: FieldMeta] = [:]
     var sourceDocumentId: Int?
     var places: [EventPlace] = []
+    /// Tagesrolle, Anzeigezeit und -beschriftung am betrachteten Tag (`/v1/today`, `/v1/trips/:id/day/:date`, Summary).
+    var dayRole: DayRole?
+    var displayTime: String?
+    var displayLabel: String?
+}
+
+/// Rolle eines Ereignisses an einem Kalendertag: eintägig `single`; mehrtägig am ersten Tag `start`, am letzten `end`,
+/// dazwischen `middle`.
+enum DayRole: String, Codable, Sendable {
+    case single, start, middle, end
+
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = DayRole(rawValue: raw) ?? .single
+    }
 }
 
 extension TripEvent {
@@ -376,6 +391,9 @@ extension TripEvent {
         fieldsMeta = (try? c.decodeIfPresent([String: FieldMeta].self, forKey: .fieldsMeta)) ?? [:]
         sourceDocumentId = try c.decodeIfPresent(Int.self, forKey: .sourceDocumentId)
         places = (try? c.decodeIfPresent([EventPlace].self, forKey: .places)) ?? []
+        dayRole = try? c.decodeIfPresent(DayRole.self, forKey: .dayRole)
+        displayTime = try c.decodeIfPresent(String.self, forKey: .displayTime)
+        displayLabel = try c.decodeIfPresent(String.self, forKey: .displayLabel)
     }
 
     // MARK: Abgeleitetes
@@ -389,30 +407,29 @@ extension TripEvent {
     }
 
     /// Orte für die Karte: `places` vom Server, sonst aus Ereignis und Typ-Feldern abgeleitet (ältere Stände, offline).
+    /// Katalog Version 2 liefert je Ort ein Adressfeld (`pickupAddress`, `returnAddress`, …).
     var resolvedPlaces: [EventPlace] {
         if !places.isEmpty { return places }
         var out: [EventPlace] = []
         let pairs: [(String, String, String)] = [
-            ("pickupPlace", "pickup", "Abholung"), ("returnPlace", "return", "Rückgabe"),
-            ("originPlace", "start", "Start"), ("destinationPlace", "end", "Ziel"),
+            ("pickupPlace", "pickup", "pickupAddress"), ("returnPlace", "return", "returnAddress"),
+            ("originPlace", "start", "originAddress"), ("destinationPlace", "end", "destinationAddress"),
+            ("terminal", "venue", "terminalAddress"), ("venue", "venue", "venueAddress"),
         ]
-        let typed = pairs.compactMap { key, role, _ -> EventPlace? in
-            guard let text = detail(key) else { return nil }
-            return EventPlace(role: role, label: text, address: nil, lat: nil, lon: nil)
+        for (key, role, addressKey) in pairs {
+            let label = detail(key), addr = detail(addressKey)
+            if label == nil && addr == nil { continue }
+            if out.contains(where: { $0.role == role && role == "venue" }) { continue }
+            out.append(EventPlace(role: role, label: label, address: addr, lat: nil, lon: nil))
         }
-        if (address != nil || location != nil || hasCoordinate) && typed.isEmpty {
-            out.append(EventPlace(role: "venue", label: location, address: address, lat: lat, lon: lon))
-        } else if !typed.isEmpty {
-            out = typed
-            // Hauptort (Adresse/Koordinate) dem ersten typisierten Ort zuordnen, wenn dort nichts steht.
-            if hasCoordinate || address != nil, !out.isEmpty {
-                out[0].address = address
-                out[0].lat = lat
-                out[0].lon = lon
+        if out.isEmpty {
+            if address != nil || location != nil || hasCoordinate {
+                out.append(EventPlace(role: "venue", label: location, address: address, lat: lat, lon: lon))
             }
-        }
-        if let venue = detail("venue"), out.isEmpty {
-            out.append(EventPlace(role: "venue", label: venue, address: address, lat: lat, lon: lon))
+        } else if (hasCoordinate || address != nil), out[0].address == nil || !out[0].hasCoordinate {
+            // Hauptort (Adresse/Koordinate des Ereignisses) dem ersten Ort zuordnen, wenn dort nichts steht.
+            if out[0].address == nil { out[0].address = address }
+            if !out[0].hasCoordinate { out[0].lat = lat; out[0].lon = lon }
         }
         return out
     }
@@ -643,6 +660,10 @@ struct EventBody: Encodable, Equatable, Sendable {
 
 struct TripCommentBody: Encodable, Equatable, Sendable {
     var body: String
+}
+
+struct AttachDocumentBody: Encodable, Equatable, Sendable {
+    var documentId: Int
 }
 
 struct MergeBody: Encodable, Equatable, Sendable {

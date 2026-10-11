@@ -23,10 +23,12 @@ enum SharedSampleData {
             id: 1, title: "Ferien 2026", destination: "Barcelona → Florida", startDate: start, endDate: end,
             phase: "active", timezone: zone.identifier, ledgerId: 1, dayIndex: 3, dayCount: 29)
         let events: [SharedSummary.Event] = [
-            .init(id: 11, tripId: 1, type: "Hotel", title: "Check-out Hotel Negresco", startDate: checkout.day,
-                  startTime: checkout.time, startTz: zone.identifier, location: "Negresco Princess 4*",
-                  bookingReference: "HN48271", icon: "bed", color: "stay",
-                  summary: [.init(label: "Zimmer", value: "412")]),
+            // Hotel am Abreisetag: Rolle `end`, angezeigt wird das Check-out; Start-Felder bleiben die ursprünglichen.
+            .init(id: 11, tripId: 1, type: "Hotel", title: "Hotel Negresco", startDate: start, startTime: "15:00",
+                  startTz: zone.identifier, endDate: checkout.day, endTime: checkout.time, endTz: zone.identifier,
+                  location: "Negresco Princess 4*", bookingReference: "HN48271", icon: "bed", color: "stay",
+                  summary: [.init(label: "Zimmer", value: "412")],
+                  dayRole: "end", displayTime: checkout.time, displayLabel: "Check-out"),
             .init(id: 12, tripId: 1, type: "Kreuzfahrt", title: "Einschiffung", startDate: boarding.day,
                   startTime: boarding.time, startTz: zone.identifier, location: "Terminal Port Nou",
                   bookingReference: "RCI7KQ4", icon: "ship", color: "ship",
@@ -36,8 +38,13 @@ enum SharedSampleData {
                   bookingReference: "RCI7KQ4", icon: "ship", color: "ship"),
             .init(id: 14, tripId: 1, type: "Restaurant", title: "Abendessen Bord", startDate: dinner.day,
                   startTime: dinner.time, startTz: zone.identifier, location: "Hauptrestaurant", icon: "fork", color: "food"),
+            // Gesamtreise der Kreuzfahrt: ohne Uhrzeit, an allen Tagen `middle`.
+            .init(id: 16, tripId: 1, type: "Kreuzfahrt", title: "Legend of the Seas", startDate: start, startTz: zone.identifier,
+                  endDate: end, location: "13 Nächte", bookingReference: "RCI7KQ4", icon: "ship", color: "ship",
+                  dayRole: "middle", displayTime: nil, displayLabel: "Unterwegs"),
             .init(id: 15, tripId: 1, type: "Ausflug", title: "Palma de Mallorca", startDate: tomorrow, startTime: "07:30",
-                  startTz: zone.identifier, location: "Hafentag, 07:30–15:30", icon: "map", color: "activity"),
+                  startTz: zone.identifier, location: "Hafentag, 07:30–15:30", icon: "map", color: "activity",
+                  dayRole: "single", displayTime: "07:30"),
         ]
         return SharedSummary(
             generatedAt: ISO8601DateFormatter().string(from: now), activeTrip: trip, nextTrip: nil,
@@ -55,10 +62,13 @@ enum SharedSampleData {
             id: 21, tripId: 2, type: "Flug", title: "Flug ZRH → LIS", startDate: startDay, startTime: "07:45",
             startTz: "Europe/Zurich", endDate: startDay, endTime: "09:50", endTz: "Europe/Lisbon", location: "Zürich, Terminal 2",
             bookingReference: "X7K4QP", icon: "plane", color: "air",
-            summary: [.init(label: "Flug", value: "LX 2086"), .init(label: "Gate", value: "B42"), .init(label: "Sitz", value: "12C")])
+            summary: [.init(label: "Flug", value: "LX 2086"), .init(label: "Gate", value: "B42"), .init(label: "Sitz", value: "12C")],
+            dayRole: "single", displayTime: "07:45")
         let hotel = SharedSummary.Event(
             id: 22, tripId: 2, type: "Hotel", title: "Check-in Hotel Avenida", startDate: startDay, startTime: "15:00",
-            startTz: "Europe/Lisbon", location: "Avenida da Liberdade", bookingReference: "AV55120", icon: "bed", color: "stay")
+            startTz: "Europe/Lisbon", endDate: endDay, endTime: "11:00", endTz: "Europe/Lisbon",
+            location: "Avenida da Liberdade", bookingReference: "AV55120", icon: "bed", color: "stay",
+            dayRole: "start", displayTime: "15:00", displayLabel: "Check-in")
         return SharedSummary(
             generatedAt: ISO8601DateFormatter().string(from: now), activeTrip: nil, nextTrip: trip,
             nextEvents: [flight, hotel], today: nil, ledger: nil)

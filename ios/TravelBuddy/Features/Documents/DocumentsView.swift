@@ -229,12 +229,14 @@ struct DocumentDetailView: View {
     }
 
     private func attach(_ d: TBDocument, to event: TripEvent) async {
-        var ids = event.documentIds
-        if !ids.contains(d.id) { ids.append(d.id) }
         do {
-            try await store.updateEvent(tripID: tripID, eventID: event.id, body: EventBody(["documentIds": .array(ids.map { .int($0) })]))
+            try await store.api.attachDocument(tripID: tripID, eventID: event.id, documentID: d.id)
+            await store.refreshDetail(id: tripID)
             attachMessage = "Zugeordnet: \(event.title)"
-        } catch { attachMessage = error.writeMessage }
+        } catch {
+            attachMessage = (error as? APIError)?.code == "forbidden"
+                ? "Nur Administratoren können Dokumente Ereignissen zuordnen." : error.writeMessage
+        }
     }
 }
 

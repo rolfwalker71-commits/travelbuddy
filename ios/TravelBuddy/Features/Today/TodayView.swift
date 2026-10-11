@@ -31,10 +31,6 @@ struct TodayView: View {
                 TodayHero(plan: plan, now: context.date.addingTimeInterval(AppClock.offset))
             }
             TodayDayBandCard(plan: plan)
-            if !plan.ongoing.isEmpty {
-                SectionHeader("Unterkunft und Reise")
-                ForEach(plan.ongoing) { entry in TodayEntryCard(entry: entry, plan: plan) }
-            }
             SectionHeader("Heute", trailing: TBDate.display(plan.date))
             if plan.entries.isEmpty {
                 PlainCard {
@@ -48,6 +44,10 @@ struct TodayView: View {
                         }
                     }
                 }
+            }
+            if !plan.ongoing.isEmpty {
+                SectionHeader("Aufenthalt und Reise")
+                ForEach(plan.ongoing) { entry in TodayEntryCard(entry: entry, plan: plan) }
             }
             if !plan.tomorrow.isEmpty {
                 SectionHeader("Morgen", trailing: TBDate.display(TBDate.addDays(1, to: plan.date) ?? plan.date))
@@ -94,7 +94,7 @@ struct TodayHero: View {
             VStack(alignment: .leading, spacing: 4) {
                 if let trip {
                     let dayText = (trip.dayIndex != nil && trip.dayCount != nil) ? " · Tag \(trip.dayIndex!) von \(trip.dayCount!)" : ""
-                    TBLabel("\(trip.title)\(dayText)", color: Palette.heroInk.opacity(0.7))
+                    TBLabel("\(trip.title)\(dayText)", color: Palette.heroInk.opacity(0.7)).lineLimit(2)
                 }
                 Text(TBDate.longDay(plan.date)).tbTitle(26, weight: .bold, relativeTo: .title, color: Palette.heroInk)
                 HStack(spacing: 6) {
@@ -139,22 +139,22 @@ struct TodayHero: View {
 extension TodayEntry {
     /// Ereignistitel mit Rolle: «Check-out Hotel Negresco», «Abflug ZRH → BCN».
     func title(in plan: TodayPlan) -> String {
+        if role == .ongoing { return event.title }
         let catalog = EventCatalogLoader.shared
         let t = catalog.typeOrFallback(for: event.type)
-        let label = role == .end ? t.endLabel : t.startLabel
-        if role == .ongoing { return event.title }
-        if ["Flug"].contains(event.type), let a = event.detail("departureAirport"), let b = event.detail("arrivalAirport") {
+        let label = self.label ?? (role == .end ? t.endLabel : t.startLabel)
+        if event.type == "Flug", role != .end, let a = event.detail("departureAirport"), let b = event.detail("arrivalAirport") {
             return "\(label) \(a) → \(b)"
         }
-        if event.title.lowercased().hasPrefix(label.lowercased()) || label.isEmpty { return event.title }
-        if ["Hotel", "Unterkunft", "Mietauto"].contains(event.type) { return "\(label) \(event.title)" }
+        if label.isEmpty || event.title.lowercased().hasPrefix(label.lowercased()) { return event.title }
+        if role == .end || ["Hotel", "Unterkunft", "Mietauto"].contains(event.type) { return "\(label) \(event.title)" }
         return event.title
     }
 
     /// Zeit (mit Ortszeit-Hinweis) und Ort.
     func subtitle(in plan: TodayPlan) -> String? {
         var parts: [String] = []
-        if let time { parts.append(TripClock.timeLabel(time, zoneID: zoneID, tripZoneID: plan.zoneID)) }
+        if let time { parts.append(TripClock.timeLabel(time, zoneID: zoneID, tripZoneID: plan.zoneID, at: instant ?? Date())) }
         if let place = event.location ?? event.provider, !event.title.localizedCaseInsensitiveContains(place) { parts.append(place) }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
@@ -216,11 +216,13 @@ struct TodayEntryCard: View {
                         if let time = entry.time {
                             Text(time).tbMono(30, weight: .semibold, relativeTo: .largeTitle)
                         } else {
-                            Text("ganztägig").tbMono(14, weight: .medium, relativeTo: .subheadline, color: Palette.mute)
+                            Text(entry.label ?? "ohne Zeit").textCase(.uppercase)
+                                .tbMono(13, weight: .medium, relativeTo: .footnote, color: Palette.mute)
+                                .frame(maxWidth: 96, alignment: .leading)
                         }
                         VStack(alignment: .leading, spacing: 2) {
                             Text(entry.title(in: plan)).tbTitle(20, weight: .semibold, relativeTo: .title3)
-                            if let z = entry.zoneID, z != plan.zoneID, entry.time != nil {
+                            if let z = entry.zoneID, TripClock.differs(z, from: plan.zoneID, at: entry.instant ?? Date()), entry.time != nil {
                                 Text("Ortszeit \(TripClock.placeName(z))").tbText(13, color: Palette.mute)
                             }
                             if let place = event.location ?? event.address, !event.title.localizedCaseInsensitiveContains(place) {

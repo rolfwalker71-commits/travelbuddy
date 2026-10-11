@@ -185,6 +185,25 @@ final class DemoAPI: TravelAPI, @unchecked Sendable {
         try check()
         return try mutate(tripID) { $0.events.removeAll { $0.id == eventID } }
     }
+    func attachDocument(tripID: Int, eventID: Int, documentID: Int) async throws {
+        try check()
+        _ = try mutate(tripID) { d in
+            if let i = d.events.firstIndex(where: { $0.id == eventID }), !d.events[i].documentIds.contains(documentID) {
+                d.events[i].documentIds.append(documentID)
+            }
+        }
+    }
+
+    func detachDocument(tripID: Int, eventID: Int, documentID: Int) async throws {
+        try check()
+        _ = try mutate(tripID) { d in
+            if let i = d.events.firstIndex(where: { $0.id == eventID }) {
+                d.events[i].documentIds.removeAll { $0 == documentID }
+                d.events[i].documents.removeAll { $0.id == documentID }
+            }
+        }
+    }
+
     func addComment(tripID: Int, eventID: Int, body: String) async throws -> TripComment {
         try check()
         return with {
@@ -218,6 +237,13 @@ final class DemoAPI: TravelAPI, @unchecked Sendable {
         let ledger = TodayLedger(id: d.trip.ledgerId ?? 0, balanceMinor: 21_500, currency: "CHF")
         return TodayPlanner.response(from: d, now: now, myParticipantId: me, ledger: ledger)
     }
+    func day(tripID: Int, date: String) async throws -> TodayResponse {
+        try check()
+        guard let d = with({ trips[tripID] }) else { throw APIError.server(status: 404, code: "not_found", message: "Reise nicht gefunden.") }
+        let at = TripClock.instant(date: date, time: "12:00", zone: d.trip.zone) ?? now
+        return TodayPlanner.response(from: d, now: at, myParticipantId: d.travelers.first { $0.userId == Self.user.id }?.id)
+    }
+
     func summaryData() async throws -> Data {
         try check()
         return Data("{\"generatedAt\":\"\(ISO8601DateFormatter().string(from: now))\",\"nextEvents\":[]}".utf8)
@@ -416,17 +442,26 @@ struct DemoFixtures {
                       "destinationPlace": "Terminal Port Nou, Barcelona", "durationMinutes": 25],
             places: [EventPlace(role: "start", label: "Hotel Negresco Princess", address: "Carrer de Pere IV 5", lat: 41.4021, lon: 2.1940),
                      EventPlace(role: "end", label: "Terminal Port Nou", address: "Moll Adossat, 08039 Barcelona", lat: 41.3566, lon: 2.1573)]))
+        // Gesamtreise ohne Uhrzeit («Reise»): an allen Tagen «Unterwegs».
         events.append(TripEvent(
             id: 104, tripId: 1, type: "Kreuzfahrt", title: "Legend of the Seas", startDate: day(0), endDate: day(26),
-            startTime: "13:30", endTime: "07:00", startTz: "Europe/Madrid", endTz: "America/New_York", location: "Terminal Port Nou", address: "Moll Adossat, 08039 Barcelona",
-            provider: "Royal Caribbean", bookingReference: "LS88-4410",
+            startTz: "Europe/Madrid", endTz: "America/New_York", location: "Terminal Port Nou",
+            address: "Moll Adossat, 08039 Barcelona", provider: "Royal Caribbean", bookingReference: "LS88-4410",
             lat: 41.3566, lon: 2.1573,
-            details: ["entryKind": "Reise", "ship": "Legend of the Seas", "cabin": "8042", "deck": "8", "terminal": "Port Nou, Terminal B",
-                      "allAboard": "16:30", "emergencyPhone": "+34 900 000 000"],
+            details: ["entryKind": "Reise", "ship": "Legend of the Seas", "cabin": "8042", "deck": "8",
+                      "terminal": "Port Nou, Terminal B", "allAboard": "16:30", "emergencyPhone": "+34 900 000 000"],
             documents: [TBDocument(id: 1, title: "Reiseunterlagen Kreuzfahrt", fileName: "kreuzfahrt.pdf", pages: 6, analysisStatus: .done, tripIds: [1], eventIds: [104])],
             participantIds: [1, 2, 3, 4], priceMinor: 1_840_000, currency: "CHF", paymentStatus: .deposit, cancelUntil: day(5),
             places: [EventPlace(role: "start", label: "Terminal Port Nou", address: "Moll Adossat, 08039 Barcelona", lat: 41.3566, lon: 2.1573),
                      EventPlace(role: "end", label: "Port Miami", address: "1015 N America Way, Miami", lat: 25.7787, lon: -80.1730)]))
+        events.append(TripEvent(
+            id: 110, tripId: 1, type: "Kreuzfahrt", title: "Einschiffung Barcelona", startDate: day(0), startTime: "13:30",
+            startTz: "Europe/Madrid", location: "Terminal Port Nou", address: "Moll Adossat, 08039 Barcelona",
+            provider: "Royal Caribbean", bookingReference: "LS88-4410", lat: 41.3566, lon: 2.1573,
+            details: ["entryKind": "Einschiffung", "ship": "Legend of the Seas", "cabin": "8042",
+                      "terminal": "Port Nou, Terminal B", "allAboard": "16:30"],
+            participantIds: [1, 2, 3, 4],
+            places: [EventPlace(role: "venue", label: "Terminal Port Nou", address: "Moll Adossat, 08039 Barcelona", lat: 41.3566, lon: 2.1573)]))
         events.append(TripEvent(
             id: 105, tripId: 1, type: "Ausflug", title: "Palma de Mallorca", startDate: day(1), endDate: day(1), startTime: "07:30",
             endTime: "15:30", startTz: "Europe/Madrid", location: "Palma de Mallorca", lat: 39.5696, lon: 2.6502,

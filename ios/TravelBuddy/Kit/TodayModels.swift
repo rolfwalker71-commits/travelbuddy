@@ -94,6 +94,68 @@ struct TodayResponse: Codable, Equatable, Sendable {
     }
 }
 
+// MARK: - Tagesrolle
+
+/// Wie ein Ereignis an einem Tag erscheint: Rolle, angezeigte Zeit (Wanduhr), Beschriftung und Zone dieser Zeit.
+struct DayDisplay: Equatable, Sendable {
+    var role: DayRole
+    var time: String?
+    var label: String?
+    var zoneID: String?
+}
+
+/// Regeln für die Tagesrolle (Vertrag «Tagesrolle mehrtägiger Ereignisse»). Der Server liefert `dayRole`,
+/// `displayTime`, `displayLabel`; offline und für ältere Stände rechnet die App dieselben Regeln aus den Daten.
+enum DayRules {
+    static let stayTypes: Set<String> = ["Hotel", "Unterkunft"]
+
+    /// `nil`, wenn das Ereignis den Tag nicht berührt (oder kein Startdatum hat).
+    static func display(for e: TripEvent, on day: String, catalog: EventCatalog) -> DayDisplay? {
+        guard let start = e.startDate else { return nil }
+        let type = catalog.typeOrFallback(for: e.type)
+        let end = (e.endDate ?? start) < start ? start : (e.endDate ?? start)
+        guard day >= start, day <= end else { return nil }
+
+        // Kreuzfahrt «Reise»: Gesamtreise ohne Zeit, an allen Tagen «Unterwegs».
+        if e.type == "Kreuzfahrt", e.detail("entryKind") == "Reise" {
+            return DayDisplay(role: .middle, time: nil, label: "Unterwegs", zoneID: nil)
+        }
+        if end == start {
+            // Eintägig: keine Beschriftung (der Server liefert `null`; die Anzeige nimmt bei Bedarf `startLabel`).
+            return DayDisplay(role: .single, time: e.startTime, label: nil, zoneID: e.startTz)
+        }
+        if day == start {
+            return DayDisplay(role: .start, time: e.startTime, label: nonEmpty(type.startLabel), zoneID: e.startTz)
+        }
+        if day == end {
+            return DayDisplay(role: .end, time: e.endTime, label: nonEmpty(type.endLabel), zoneID: e.endTz ?? e.startTz)
+        }
+        return DayDisplay(role: .middle, time: nil, label: stayTypes.contains(e.type) ? "Aufenthalt" : "Unterwegs", zoneID: nil)
+    }
+
+    /// Serverfelder gehen vor; fehlen sie, gilt die eigene Berechnung.
+    static func resolve(_ e: TripEvent, on day: String, catalog: EventCatalog) -> DayDisplay? {
+        if let role = e.dayRole {
+            let computed = display(for: e, on: day, catalog: catalog)
+            return DayDisplay(role: role, time: e.displayTime, label: e.displayLabel ?? computed?.label,
+                              zoneID: role == .end ? (e.endTz ?? e.startTz) : (role == .middle ? nil : e.startTz))
+        }
+        return display(for: e, on: day, catalog: catalog)
+    }
+
+    private static func nonEmpty(_ s: String) -> String? { s.isEmpty ? nil : s }
+
+    /// Ereignis mit gesetzten Anzeigefeldern (so, wie der Server es liefert).
+    static func annotated(_ e: TripEvent, on day: String, catalog: EventCatalog) -> TripEvent {
+        guard let d = display(for: e, on: day, catalog: catalog) else { return e }
+        var copy = e
+        copy.dayRole = d.role
+        copy.displayTime = d.time
+        copy.displayLabel = d.label
+        return copy
+    }
+}
+
 // MARK: - Aufbereitung
 
 /// Eine Zeile des Tages: ein Ereignis in seiner Rolle (Beginn, Ende, läuft) mit Zeitpunkt.
@@ -106,6 +168,8 @@ struct TodayEntry: Identifiable, Equatable, Sendable {
     let time: String?
     let zoneID: String?
     let instant: Date?
+    /// Beschriftung: «Check-out», «Abflug», «Aufenthalt» …
+    var label: String?
 
     var id: String { "\(event.id)-\(role.rawValue)" }
 }
@@ -119,9 +183,9 @@ struct TodayPlan: Equatable, Sendable {
     var generatedAt: Date?
     /// Stand stammt aus dem lokalen Zwischenspeicher, nicht vom Server.
     var isOffline = false
-    /// Läuft über den Tag (Unterkunft, Mietauto, Kreuzfahrt), ohne feste Uhrzeit.
+    /// Läuft über den Tag (Aufenthalt, Mietauto, Reise), ohne Uhrzeit; steht in der Liste unten.
     var ongoing: [TodayEntry] = []
-    /// Chronologisch, nur Einträge mit oder ohne Uhrzeit des heutigen Tages.
+    /// Einträge des Tages: ohne Uhrzeit zuerst, dann chronologisch nach angezeigtem Zeitpunkt.
     var entries: [TodayEntry] = []
     var tomorrow: [TodayEntry] = []
     var next: TodayEntry?
@@ -151,8 +215,6 @@ struct TodayPlan: Equatable, Sendable {
 }
 
 enum TodayPlanner {
-    static let stayTypes: Set<String> = ["Hotel", "Unterkunft", "Mietauto", "Kreuzfahrt"]
-
     /// Aus der Serverantwort die Anzeige bauen. `now` ist der Zeitpunkt der Anzeige (nicht `generatedAt`).
     static func plan(from response: TodayResponse, catalog: EventCatalog, now: Date = Date(),
                      isOffline: Bool = false) -> TodayPlan {
@@ -162,58 +224,64 @@ enum TodayPlanner {
         var plan = TodayPlan(trip: response.trip, upcoming: response.upcoming, date: date, zoneID: zoneID,
                              generatedAt: response.generatedAt.flatMap(TBDate.parseTimestamp), isOffline: isOffline)
 
-        let built = entries(for: response.events, date: date, zone: zone)
+        let built = entries(for: response.events, date: date, zone: zone, catalog: catalog)
         plan.ongoing = built.filter { $0.role == .ongoing }
         plan.entries = built.filter { $0.role != .ongoing }
         let tomorrowDate = TBDate.addDays(1, to: date) ?? date
-        plan.tomorrow = entries(for: response.tomorrow, date: tomorrowDate, zone: zone).filter { $0.role != .ongoing }
+        plan.tomorrow = entries(for: response.tomorrow, date: tomorrowDate, zone: zone, catalog: catalog).filter { $0.role != .ongoing }
         plan.tasks = response.tasks
         plan.deadlines = response.deadlines
         plan.review = response.review
         plan.ledger = response.ledger
 
-        // Als Nächstes: erster Eintrag mit Zeitpunkt ab jetzt, sonst der erste von morgen.
-        plan.next = plan.entries.first { ($0.instant ?? .distantPast) >= now }
-            ?? plan.tomorrow.first { $0.instant != nil }
-        if plan.next == nil, let n = response.next, let first = entries(for: [n], date: date, zone: zone).first {
-            plan.next = first
+        // Als Nächstes: die Serverangabe, solange sie nicht überholt ist; sonst der erste Eintrag mit Zeitpunkt ab jetzt,
+        // sonst der erste von morgen. Bei mehrtägigen Ereignissen zählt auch das Ende (Check-out).
+        let computed = plan.entries.first { ($0.instant ?? .distantPast) >= now }
+            ?? plan.tomorrow.first { ($0.instant ?? .distantPast) >= now }
+        if let n = response.next, let entry = entry(for: n, on: date, zone: zone, catalog: catalog),
+           let t = entry.instant, t >= now, computed.map({ ($0.instant ?? .distantFuture) >= t }) ?? true {
+            plan.next = entry
+        } else {
+            plan.next = computed
         }
         return plan
     }
 
-    /// Einträge für Ereignisse an einem Kalendertag, chronologisch nach Zeitpunkt, Einträge ohne Zeit zuletzt.
-    static func entries(for events: [TripEvent], date: String, zone: TimeZone) -> [TodayEntry] {
-        var out: [TodayEntry] = []
-        for e in events where e.type != "Aufgabe" {
-            let startsToday = e.startDate == date
-            let endsToday = e.endDate == date && e.startDate != date
-            if startsToday {
-                let z = e.startZone(trip: zone)
-                out.append(TodayEntry(event: e, role: .start, time: e.startTime, zoneID: e.startTz,
-                                      instant: e.startTime == nil ? nil : TripClock.instant(date: e.startDate, time: e.startTime, zone: z)))
-            } else if endsToday {
-                let z = e.endZone(trip: zone)
-                out.append(TodayEntry(event: e, role: .end, time: e.endTime, zoneID: e.endTz ?? e.startTz,
-                                      instant: e.endTime == nil ? nil : TripClock.instant(date: e.endDate, time: e.endTime, zone: z)))
-            } else if let s = e.startDate, s < date, let end = e.endDate, end > date {
-                out.append(TodayEntry(event: e, role: .ongoing, time: nil, zoneID: nil, instant: nil))
-            } else if e.startDate == nil || e.startDate == date {
-                out.append(TodayEntry(event: e, role: .start, time: e.startTime, zoneID: e.startTz, instant: nil))
-            }
-        }
+    /// Einträge für Ereignisse an einem Kalendertag: ohne Uhrzeit zuerst, dann nach Zeitpunkt; laufende (`middle`) gruppiert.
+    static func entries(for events: [TripEvent], date: String, zone: TimeZone, catalog: EventCatalog) -> [TodayEntry] {
+        let out = events.filter { $0.type != "Aufgabe" }.compactMap { entry(for: $0, on: date, zone: zone, catalog: catalog) }
         return out.sorted { a, b in
+            if (a.role == .ongoing) != (b.role == .ongoing) { return b.role == .ongoing }
             switch (a.instant, b.instant) {
             case let (x?, y?): return x != y ? x < y : a.event.sortKey < b.event.sortKey
-            case (nil, _?): return false
-            case (_?, nil): return true
-            default: return a.event.sortKey != b.event.sortKey ? a.event.sortKey < b.event.sortKey : a.event.id < b.event.id
+            case (nil, _?): return true
+            case (_?, nil): return false
+            default:
+                if let ta = a.time, let tb = b.time, ta != tb { return ta < tb }
+                return a.event.sortKey != b.event.sortKey ? a.event.sortKey < b.event.sortKey : a.event.id < b.event.id
             }
         }
     }
 
-    /// Aus einer (zwischengespeicherten) Reise den Heute-Stand ableiten, ohne Server.
+    static func entry(for e: TripEvent, on date: String, zone: TimeZone, catalog: EventCatalog) -> TodayEntry? {
+        guard let d = DayRules.resolve(e, on: date, catalog: catalog) else {
+            // Ohne Datum: als «ohne Zeit» am heutigen Tag anzeigen.
+            if e.startDate == nil { return TodayEntry(event: e, role: .start, time: e.startTime, zoneID: e.startTz, instant: nil, label: nil) }
+            return nil
+        }
+        let role: TodayEntry.Role = d.role == .middle ? .ongoing : (d.role == .end ? .end : .start)
+        var instant: Date?
+        if let time = d.time, role != .ongoing {
+            let z = role == .end ? e.endZone(trip: zone) : e.startZone(trip: zone)
+            let instantDate = role == .end ? (e.endDate ?? date) : (e.startDate ?? date)
+            instant = TripClock.instant(date: instantDate, time: time, zone: z)
+        }
+        return TodayEntry(event: e, role: role, time: d.time, zoneID: d.zoneID, instant: instant, label: d.label)
+    }
+
+    /// Aus einer (zwischengespeicherten) Reise den Heute-Stand ableiten, ohne Server; dieselben Regeln wie der Server.
     static func response(from detail: TripDetail, now: Date = Date(), myParticipantId: Int? = nil,
-                         ledger: TodayLedger? = nil) -> TodayResponse {
+                         ledger: TodayLedger? = nil, catalog: EventCatalog = EventCatalogLoader.shared) -> TodayResponse {
         let trip = detail.trip
         let zone = trip.zone
         let today = TBDate.isoDay(of: now, in: zone)
@@ -222,13 +290,13 @@ enum TodayPlanner {
             guard let me = myParticipantId, !e.participantIds.isEmpty else { return true }
             return e.participantIds.contains(me)
         }
-        func touches(_ e: TripEvent, _ day: String) -> Bool {
-            if e.startDate == day || e.endDate == day { return true }
-            if let s = e.startDate, let end = e.endDate { return s < day && end > day && stayTypes.contains(e.type) }
-            return false
+        func on(_ day: String) -> [TripEvent] {
+            let list = visible.filter { $0.type != "Aufgabe" && DayRules.display(for: $0, on: day, catalog: catalog) != nil }
+                .map { DayRules.annotated($0, on: day, catalog: catalog) }
+            return TripTimeline.sort(list, tripZone: zone)
         }
-        let todayEvents = TripTimeline.sort(visible.filter { touches($0, today) && $0.type != "Aufgabe" }, tripZone: zone)
-        let tomorrowEvents = TripTimeline.sort(visible.filter { ($0.startDate == tomorrow || $0.endDate == tomorrow) && $0.type != "Aufgabe" }, tripZone: zone)
+        let todayEvents = on(today)
+        let tomorrowEvents = on(tomorrow).filter { $0.dayRole != .middle }
         let tasks = visible.filter { $0.type == "Aufgabe" && $0.detail("done") != "true" && ($0.startDate ?? today) <= tomorrow }
             .map { TodayTask(eventId: $0.id, title: $0.title, dueDate: $0.startDate) }
         var deadlines: [TodayDeadline] = []
@@ -300,7 +368,9 @@ enum EventFacts {
 
         func add(_ key: String) {
             guard out.count < limit, !used.contains(key), let fact = fact(key, event: event, type: type,
-                                                                          catalog: catalog, participantId: participantId)
+                                                                          catalog: catalog, participantId: participantId),
+                  // Lange Texte (volle Adressen) gehören in die Buchungsdaten, nicht auf die grosse Kachel.
+                  fact.value.count <= 48
             else { return }
             used.insert(key)
             out.append(fact)

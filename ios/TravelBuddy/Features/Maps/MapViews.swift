@@ -124,28 +124,34 @@ struct EventMapCard: View {
         .font(TB.Font.title(14, weight: .semibold))
     }
 
-    /// Fehlende Koordinaten per MapKit auflösen; den Hauptort zusätzlich im Ereignis speichern.
+    /// Fehlende Koordinaten per MapKit auflösen und je Rolle im Ereignis speichern (`placeCoords`, Vertrag).
     private func resolveMissing() async {
         let missing = places.filter { !$0.hasCoordinate && resolved[$0.id] == nil }
-        guard !missing.isEmpty || (event.lat == nil && places.isEmpty) else { return }
+        guard !missing.isEmpty else { return }
         searching = true
         defer { searching = false }
         failedPlaces = []
-        for (index, p) in missing.enumerated() {
+        var found: [String: JSONValue] = [:]
+        for p in missing {
             guard let query = [p.address, p.label].compactMap({ $0 }).first(where: { !$0.isEmpty }) else { continue }
             let q = (p.address != nil && p.label != nil && p.address != p.label) ? "\(p.label!), \(p.address!)" : query
-            var found = await PlaceResolver.resolve(q)
-            if found == nil, q != query { found = await PlaceResolver.resolve(query) }
-            if let c = found {
+            var coordinate = await PlaceResolver.resolve(q)
+            if coordinate == nil, q != query { coordinate = await PlaceResolver.resolve(query) }
+            if let c = coordinate {
                 resolved[p.id] = c
-                if index == 0, event.lat == nil, event.lon == nil, !store.isOffline {
-                    // Hauptort speichern; scheitert das (offline, gesperrt), bleibt die Karte trotzdem richtig.
-                    try? await store.updateEvent(tripID: event.tripId, eventID: event.id,
-                                                 body: EventBody(["lat": .double(c.latitude), "lon": .double(c.longitude)]))
-                }
+                found[p.role] = .object(["lat": .double(c.latitude), "lon": .double(c.longitude)])
             } else {
                 failedPlaces.insert(p.id)
             }
+        }
+        // Speichern; scheitert das (offline, gesperrt), bleibt die Karte trotzdem richtig.
+        if !found.isEmpty, !store.isOffline {
+            var body: [String: JSONValue] = ["placeCoords": .object(found)]
+            // Das Ereignis selbst hat noch keine Koordinate: den ersten Ort zusätzlich als Hauptkoordinate ablegen.
+            if event.lat == nil, event.lon == nil, let first = missing.first, let c = resolved[first.id] {
+                body["lat"] = .double(c.latitude); body["lon"] = .double(c.longitude)
+            }
+            try? await store.updateEvent(tripID: event.tripId, eventID: event.id, body: EventBody(body))
         }
     }
 }

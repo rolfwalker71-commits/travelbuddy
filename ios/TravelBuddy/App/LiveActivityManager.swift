@@ -23,7 +23,7 @@ enum LiveActivityContentBuilder {
         let remaining = entry.instant.map { $0.timeIntervalSince(now) }
 
         // Überschrift: «Abflug ZRH → BCN», sonst «Check-out Hotel Negresco».
-        let label = entry.role == .end ? type.endLabel : type.startLabel
+        let label = entry.label ?? (entry.role == .end ? type.endLabel : type.startLabel)
         let route: String? = {
             if let a = e.detail("departureAirport"), let b = e.detail("arrivalAirport") { return "\(a) → \(b)" }
             if let a = e.detail("originPlace"), let b = e.detail("destinationPlace") { return "\(a) → \(b)" }

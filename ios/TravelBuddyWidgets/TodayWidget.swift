@@ -56,6 +56,14 @@ private extension TravelSnapshot {
     }
 }
 
+private extension Array where Element == SharedSummary.Event {
+    /// Bis zu `limit` Einträge; ein mehrtägiger («Aufenthalt», «Unterwegs») behält seinen Platz am Ende der Liste.
+    func visible(limit: Int) -> [SharedSummary.Event] {
+        guard count > limit, let middle = first(where: \.isMiddle) else { return Array(prefix(limit)) }
+        return Array(filter { !$0.isMiddle }.prefix(limit - 1)) + [middle]
+    }
+}
+
 // MARK: - Mittel
 
 private struct MediumToday: View {
@@ -105,7 +113,7 @@ private struct MediumToday: View {
                         .foregroundStyle(TB.Palette.mute)
                     Spacer(minLength: 0)
                 } else {
-                    ForEach(Array(events.prefix(4)), id: \.id) { e in
+                    ForEach(events.visible(limit: 4), id: \.self) { e in
                         EventRow(event: e, isNext: e.id == next?.id)
                     }
                     if events.count > 4 {
@@ -133,7 +141,7 @@ private struct LargeToday: View {
         let events = snapshot.remainingEvents(on: entry.date)
         let next = snapshot.nextEvent(at: entry.date)
         let tomorrow = SharedFormat.isoDay(entry.date.addingTimeInterval(86_400), in: snapshot.zone)
-        let tomorrowEvents = snapshot.events(on: tomorrow)
+        let tomorrowEvents = snapshot.events(on: tomorrow).filter { !$0.isMiddle }
 
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
@@ -164,11 +172,11 @@ private struct LargeToday: View {
                     .padding(.top, 6)
             } else {
                 VStack(alignment: .leading, spacing: 9) {
-                    ForEach(Array(events.prefix(4)), id: \.id) { e in
+                    ForEach(events.visible(limit: 4), id: \.self) { e in
                         EventRow(event: e, isNext: e.id == next?.id, showsDetail: true, timeWidth: 48)
                     }
                     if events.count > 4 {
-                        Text("+ \(events.count - 4) weitere Ereignisse")
+                        Text(events.count - 4 == 1 ? "+ 1 weiteres Ereignis" : "+ \(events.count - 4) weitere Ereignisse")
                             .font(TB.Font.text(11.5, relativeTo: .caption))
                             .foregroundStyle(TB.Palette.mute)
                     }

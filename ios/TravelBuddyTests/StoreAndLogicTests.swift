@@ -176,14 +176,25 @@ struct LinkTests {
         #expect(r?.1 == .route)
     }
 
-    @Test func preferences() {
+    @Test func preferences() throws {
         var p = NotificationPrefs(raw: ["tripToday": false])
         #expect(!p.isOn(.today))
-        #expect(p.key(for: .today) == "tripToday")
         #expect(p.isOn(.depart))                    // unbekannt = an
         p.set(.depart, false)
-        #expect(p.key(for: .depart) == "trip.depart")
+        #expect(p.raw["tripDepart"] == .bool(false))
         #expect(!p.isOn(.depart))
+        // Vertragsschlüssel, genau so.
+        #expect(TripNotificationKind.allCases.map(\.prefKey) == [
+            "tripToday", "tripDepart", "tripStay", "tripPickup", "tripDeadline", "tripReview", "tripComment",
+            "ledgerExpense", "ledgerSettlement"])
+        // Ruhezeiten und Vorlaufzeiten.
+        #expect(p.quietHours == QuietHours(enabled: true, from: "22:30", to: "06:30"))   // Standard
+        let json = Data(#"{"quietHours":{"enabled":false,"from":"23:00","to":"07:00"},"leadTimes":{"departHours":[24,6],"checkoutMinutes":90,"deadlineDays":5,"todayBriefing":"08:00"}}"#.utf8)
+        let parsed = try JSONDecoder().decode([String: JSONValue].self, from: json)
+        let q = NotificationPrefs(raw: parsed)
+        #expect(q.quietHours == QuietHours(enabled: false, from: "23:00", to: "07:00"))
+        #expect(q.leadTimes.departHours == [24, 6])
+        #expect(q.leadTimes.checkoutMinutes == 90 && q.leadTimes.deadlineDays == 5 && q.leadTimes.todayBriefing == "08:00")
     }
 }
 

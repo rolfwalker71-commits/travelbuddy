@@ -201,7 +201,7 @@ struct EventRowView: View {
                 VStack(spacing: 2) {
                     if let t = event.startTime {
                         Text(t).tbMono(15, weight: .semibold, relativeTo: .subheadline)
-                        if let z = event.startTz, z != tripZoneID { Text(TripClock.placeName(z)).tbText(10, relativeTo: .caption2, color: Palette.mute).lineLimit(1) }
+                        if let z = event.startTz, TripClock.differs(z, from: tripZoneID) { Text(TripClock.placeName(z)).tbText(10, relativeTo: .caption2, color: Palette.mute).lineLimit(1) }
                     } else {
                         Text("–:–").tbMono(15, weight: .regular, relativeTo: .subheadline, color: Palette.mute)
                     }

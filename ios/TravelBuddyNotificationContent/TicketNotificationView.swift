@@ -199,9 +199,14 @@ struct TicketNotificationView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(Array(c.rows.prefix(5).enumerated()), id: \.offset) { _, r in
                         HStack(spacing: 9) {
-                            Text(r.time ?? "––:––")
-                                .font(TB.Font.mono(14, weight: r.isNext ? .semibold : .medium, relativeTo: .subheadline))
-                                .foregroundStyle(r.isNext ? TB.Palette.accent : TB.Palette.ink)
+                            let isTime = SharedFormat.hm(r.time) != nil
+                            Text(r.time ?? "ganztags")
+                                .font(isTime
+                                      ? TB.Font.mono(14, weight: r.isNext ? .semibold : .medium, relativeTo: .subheadline)
+                                      : TB.Font.title(11, weight: .semibold, relativeTo: .caption))
+                                .foregroundStyle(r.isNext ? TB.Palette.accent : (isTime ? TB.Palette.ink : TB.Palette.mute))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
                                 .frame(width: 52, alignment: .leading)
                             TBTypeBadge(icon: r.icon, colorKey: r.color, size: 22)
                             Text(r.title)

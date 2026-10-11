@@ -243,6 +243,14 @@ final class APIClient: TravelAPI, Sendable {
         try await send(.post, "/v1/trips/\(tripID)/events/\(eventID)/merge", body: MergeBody(intoEventId: targetID))
     }
 
+    func attachDocument(tripID: Int, eventID: Int, documentID: Int) async throws {
+        try await sendVoid(.post, "/v1/trips/\(tripID)/events/\(eventID)/documents", body: AttachDocumentBody(documentId: documentID))
+    }
+
+    func detachDocument(tripID: Int, eventID: Int, documentID: Int) async throws {
+        try await sendVoid(.delete, "/v1/trips/\(tripID)/events/\(eventID)/documents/\(documentID)")
+    }
+
     func addComment(tripID: Int, eventID: Int, body: String) async throws -> TripComment {
         let r: TripCommentResponse = try await send(
             .post, "/v1/trips/\(tripID)/events/\(eventID)/comments", body: TripCommentBody(body: body))
@@ -260,6 +268,10 @@ final class APIClient: TravelAPI, Sendable {
         if let date { q.append(URLQueryItem(name: "date", value: date)) }
         if let tz { q.append(URLQueryItem(name: "tz", value: tz)) }
         return try await send(.get, "/v1/today", query: q)
+    }
+
+    func day(tripID: Int, date: String) async throws -> TodayResponse {
+        try await send(.get, "/v1/trips/\(tripID)/day/\(date)")
     }
 
     func summaryData() async throws -> Data { try await rawData("/v1/summary", accept: "application/json").data }

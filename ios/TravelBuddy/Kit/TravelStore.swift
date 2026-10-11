@@ -170,7 +170,16 @@ final class TravelStore {
         let zone = TripClock.zone(active.timezone) ?? .current
         let now = AppClock.now
         do {
-            let response = try await api.today(date: TBDate.isoDay(of: now, in: zone), tz: zone.identifier)
+            let day = TBDate.isoDay(of: now, in: zone)
+            var response: TodayResponse
+            if AppClock.offset != 0 {
+                // Vorführuhr: der Server kennt «heute» nicht, die Tagesansicht der Reise schon.
+                response = try await api.day(tripID: active.id, date: day)
+            } else {
+                response = try await api.today(date: day, tz: zone.identifier)
+                // Der Server sieht keine aktive Reise, die App schon (Zonengrenze): Tagesansicht der Reise.
+                if response.trip == nil, let d = try? await api.day(tripID: active.id, date: day), d.trip != nil { response = d }
+            }
             let plan = TodayPlanner.plan(from: response, catalog: catalog, now: now)
             if plan.trip == nil, plan.upcoming == nil, plan.entries.isEmpty {
                 // Der Server kennt keine aktive Reise, die App aber schon (veralteter Zwischenspeicher).
@@ -198,7 +207,7 @@ final class TravelStore {
     /// Heute-Stand ohne Server: aus der zwischengespeicherten Reise, sonst aus dem letzten Heute-Stand.
     func offlineToday(trip: TripSummary, now: Date) -> (plan: TodayPlan, savedAt: Date?)? {
         if let d = details[trip.id] ?? cache.load(TripDetail.self, name: CacheKey.trip(trip.id))?.value {
-            let response = TodayPlanner.response(from: d, now: now, myParticipantId: d.travelers.first { $0.userId == user.id }?.id)
+            let response = TodayPlanner.response(from: d, now: now, myParticipantId: d.travelers.first { $0.userId == user.id }?.id, catalog: catalog)
             var plan = TodayPlanner.plan(from: response, catalog: catalog, now: now, isOffline: true)
             plan.isOffline = true
             return (plan, detailSavedAt[trip.id] ?? cache.load(TripDetail.self, name: CacheKey.trip(trip.id))?.savedAt)

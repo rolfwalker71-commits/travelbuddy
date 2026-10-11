@@ -64,6 +64,7 @@ struct NextWidgetView: View {
 private extension SharedSummary.Event {
     /// Beschriftung im Ticket-Kopf: Typ-Startlabel («ABFLUG», «CHECK-IN») oder der Typ selbst.
     var headLabel: String {
+        if let label = roleLabel { return label }
         if title.localizedCaseInsensitiveContains("check-out") { return "Check-out" }
         switch catalog.id {
         case "Flug", "Zugreisen", "Hotel", "Unterkunft", "Mietauto", "Transfer": return catalog.startLabel
@@ -203,7 +204,7 @@ private struct MediumNext: View {
             }
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 EventTimeText(event: event, day: snapshot.day(at: entry.date), size: 32)
-                if let end = SharedFormat.time(event.endTime), event.hasTime {
+                if let end = SharedFormat.time(event.endTime), event.hasTime, event.dayRole == nil || event.dayRole == "single" {
                     Text("→ \(end)")
                         .font(TB.Font.mono(13, weight: .medium, relativeTo: .footnote))
                         .foregroundStyle(TB.Palette.mute)
@@ -311,7 +312,7 @@ private struct RectangularNext: View {
     /// Zeit; an einem anderen Tag davor das vollständige Datum (`26.10.2026 07:45`).
     private var rectangularTime: String {
         let time = event.timeText
-        if event.startDate == snapshot.day(at: entry.date) { return time ?? "ganztags" }
+        if event.shownDate == snapshot.day(at: entry.date) { return time ?? event.roleLabel ?? "ganztags" }
         return [event.dateText, time].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
     }
 
@@ -357,7 +358,7 @@ private struct InlineNext: View {
 
     private var inlineTime: String {
         let time = event.timeText
-        if event.startDate == snapshot.day(at: entry.date) { return time ?? "ganztags" }
+        if event.shownDate == snapshot.day(at: entry.date) { return time ?? event.roleLabel ?? "ganztags" }
         return [event.dateText, time].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
     }
 

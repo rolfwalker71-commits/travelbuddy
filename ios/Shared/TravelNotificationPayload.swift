@@ -52,6 +52,9 @@ struct TravelNotificationPayload {
         var startDate: String?
         var startTime: String?
         var endTime: String?
+        var displayTime: String?
+        var displayLabel: String?
+        var dayRole: String?
         var tz: String?
         var startAt: Date?
         var from: String?
@@ -117,6 +120,9 @@ struct TravelNotificationPayload {
         ticket.startDate = ts("startDate")
         ticket.startTime = ts("startTime")
         ticket.endTime = ts("endTime")
+        ticket.displayTime = ts("displayTime")
+        ticket.displayLabel = ts("displayLabel", alt: "displayLabel")
+        ticket.dayRole = ts("dayRole", alt: "dayRole")
         ticket.tz = ts("tz", alt: "startTz")
         if let at = ts("startAt") { ticket.startAt = ISO8601DateFormatter().date(from: at) }
         ticket.from = ts("from")

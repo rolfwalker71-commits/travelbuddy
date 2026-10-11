@@ -161,8 +161,8 @@ struct EventTimeText: View {
                 .foregroundStyle(TB.Palette.ink)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-            if event.startDate != day, !event.dateText.isEmpty {
-                Text(SharedFormat.weekdayShortDate(event.startDate))
+            if event.shownDate != day, !event.dateText.isEmpty {
+                Text(SharedFormat.weekdayShortDate(event.shownDate))
                     .font(TB.Font.mono(10.5, weight: .medium, relativeTo: .caption2))
                     .foregroundStyle(TB.Palette.mute)
                     .lineLimit(1)
@@ -180,10 +180,21 @@ struct EventRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
-            Text(event.timeText ?? "––:––")
-                .font(TB.Font.mono(12.5, weight: isNext ? .semibold : .medium, relativeTo: .caption))
-                .foregroundStyle(isNext ? TB.Palette.accent : TB.Palette.ink)
-                .frame(width: timeWidth, alignment: .leading)
+            Group {
+                if let time = event.timeText {
+                    Text(time)
+                        .font(TB.Font.mono(12.5, weight: isNext ? .semibold : .medium, relativeTo: .caption))
+                        .foregroundStyle(isNext ? TB.Palette.accent : TB.Palette.ink)
+                } else {
+                    // Ohne Uhrzeit (mehrtägig, ganztägig): Rolle als Text («Aufenthalt», «Unterwegs»).
+                    Text(event.roleLabel ?? "ganztags")
+                        .font(TB.Font.title(11.5, weight: .semibold, relativeTo: .caption2))
+                        .foregroundStyle(TB.Palette.mute)
+                        .minimumScaleFactor(0.7)
+                }
+            }
+            .lineLimit(1)
+            .frame(width: timeWidth, alignment: .leading)
             TBTypeBadge(icon: event.iconName, colorKey: event.colorKey, size: showsDetail ? 24 : 18)
                 .accentable()
             VStack(alignment: .leading, spacing: 1) {
@@ -204,6 +215,7 @@ struct EventRow: View {
 
     private var detailText: String? {
         var parts: [String] = []
+        if event.dayRole == "start" || event.dayRole == "end", let role = event.roleLabel { parts.append(role) }
         if let l = event.location, !l.isEmpty { parts.append(l) }
         if let r = event.bookingReference, !r.isEmpty { parts.append(r) }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
@@ -214,10 +226,11 @@ extension TravelSnapshot {
     /// Segmente für das Tagesband aus den Ereignissen des Tages.
     func bandSegments(on day: String) -> [TBDayBand.Segment] {
         events(on: day).compactMap { e in
-            guard let t = SharedFormat.hm(e.startTime) else { return nil }
+            guard let t = SharedFormat.hm(e.timeText) else { return nil }
             let start = t.h * 60 + t.m
             var end: Int?
-            if let et = SharedFormat.hm(e.endTime), e.endDate == nil || e.endDate == e.startDate {
+            if let et = SharedFormat.hm(e.endTime), e.dayRole == nil || e.dayRole == "single",
+               e.endDate == nil || e.endDate == e.startDate {
                 let candidate = et.h * 60 + et.m
                 if candidate > start { end = candidate }
             }

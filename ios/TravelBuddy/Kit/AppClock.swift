@@ -6,10 +6,14 @@ enum AppClock {
     static var now: Date { Date().addingTimeInterval(offset) }
 
     /// Setzt die Uhr so, dass «jetzt» in `zone` die gegebene Uhrzeit ist.
-    static func pin(time: String, zone: TimeZone, on date: Date = Date()) {
+    static func pin(time: String, zone: TimeZone, on date: Date = Date(), day: String? = nil) {
         guard let minutes = TBDate.minutes(time) else { return }
         let cal = TBDate.calendar(in: zone)
         var c = cal.dateComponents([.year, .month, .day], from: date)
+        if let day, TBDate.isValid(day) {
+            let p = day.split(separator: "-").compactMap { Int($0) }
+            c.year = p[0]; c.month = p[1]; c.day = p[2]
+        }
         c.hour = minutes / 60; c.minute = minutes % 60
         if let target = cal.date(from: c) { offset = target.timeIntervalSince(date) }
     }

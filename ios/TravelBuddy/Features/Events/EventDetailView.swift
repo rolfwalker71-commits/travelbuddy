@@ -124,7 +124,7 @@ struct EventDetailView: View {
                     }
                     if let time { Text(time).tbMono(20, weight: .semibold) }
                 }
-                if let zone, zone != tripZone { Text("Ortszeit \(TripClock.placeName(zone))").tbText(12, color: Palette.mute) }
+                if let zone, TripClock.differs(zone, from: tripZone) { Text("Ortszeit \(TripClock.placeName(zone))").tbText(12, color: Palette.mute) }
             }
         }
         .accessibilityElement(children: .combine)

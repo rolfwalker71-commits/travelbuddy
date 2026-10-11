@@ -104,6 +104,7 @@ struct NotificationSettingsSection: View {
                 .tint(Palette.accent)
                 .disabled(!loaded)
             }
+            if loaded { timingRows }
         } header: { TBLabel("Mitteilungen") }
         .tbRow()
         .task {
@@ -123,15 +124,100 @@ struct NotificationSettingsSection: View {
     private func set(_ kind: TripNotificationKind, _ on: Bool) async {
         var next = prefs
         next.set(kind, on)
+        await send(next, fields: [kind.prefKey: .bool(on)])
+    }
+
+    /// Schickt nur die geänderten Schlüssel; bei Fehler bleibt der alte Stand.
+    private func send(_ next: NotificationPrefs, fields: [String: JSONValue]) async {
         let old = prefs
         prefs = next
         do {
-            prefs = try await store.api.updateNotificationPrefs(NotificationPrefsPatch(fields: [next.key(for: kind): .bool(on)]))
+            prefs = try await store.api.updateNotificationPrefs(NotificationPrefsPatch(fields: fields))
             errorMessage = nil
         } catch {
             prefs = old
             errorMessage = error.writeMessage
         }
+    }
+
+    // MARK: Ruhezeiten und Vorlaufzeiten
+
+    @ViewBuilder private var timingRows: some View {
+        let quiet = prefs.quietHours
+        Toggle(isOn: Binding(get: { prefs.quietHours.enabled }, set: { v in
+            var q = prefs.quietHours; q.enabled = v
+            var n = prefs; n.quietHours = q
+            Task { await send(n, fields: ["quietHours": quietJSON(q)]) }
+        })) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Ruhezeiten").tbText(16)
+                Text("In dieser Zeit kommen Mitteilungen ohne Ton.").tbText(12, color: Palette.mute)
+            }
+        }
+        .tint(Palette.accent).disabled(!loaded)
+        if quiet.enabled {
+            TimeFieldRow(label: "Von", value: Binding<String?>(get: { prefs.quietHours.from }, set: { v in
+                guard let v else { return }
+                var q = prefs.quietHours; q.from = v
+                var n = prefs; n.quietHours = q
+                Task { await send(n, fields: ["quietHours": quietJSON(q)]) }
+            }))
+            TimeFieldRow(label: "Bis", value: Binding<String?>(get: { prefs.quietHours.to }, set: { v in
+                guard let v else { return }
+                var q = prefs.quietHours; q.to = v
+                var n = prefs; n.quietHours = q
+                Task { await send(n, fields: ["quietHours": quietJSON(q)]) }
+            }))
+        }
+        TimeFieldRow(label: "Morgenbriefing um", value: Binding<String?>(get: { prefs.leadTimes.todayBriefing }, set: { v in
+            guard let v else { return }
+            var l = prefs.leadTimes; l.todayBriefing = v
+            var n = prefs; n.leadTimes = l
+            Task { await send(n, fields: ["leadTimes": leadJSON(l)]) }
+        }))
+        Stepper(value: Binding(get: { prefs.leadTimes.checkoutMinutes }, set: { v in
+            var l = prefs.leadTimes; l.checkoutMinutes = v
+            var n = prefs; n.leadTimes = l
+            Task { await send(n, fields: ["leadTimes": leadJSON(l)]) }
+        }), in: 15...240, step: 15) {
+            Text("Check-out-Erinnerung \(prefs.leadTimes.checkoutMinutes) Min. vorher").tbText(16)
+        }
+        Stepper(value: Binding(get: { prefs.leadTimes.deadlineDays }, set: { v in
+            var l = prefs.leadTimes; l.deadlineDays = v
+            var n = prefs; n.leadTimes = l
+            Task { await send(n, fields: ["leadTimes": leadJSON(l)]) }
+        }), in: 1...14) {
+            Text("Fristen \(prefs.leadTimes.deadlineDays) Tage vorher").tbText(16)
+        }
+        FieldRow(label: "Abflug-Erinnerungen (Stunden vorher)") {
+            FlowLayout(spacing: 8) {
+                ForEach([48, 24, 12, 6, 3, 2, 1], id: \.self) { h in
+                    let on = prefs.leadTimes.departHours.contains(h)
+                    Button {
+                        var l = prefs.leadTimes
+                        if on { l.departHours.removeAll { $0 == h } } else { l.departHours.append(h) }
+                        l.departHours.sort(by: >)
+                        var n = prefs; n.leadTimes = l
+                        Task { await send(n, fields: ["leadTimes": leadJSON(l)]) }
+                    } label: {
+                        Text("\(h) Std.").tbMono(13, weight: .semibold, color: on ? Palette.onAccent : Palette.ink)
+                            .padding(.horizontal, 10).padding(.vertical, 6)
+                            .background(on ? Palette.accent : Palette.surface2, in: RoundedRectangle(cornerRadius: 6))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(on ? .isSelected : [])
+                }
+            }
+        }
+    }
+
+    private func quietJSON(_ q: QuietHours) -> JSONValue {
+        .object(["enabled": .bool(q.enabled), "from": .string(q.from), "to": .string(q.to)])
+    }
+
+    private func leadJSON(_ l: LeadTimes) -> JSONValue {
+        .object(["departHours": .array(l.departHours.map { .int($0) }), "checkoutMinutes": .int(l.checkoutMinutes),
+                 "deadlineDays": .int(l.deadlineDays), "todayBriefing": .string(l.todayBriefing)])
     }
 }
 

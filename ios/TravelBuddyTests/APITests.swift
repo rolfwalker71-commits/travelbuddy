@@ -8,6 +8,8 @@ struct APIClientTests {
         APIClient(baseURL: URL(string: "http://localhost:7780")!, token: token, session: StubURLProtocol.session(), onUnauthorized: onUnauthorized)
     }
 
+    var tripJSONPublic: String { tripJSON }
+
     private let tripJSON = """
     {"trip":{"id":7,"title":"Ferien","status":"active","destination":"Florida","startDate":"2026-10-23","endDate":"2026-11-20",
              "ledgerId":11,"homeCurrency":"CHF","timezone":"Europe/Madrid","coverUrl":null,"needsReviewCount":1,"phase":"active"},
@@ -135,6 +137,40 @@ struct APIClientTests {
         #expect(obj["apnsToken"] is NSNull)
         #expect(obj["pushToStartToken"] as? String == "abcd")
         #expect(obj["platform"] as? String == "ios")
+    }
+
+    @Test func attachDocumentAndPlaceCoords() async throws {
+        StubURLProtocol.handler = { _ in (200, Data("{\"ok\":true}".utf8), [:]) }
+        let c = client()
+        try await c.attachDocument(tripID: 7, eventID: 5, documentID: 9)
+        let req = try #require(StubURLProtocol.requests.last)
+        #expect(req.httpMethod == "POST")
+        #expect(req.url?.path == "/v1/trips/7/events/5/documents")
+        let body = try #require(try JSONSerialization.jsonObject(with: StubURLProtocol.bodies.last!) as? [String: Any])
+        #expect(body["documentId"] as? Int == 9)
+        try await c.detachDocument(tripID: 7, eventID: 5, documentID: 9)
+        #expect(StubURLProtocol.requests.last?.httpMethod == "DELETE")
+        #expect(StubURLProtocol.requests.last?.url?.path == "/v1/trips/7/events/5/documents/9")
+
+        StubURLProtocol.handler = { _ in (200, Data(self.tripJSONPublic.utf8), [:]) }
+        let coords: JSONValue = .object(["return": .object(["lat": .double(25.79), "lon": .double(-80.29)])])
+        _ = try await c.updateEvent(tripID: 7, eventID: 5, EventBody(["placeCoords": coords]))
+        let patch = try #require(try JSONSerialization.jsonObject(with: StubURLProtocol.bodies.last!) as? [String: Any])
+        let pc = try #require(patch["placeCoords"] as? [String: Any])
+        #expect((pc["return"] as? [String: Double])?["lat"] == 25.79)
+    }
+
+    @Test func dayFieldsDecode() async throws {
+        let json = """
+        {"generatedAt":"2026-10-25T10:00:00Z","trip":{"id":1,"title":"T","timezone":"Europe/Madrid"},"date":"2026-10-25",
+         "events":[{"id":1,"type":"Hotel","title":"H","startDate":"2026-10-23","endDate":"2026-10-25","dayRole":"end","displayTime":"12:00","displayLabel":"Check-out"},
+                   {"id":2,"type":"Hotel","title":"I","startDate":"2026-10-20","endDate":"2026-10-30","dayRole":"middle","displayTime":null,"displayLabel":"Aufenthalt"}],
+         "tomorrow":[],"tasks":[],"deadlines":[],"review":0}
+        """
+        StubURLProtocol.handler = { _ in (200, Data(json.utf8), [:]) }
+        let t = try await client().today(date: "2026-10-25", tz: "Europe/Madrid")
+        #expect(t.events[0].dayRole == .end && t.events[0].displayTime == "12:00" && t.events[0].displayLabel == "Check-out")
+        #expect(t.events[1].dayRole == .middle && t.events[1].displayTime == nil)
     }
 
     @Test func mediaPathGuard() {

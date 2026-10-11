@@ -124,32 +124,94 @@ enum TripNotificationKind: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// Mögliche JSON-Schlüssel in `notification-prefs` (Vertrag nennt nur die Art; der Server-Schlüssel steht noch nicht fest).
-    var prefKeyCandidates: [String] {
-        let camel = rawValue.split(separator: ".").enumerated().map { i, part in
-            i == 0 ? String(part) : part.prefix(1).uppercased() + part.dropFirst()
-        }.joined()
-        return [rawValue, camel, rawValue.replacingOccurrences(of: ".", with: "_")]
+    /// Schlüssel in `/v1/me/notification-prefs` (camelCase, Vertrag): `tripToday`, `tripDepart`, …, `ledgerSettlement`.
+    var prefKey: String {
+        switch self {
+        case .today: "tripToday"
+        case .depart: "tripDepart"
+        case .stay: "tripStay"
+        case .pickup: "tripPickup"
+        case .deadline: "tripDeadline"
+        case .review: "tripReview"
+        case .comment: "tripComment"
+        case .expense: "ledgerExpense"
+        case .settlement: "ledgerSettlement"
+        }
     }
 }
 
-/// `GET/PUT /v1/me/notification-prefs`: je Art ein Schalter, dazu Lead-Zeiten. Unbekannte Schlüssel bleiben erhalten.
+/// Vorlaufzeiten der Mitteilungen (`leadTimes`).
+struct LeadTimes: Codable, Equatable, Sendable {
+    /// Stunden vor Abflug/Abfahrt, z. B. `[24, 3, 1]`.
+    var departHours: [Int] = [24, 3, 1]
+    /// Check-out-Erinnerung: Minuten vorher.
+    var checkoutMinutes: Int = 60
+    /// Tage vor einer Frist.
+    var deadlineDays: Int = 3
+    /// Morgenbriefing, `HH:mm` Reisezeit.
+    var todayBriefing: String = "07:30"
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        departHours = (try? c.decodeIfPresent([Int].self, forKey: .departHours)) ?? [24, 3, 1]
+        checkoutMinutes = (try? c.decodeIfPresent(Int.self, forKey: .checkoutMinutes)) ?? 60
+        deadlineDays = (try? c.decodeIfPresent(Int.self, forKey: .deadlineDays)) ?? 3
+        todayBriefing = (try? c.decodeIfPresent(String.self, forKey: .todayBriefing)) ?? "07:30"
+    }
+}
+
+/// Ruhezeiten (`quietHours`): in dieser Zeit keine Töne (Standard an, 22:30–06:30).
+struct QuietHours: Codable, Equatable, Sendable {
+    var enabled: Bool = true
+    var from: String = "22:30"
+    var to: String = "06:30"
+
+    init() {}
+    init(enabled: Bool, from: String, to: String) { self.enabled = enabled; self.from = from; self.to = to }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = (try? c.decodeIfPresent(Bool.self, forKey: .enabled)) ?? true
+        from = (try? c.decodeIfPresent(String.self, forKey: .from)) ?? "22:30"
+        to = (try? c.decodeIfPresent(String.self, forKey: .to)) ?? "06:30"
+    }
+}
+
+/// `GET/PUT /v1/me/notification-prefs`: je Art ein Schalter, dazu `leadTimes` und `quietHours`.
+/// Unbekannte Schlüssel bleiben erhalten.
 struct NotificationPrefs: Equatable, Sendable {
     var raw: [String: JSONValue]
 
     init(raw: [String: JSONValue] = [:]) { self.raw = raw }
 
-    /// Schlüssel, unter dem die Art in der Serverantwort steht; sonst der erste Kandidat (Punktschreibweise).
-    func key(for kind: TripNotificationKind) -> String {
-        kind.prefKeyCandidates.first { raw[$0] != nil } ?? kind.rawValue
+    /// Kompatibilität: Schlüssel der Art.
+    func key(for kind: TripNotificationKind) -> String { kind.prefKey }
+
+    func isOn(_ kind: TripNotificationKind) -> Bool { raw[kind.prefKey]?.boolValue ?? true }
+
+    mutating func set(_ kind: TripNotificationKind, _ on: Bool) { raw[kind.prefKey] = .bool(on) }
+
+    var leadTimes: LeadTimes {
+        get { decode(LeadTimes.self, "leadTimes") ?? LeadTimes() }
+        set { encode(newValue, "leadTimes") }
     }
 
-    func isOn(_ kind: TripNotificationKind) -> Bool {
-        raw[key(for: kind)]?.boolValue ?? true
+    var quietHours: QuietHours {
+        get { decode(QuietHours.self, "quietHours") ?? QuietHours() }
+        set { encode(newValue, "quietHours") }
     }
 
-    mutating func set(_ kind: TripNotificationKind, _ on: Bool) {
-        raw[key(for: kind)] = .bool(on)
+    private func decode<T: Decodable>(_ type: T.Type, _ key: String) -> T? {
+        guard let v = raw[key], let data = try? JSONEncoder().encode(v) else { return nil }
+        return try? JSONDecoder().decode(T.self, from: data)
+    }
+
+    private mutating func encode<T: Encodable>(_ value: T, _ key: String) {
+        if let data = try? JSONEncoder().encode(value), let v = try? JSONDecoder().decode(JSONValue.self, from: data) {
+            raw[key] = v
+        }
     }
 
     static let allOn = NotificationPrefs()

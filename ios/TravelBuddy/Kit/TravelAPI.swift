@@ -35,11 +35,16 @@ protocol TravelAPI: Sendable {
     func deleteEvent(tripID: Int, eventID: Int) async throws -> TripDetail
     func confirmEvent(tripID: Int, eventID: Int) async throws -> TripDetail
     func mergeEvent(tripID: Int, eventID: Int, into targetID: Int) async throws -> TripDetail
+    /// `POST /v1/trips/:id/events/:eventId/documents { documentId }` (nur Admin).
+    func attachDocument(tripID: Int, eventID: Int, documentID: Int) async throws
+    func detachDocument(tripID: Int, eventID: Int, documentID: Int) async throws
     func addComment(tripID: Int, eventID: Int, body: String) async throws -> TripComment
     func deleteComment(tripID: Int, eventID: Int, commentID: Int) async throws
 
     // MARK: Heute, Zusammenfassung
     func today(date: String?, tz: String?) async throws -> TodayResponse
+    /// `GET /v1/trips/:id/day/:date`: Tagesansicht in der Form von `/v1/today` (beliebiger Tag der Reise).
+    func day(tripID: Int, date: String) async throws -> TodayResponse
     /// Rohdaten von `GET /v1/summary` (unverändert an die Widgets weitergereicht).
     func summaryData() async throws -> Data
 

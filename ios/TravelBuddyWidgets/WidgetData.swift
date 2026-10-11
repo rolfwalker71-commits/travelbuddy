@@ -41,8 +41,12 @@ struct TravelSnapshot: Equatable {
     }
 
     /// Ereignisse des lokalen Tages von `date` (Beginn an diesem Tag), chronologisch.
+    /// Zeitlich geordnet: ohne Uhrzeit zuerst, dann nach Zeit; mehrtägige Einträge in der Mitte (`middle`) unten.
     func events(on day: String) -> [SharedSummary.Event] {
-        events.filter { $0.startDate == day }
+        let list = events.filter { $0.appears(on: day) }
+        let regular = list.filter { !$0.isMiddle }
+            .sorted { ($0.timeText ?? "00:00") < ($1.timeText ?? "00:00") }
+        return regular + list.filter(\.isMiddle)
     }
 
     /// Heute noch nicht vergangene Ereignisse zuerst; vergangene davor werden in der Liste ausgeblendet.
@@ -50,8 +54,9 @@ struct TravelSnapshot: Equatable {
         let d = day(at: date)
         let cutoff = date.addingTimeInterval(-60 * 60)
         return events(on: d).filter { e in
-            guard let s = e.start(fallback: zone) else { return true }
-            return (e.end(fallback: zone) ?? s) >= cutoff
+            guard let s = e.start(fallback: zone) else { return true }   // ohne Zeit: ganztägig, bleibt
+            let single = e.dayRole == nil || e.dayRole == "single"
+            return (single ? (e.end(fallback: zone) ?? s) : s) >= cutoff
         }
     }
 
@@ -141,8 +146,8 @@ enum TravelWidgetLoader {
         let events = summary.nextEvents
             .filter { !$0.isProposal && ($0.tripId == nil || trip == nil || $0.tripId == trip?.id) }
             .sorted { a, b in
-                let ka = (a.startDate ?? "9999-99-99", a.startTime ?? "00:00")
-                let kb = (b.startDate ?? "9999-99-99", b.startTime ?? "00:00")
+                let ka = (a.shownDate ?? "9999-99-99", a.timeText ?? "00:00")
+                let kb = (b.shownDate ?? "9999-99-99", b.timeText ?? "00:00")
                 return ka < kb
             }
         let ledger = summary.ledger.map { l -> SharedSummary.Ledger in

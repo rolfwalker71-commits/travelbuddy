@@ -193,9 +193,17 @@ enum TripClock {
         return last.replacingOccurrences(of: "_", with: " ")
     }
 
+    /// Weicht die Zone von der Reisezone ab (anderer Name **und** anderer UTC-Versatz zum Zeitpunkt)?
+    /// «Europe/Madrid» gegen «Europe/Zurich» ist keine Abweichung, «America/New_York» schon.
+    static func differs(_ zoneID: String?, from tripZoneID: String?, at date: Date = Date()) -> Bool {
+        guard let zoneID, !zoneID.isEmpty, zoneID != tripZoneID else { return false }
+        guard let z = zone(zoneID), let t = zone(tripZoneID) else { return true }
+        return z.secondsFromGMT(for: date) != t.secondsFromGMT(for: date)
+    }
+
     /// `14:05` oder `14:05 Ortszeit Miami`, wenn die Zone von der Reisezone abweicht.
-    static func timeLabel(_ time: String, zoneID: String?, tripZoneID: String?) -> String {
-        guard let zoneID, !zoneID.isEmpty, zoneID != tripZoneID else { return time }
+    static func timeLabel(_ time: String, zoneID: String?, tripZoneID: String?, at date: Date = Date()) -> String {
+        guard differs(zoneID, from: tripZoneID, at: date), let zoneID else { return time }
         return "\(time) Ortszeit \(placeName(zoneID))"
     }
 
