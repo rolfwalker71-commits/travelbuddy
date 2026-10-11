@@ -1,0 +1,178 @@
+/*
+ * Design-Tokens, Richtung B «Ticket» (docs/DESIGN.md): warmes Papier, Tinte, Zinnoberrot als Signal.
+ * Hell «Papier» ist der Grundwert; Dunkel «Nachtpapier» steht unter `html[data-theme="dark"]` (Einstellungen:
+ * System, Hell, Dunkel; gesetzt in lib/theme.ts). Vor dem ersten Skriptlauf folgt `:root:not([data-theme])`
+ * der Geräteeinstellung, damit nichts aufblitzt.
+ *
+ * Kanonische Namen: --bg --surface --surface-2 --line --ink --mute --accent --on-accent --positive --negative.
+ * Die älteren Namen (--text, --border, --pos …) bleiben als Aliase bestehen, damit bestehende Bausteine mitziehen.
+ */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --font-sans: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-title: "Barlow Semi Condensed", "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Flächen und Linien (Papier) */
+  --bg: #ece5d7;
+  --surface: #fbf8f1;
+  --surface-2: #f1ebdd;
+  --surface-3: #e6dec9;
+  --line: #d4c9b4;
+  --line-strong: #b9ac92;
+  --ink: #1d1b18;
+  --mute: #6f675a;
+  --overlay: rgba(29, 27, 24, 0.5);
+
+  --accent: #d8452b;
+  --accent-hover: #bf3a22;
+  --on-accent: #ffffff;
+  --positive: #2f7d4f;
+  --negative: #b3261e;
+  --warn: #8a5a00;
+  --info: #3c6e8f;
+
+  /* Hero (Heute, Live Activity): in beiden Modi dunkel */
+  --hero: #1d1b18;
+  --hero-ink: #fbf8f1;
+  --hero-mute: #b9b0a0;
+  --hero-accent: #ffb347;
+
+  /* Typfarben (event-types.json → color) */
+  --k-air: #d8452b;
+  --k-ship: #1f4e5f;
+  --k-stay: #b48a2b;
+  --k-car: #5b8c5a;
+  --k-rail: #3c6e8f;
+  --k-transfer: #7a5c99;
+  --k-activity: #c46a2d;
+  --k-food: #a8433f;
+  --k-ticket: #8a6f9e;
+  --k-safety: #3f7a8c;
+  --k-doc: #6f675a;
+  --k-task: #6f675a;
+
+  /* Diagramm-Reihen (Kasse nach Kategorie) */
+  --c1: #1f4e5f;
+  --c2: #d8452b;
+  --c3: #e0a526;
+  --c4: #5b8c5a;
+  --c5: #8a6f9e;
+  --c6: #9a8f7e;
+
+  /* Form */
+  --r-s: 6px;
+  --r-m: 6px;
+  --r-l: 10px;
+  --r-xl: 10px;
+  --notch: var(--bg);
+
+  --shadow-1: 0 1px 0 rgba(0, 0, 0, 0.05);
+  --shadow-2: 0 14px 36px rgba(40, 30, 10, 0.22);
+
+  --tabbar-h: 64px;
+  --topbar-h: 60px;
+  --content-max: 1200px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #151412;
+  --surface: #1f1d1a;
+  --surface-2: #2a2723;
+  --surface-3: #34302b;
+  --line: #3a362f;
+  --line-strong: #52493e;
+  --ink: #f1ebdd;
+  --mute: #a59c8b;
+  --overlay: rgba(0, 0, 0, 0.62);
+
+  --accent: #f0653f;
+  --accent-hover: #ff7d5a;
+  --on-accent: #1a0e0a;
+  --positive: #6fcf97;
+  --negative: #f28b82;
+  --warn: #e7c466;
+  --info: #6fa3c4;
+
+  --hero: #0e0d0b;
+  --hero-ink: #f1ebdd;
+  --hero-mute: #a59c8b;
+  --hero-accent: #ffb347;
+
+  --k-air: #f0653f;
+  --k-ship: #5fa3b8;
+  --k-stay: #d6b04e;
+  --k-car: #7fb47e;
+  --k-rail: #6fa3c4;
+  --k-transfer: #a68bc4;
+  --k-activity: #e08f55;
+  --k-food: #d97671;
+  --k-ticket: #b59bc7;
+  --k-safety: #6fa9bb;
+  --k-doc: #a59c8b;
+  --k-task: #a59c8b;
+
+  --c1: #5fa3b8;
+  --c2: #f0653f;
+  --c3: #e0a526;
+  --c4: #7fb47e;
+  --c5: #b59bc7;
+  --c6: #a59c8b;
+
+  --shadow-1: none;
+  --shadow-2: 0 14px 36px rgba(0, 0, 0, 0.55);
+}
+
+/* Vor dem Skriptlauf: Geräteeinstellung (Dunkel) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #151412;
+    --surface: #1f1d1a;
+    --surface-2: #2a2723;
+    --surface-3: #34302b;
+    --line: #3a362f;
+    --line-strong: #52493e;
+    --ink: #f1ebdd;
+    --mute: #a59c8b;
+    --accent: #f0653f;
+    --accent-hover: #ff7d5a;
+    --on-accent: #1a0e0a;
+    --positive: #6fcf97;
+    --negative: #f28b82;
+  }
+}
+
+/* Aliase und abgeleitete Töne (gelten in beiden Modi) */
+:root,
+:root[data-theme] {
+  --text: var(--ink);
+  --text-2: var(--mute);
+  --text-3: var(--mute);
+  --border: var(--line);
+  --border-strong: var(--line-strong);
+  --pos: var(--positive);
+  --neg: var(--negative);
+  --focus: var(--accent);
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  --pos-soft: color-mix(in srgb, var(--positive) 13%, transparent);
+  --neg-soft: color-mix(in srgb, var(--negative) 11%, transparent);
+  --warn-soft: color-mix(in srgb, var(--warn) 15%, transparent);
+  --info-soft: color-mix(in srgb, var(--info) 14%, transparent);
+  --chart-grid: var(--line);
+  --chart-mute: var(--line-strong);
+}
+
+/* Bei erhöhtem Kontrast werden Linien kräftiger */
+@media (prefers-contrast: more) {
+  :root,
+  :root[data-theme] {
+    --line: var(--line-strong);
+    --border: var(--line-strong);
+  }
+}

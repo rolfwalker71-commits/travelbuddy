@@ -1,0 +1,111 @@
+import type { ReactNode } from "react";
+import type { Traveler, TripEvent } from "../api/types";
+import { getType, type Catalog } from "../lib/catalog";
+import { formatDate } from "../lib/dates";
+import { keyFacts, referenceOf, routeOf, summaryLine, timeLine } from "../lib/eventUi";
+import { Chip } from "../ui/Chip";
+import { catalogIcon, eventIcon } from "../ui/Icon";
+import { TicketCard } from "../ui/TicketCard";
+
+/** Typ-Angaben (Farbe, Icon, Beschriftung) eines Ereignisses aus dem Katalog; mit Rückfall für unbekannte Typen. */
+export function typeInfo(catalog: Catalog, e: Pick<TripEvent, "type">) {
+  const t = getType(catalog, e.type);
+  return {
+    color: t?.color ?? "doc",
+    icon: t ? catalogIcon(t.icon) : eventIcon(e.type),
+    label: t?.label ?? e.type,
+    start: t?.startLabel ?? "Beginn",
+    end: t?.endLabel ?? "Ende",
+  };
+}
+
+export function statusChips(e: TripEvent): ReactNode {
+  if (e.status === "needs_review") return <Chip tone="review" icon="alert">Zu prüfen</Chip>;
+  if (e.status === "proposed") return <Chip tone="proposal" icon="sparkle">Vorschlag</Chip>;
+  return null;
+}
+
+/**
+ * Ereignis als Ticket-Karte: Kopfband mit Typ und Referenz, Zeiten gross, Wichtiges je Typ, Abrissstreifen.
+ * Ohne `to` ist die Karte nicht anklickbar (Gast-Ansicht).
+ */
+export function EventTicket({
+  catalog,
+  event: e,
+  tripTz,
+  travelers = [],
+  meId = null,
+  to,
+  active,
+  soft,
+  stub,
+  showDate = false,
+  badges,
+  maxFacts = 4,
+}: {
+  catalog: Catalog;
+  event: TripEvent;
+  tripTz: string;
+  travelers?: Traveler[];
+  meId?: number | null;
+  to?: string;
+  active?: boolean;
+  soft?: boolean;
+  stub?: ReactNode;
+  showDate?: boolean;
+  badges?: ReactNode;
+  maxFacts?: number;
+}) {
+  const info = typeInfo(catalog, e);
+  const tl = timeLine(e, tripTz);
+  const route = routeOf(e);
+  const sum = summaryLine(catalog, e);
+  const facts = keyFacts(catalog, e, { meId, travelers, max: maxFacts });
+  const multi = e.endDate && e.startDate && e.endDate !== e.startDate;
+  const main =
+    tl.start || tl.end || route ? (
+      <>
+        {tl.start ? <span>{tl.start}</span> : null}
+        {tl.start && tl.end ? <span className="sep">→</span> : null}
+        {tl.end ? <span>{tl.end}</span> : null}
+        {multi ? <small>bis {formatDate(e.endDate)}</small> : null}
+        {route ? (
+          <small className="num">
+            {route.from} → {route.to}
+          </small>
+        ) : null}
+        {tl.startZone || tl.endZone ? <small>Ortszeit {[tl.startZone, tl.endZone].filter(Boolean).filter((z, i, a) => a.indexOf(z) === i).join(" / ")}</small> : null}
+      </>
+    ) : null;
+  return (
+    <TicketCard
+      id={`ev-${e.id}`}
+      kind={info.color}
+      icon={info.icon}
+      label={info.label}
+      reference={referenceOf(e)}
+      badges={
+        <>
+          {active ? <Chip tone="now">Jetzt</Chip> : null}
+          {statusChips(e)}
+          {badges}
+        </>
+      }
+      title={
+        <>
+          {showDate && e.startDate ? <span className="ticket__date num">{formatDate(e.startDate)} · </span> : null}
+          {e.title}
+        </>
+      }
+      main={main}
+      facts={facts}
+      stub={stub}
+      to={to}
+      active={active}
+      soft={soft}
+      dashed={e.status === "proposed" || e.status === "needs_review"}
+    >
+      {sum ? <p className="ticket__sum muted">{sum}</p> : null}
+    </TicketCard>
+  );
+}

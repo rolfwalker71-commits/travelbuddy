@@ -1,0 +1,26 @@
+/* Karten: Apple Karten (MapKit JS) und Ersatz */
+.map-card { margin: 0; position: relative; border: 1px solid var(--line); border-radius: var(--r-l); overflow: hidden; background: var(--surface-2); }
+.map-card__map { position: relative; width: 100%; background: var(--surface-2); }
+.map-card__status { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; }
+.map-card--compact { border-radius: var(--r-m); }
+.eventmap { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
+.eventmap .viz { padding: 4px; }
+.eventmap__note { display: flex; align-items: center; gap: 8px; }
+.eventmap__places { display: flex; flex-direction: column; }
+.eventmap__place { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line); }
+.eventmap__place:first-child { border-top: 0; }
+.eventmap__ic { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #fff; flex: none; }
+.eventmap__text { display: flex; flex-direction: column; flex: 1; min-width: 180px; }
+.eventmap__addr { font-weight: 600; overflow-wrap: anywhere; }
+.eventmap__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.mapTab { display: flex; flex-direction: column; gap: 14px; }
+.maptoolbar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; }
+.maptoolbar .field { min-width: 240px; }
+.maplegend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.875rem; color: var(--mute); padding-bottom: 10px; }
+.maplegend li { display: inline-flex; align-items: center; gap: 6px; }
+.maplegend__dot { width: 10px; height: 10px; border-radius: 50%; }
+.stations { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.stations li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 2px 10px; align-items: center; }
+.stations__no { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; color: #fff; font-size: 0.75rem; font-weight: 600; grid-row: 1 / span 2; }
+.stations__title { font-weight: 600; }
+.stations li > span.muted { grid-column: 2; }
