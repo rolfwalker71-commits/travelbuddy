@@ -1,0 +1,25 @@
+# Docker-Build-Kontext ist das Repo-Root. Nichts davon gehört ins Image (und macOS-node_modules würden
+# die Linux-Installation aus `npm ci` überschreiben).
+**/node_modules
+**/dist
+.git
+.github
+.DS_Store
+.env
+.env.*
+!.env.example
+*.p8
+AuthKey_*
+
+# Echte Daten und Arbeitsverzeichnisse
+data
+server/data
+import-in
+import-out
+
+# Apple-App, Entwürfe, Doku, Screenshots
+ios
+design
+docs
+**/coverage
+web/.vite

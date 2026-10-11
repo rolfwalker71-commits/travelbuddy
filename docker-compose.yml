@@ -3,7 +3,8 @@
 #   cp .env.example .env            # Werte eintragen, .env nie committen
 #   mkdir -p data/apns && sudo chown -R 1000:1000 data
 #   (später: AuthKey_<KEYID>.p8 nach ./data/apns/ legen, chmod 600, Besitzer 1000; kein Neustart nötig)
-#   docker compose up -d --build
+#   docker compose pull && docker compose up -d        # fertiges Image von ghcr.io (siehe docs/DEPLOY.md)
+#   docker compose up -d --build                         # alternativ lokal bauen
 #   docker compose exec -it travelbuddy node dist/create-user.mjs rolf "Rolf" --admin
 #
 # Daten (SQLite, documents/, media/, apns/) liegen in ./data. Standardmässig nur lokal gebunden (127.0.0.1:7780);
@@ -15,7 +16,8 @@ services:
       dockerfile: server/Dockerfile
       args:
         GIT_SHA: ${TRAVELBUDDY_BUILD:-dev}
-    image: travelbuddy-server:local
+    # Standard: fertiges x86-Image aus GitHub Actions (docker compose pull). Lokal bauen: docker compose up -d --build
+    image: ghcr.io/rolfwalker71-commits/travelbuddy:${TRAVELBUDDY_TAG:-latest}
     container_name: travelbuddy
     restart: unless-stopped
     environment:
