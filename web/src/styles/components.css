@@ -458,3 +458,4 @@ dialog.sheet[data-state="closing"] .sheet__panel { animation: sheet-fly-out var(
   border-radius: 20px;
 }
 
+.tabs__item > svg { flex: none; }

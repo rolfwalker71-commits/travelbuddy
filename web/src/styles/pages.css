@@ -251,11 +251,14 @@
 .evhero__illu { align-self: flex-end; max-width: 240px; width: 100%; }
 .ticket--l .ticket__body { position: relative; }
 .ticket--l .evhero__illu { margin-top: 4px; }
-@media (min-width: 900px) {
+.ticket--l { container-type: inline-size; container-name: tkl; }
+/* Illustration neben dem Text erst, wenn die Karte selbst breit genug ist (nicht das Fenster) */
+@container tkl (min-width: 640px) {
   .ticket--l .ticket__body { display: grid; grid-template-columns: minmax(0, 1fr) 220px; column-gap: 20px; }
   .ticket--l .ticket__body > * { grid-column: 1; }
   .ticket--l .ticket__body > .evhero__illu { grid-column: 2; grid-row: 1 / span 4; align-self: start; margin: 0; }
 }
+
 
 @media (max-width: 639px) {
   .hero__row { flex-wrap: wrap; }

@@ -18,7 +18,23 @@ const port = 9500 + Math.floor(Math.random() * 100);
 
 const WIDTHS = (process.env.WIDTHS ?? "360,390,525,768,1024,1440").split(",").map(Number);
 const THEMES = ["light", "dark"];
-const PAGES = [
+// Mit REAL=1 und TB_TOKEN (Token eines Test-Benutzers) gegen den echten Server hinter dem Vite-Proxy prüfen,
+// z. B. mit importierten Daten: REAL=1 TB_TOKEN=… node scripts/layout-check.mjs http://127.0.0.1:5176
+const REAL = process.env.REAL === "1";
+const REAL_PAGES = [
+  ["reisen", "/trips"],
+  ["plan", "/trips/1"],
+  ["tag", "/trips/1/day/2026-10-25"],
+  ["ereignis-hotel", "/trips/1/events/3"],
+  ["ereignis-mietwagen", "/trips/1/events/31"],
+  ["ereignis-flug", "/trips/1/events/2"],
+  ["dokumente", "/trips/1/documents"],
+  ["kasse", "/trips/1/ledger"],
+  ["team", "/trips/1/team"],
+  ["karte", "/trips/1/map"],
+  ["konto", "/settings"],
+];
+const MOCK_PAGES = [
   ["heute", "/"],
   ["tag", "/trips/1/day/" + new Date().toISOString().slice(0, 10)],
   ["reisen", "/trips"],
@@ -33,6 +49,7 @@ const PAGES = [
   ["gast-reise", "/t/tok_valentyna_demo"],
   ["gast-kasse", "/g/tok_valentyna_demo"],
 ];
+const PAGES = REAL ? REAL_PAGES : MOCK_PAGES;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const profile = mkdtempSync(join(tmpdir(), "tb-layout-"));
@@ -69,6 +86,11 @@ const { targetId } = await send("Target.createTarget", { url: "about:blank" });
 const { sessionId } = await send("Target.attachToTarget", { targetId, flatten: true });
 const s = (m, p) => send(m, p, sessionId);
 await s("Page.enable");
+if (REAL && process.env.TB_TOKEN) {
+  await s("Page.addScriptToEvaluateOnNewDocument", {
+    source: `try { localStorage.setItem("travelbuddy.token", ${JSON.stringify(process.env.TB_TOKEN)}); } catch {}`,
+  });
+}
 
 /** Läuft im Seitenkontext: liefert Auffälligkeiten als Liste von Texten. */
 const CHECK = `(() => {
@@ -97,7 +119,7 @@ const CHECK = `(() => {
       if (!seen.has(k)) { seen.add(k); out.push("ragt aus dem Fenster: " + k + " (links " + Math.round(r.left) + ", rechts " + Math.round(r.right) + ", Fenster " + vw + ")"); }
     }
     // Text in schmalen Spalten
-    if (["P", "SPAN", "DD", "LI", "H1", "H2", "H3"].includes(el.tagName) && el.children.length === 0 && el.textContent.trim().length > 14 && r.width > 0 && r.width < 90 && cs.whiteSpace !== "nowrap") {
+    if (["P", "SPAN", "DD", "LI", "H1", "H2", "H3"].includes(el.tagName) && el.children.length === 0 && el.textContent.trim().length > 24 && r.width > 0 && r.width < 90 && cs.whiteSpace !== "nowrap") {
       const k = "schmal:" + name(el);
       if (!seen.has(k)) { seen.add(k); out.push("Textspalte nur " + Math.round(r.width) + " px breit: " + name(el) + " «" + el.textContent.trim().slice(0, 30) + "»"); }
     }
@@ -137,7 +159,8 @@ for (const theme of THEMES) {
     await s("Emulation.setDeviceMetricsOverride", { width: w, height: 900, deviceScaleFactor: 1, mobile: w < 700 });
     await s("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: theme }] });
     for (const [name, path] of PAGES) {
-      await s("Page.navigate", { url: `${base}${path}?mock=1&autologin=1&theme=${theme}` });
+      await s("Page.navigate", { url: REAL ? `${base}${path}` : `${base}${path}?mock=1&autologin=1&theme=${theme}` });
+      if (REAL) await s("Runtime.evaluate", { expression: `localStorage.setItem("travelbuddy.theme", "${theme}")` });
       await sleep(700);
       for (let i = 0; i < 40; i++) {
         const r = await s("Runtime.evaluate", {

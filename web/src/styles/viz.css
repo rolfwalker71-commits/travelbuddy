@@ -76,3 +76,4 @@
 .viz__legend small { overflow-wrap: anywhere; }
 .viz__stopno { font-size: 9px; }
 .viz__more li { white-space: normal; overflow-wrap: anywhere; }
+.viz__lane, .viz__axis { paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }

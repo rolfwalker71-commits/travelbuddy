@@ -156,8 +156,9 @@ button.prov__dot:focus-visible { outline: 3px solid var(--focus); outline-offset
 /* Schmale Bildschirme: Kennzahlen mit langen Marken (Saldo) über die ganze Breite */
 @media (max-width: 639px) {
   .stat2--wide-sm { grid-column: 1 / -1; }
-  .stat2__sub .balance { white-space: normal; }
 }
+.stat2__sub { min-width: 0; }
+.stat2__sub .balance { white-space: normal; max-width: 100%; }
 
 .illu__frame--btn { padding: 0; cursor: zoom-in; font: inherit; }
 .illu__frame--btn:hover { border-color: var(--accent); }

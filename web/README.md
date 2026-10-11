@@ -155,6 +155,16 @@ Analyse-Übergang und Vorschlag, Heute, Reisekasse, Gäste, Version, Karte ohne 
 - Hilfen für Screenshots: `?autologin=1`, `?theme=dark|light|system`.
 - Im Produktionsbündel sind die Mocks nicht enthalten (`import.meta.env.DEV`).
 
+## Layoutprüfung
+
+`npm run layout:check` (Dev-Server nötig) öffnet alle Seiten im echten Browser (DevTools-Protokoll, Microsoft Edge oder
+`CHROME_BIN`) mit den Mocks in den Breiten 360, 390, 525, 768, 1024 und 1440 px, hell und dunkel, und meldet horizontalen
+Überlauf der Seite, Elemente ausserhalb des Fensters, Inhalt, der den eigenen Rahmen sprengt, zu schmale Textspalten
+(Hilfekarten unter 200 px), abgeschnittenen Text und SVG-Beschriftungen ausserhalb der Zeichenfläche. `--shots <ordner>`
+speichert Screenshots; `REAL=1 TB_TOKEN=… node scripts/layout-check.mjs http://127.0.0.1:5176` prüft denselben Satz
+gegen einen echten Server (Vite-Proxy). Hilfekarten und Ereignis-Kopf reagieren auf die Breite ihres Behälters
+(Container Queries), nicht auf die des Fensters; Infografiken messen ihren Behälter und zeichnen 1:1 in Pixeln.
+
 ## Tests
 
 `npm test`: Katalog → Felder, Pattern/Transform, Zeitzonen und Sommerzeit, Datumsformat, Heute-Aufbereitung und Tagesband,
