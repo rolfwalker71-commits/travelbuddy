@@ -34,11 +34,13 @@ export type TicketCardProps = {
   /** Eigenes Seitenverhältnis für grosse Detailkarten. */
   size?: "m" | "l";
   id?: string;
+  /** Kleines Bild rechts im Karteninhalt (ändert die Kartenhöhe nicht). */
+  thumb?: ReactNode;
 };
 
 /** Ticket-Karte: Kopfband, Perforation, Hauptzeile, Detailraster, Abrissstreifen. */
 export function TicketCard(p: TicketCardProps) {
-  const cls = `ticket ticket--${p.size ?? "m"}${p.active ? " is-active" : ""}${p.soft ? " is-soft" : ""}${p.dashed ? " is-dashed" : ""}`;
+  const cls = `ticket ticket--${p.size ?? "m"}${p.active ? " is-active" : ""}${p.soft ? " is-soft" : ""}${p.dashed ? " is-dashed" : ""}${p.thumb ? " has-thumb" : ""}`;
   const style = { ["--tk" as string]: `var(--k-${p.kind})` } as React.CSSProperties;
   const body = (
     <>
@@ -52,6 +54,7 @@ export function TicketCard(p: TicketCardProps) {
       </header>
       <div className="ticket__perf" aria-hidden="true" />
       <div className="ticket__body">
+        {p.thumb ? <div className="ticket__thumb">{p.thumb}</div> : null}
         {p.title ? <div className="ticket__title">{p.title}</div> : null}
         {p.main ? <div className="ticket__main">{p.main}</div> : null}
         {p.children}

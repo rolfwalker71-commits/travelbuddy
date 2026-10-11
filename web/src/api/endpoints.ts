@@ -281,6 +281,11 @@ export const mediaApi = {
       method: "POST",
       body: extra && extra.trim() ? { extra: extra.trim() } : {},
     }),
+  /** Ereignisbilder einer Reise gesamthaft erzeugen: `missing` nur fehlende, `all` alle ausser eigenen Bildern. */
+  generateTrip: (tripId: number, mode: "missing" | "all") =>
+    api<{ queued: number; skipped: number; mode: string }>(`/v1/trips/${tripId}/event-images/generate`, { method: "POST", body: { mode } }),
+  tripStatus: (tripId: number) =>
+    api<{ enabled: boolean; job: { total: number; done: number; failed: number; running: boolean } | null }>(`/v1/trips/${tripId}/event-images/status`),
   /** Bild entfernen (wird nicht automatisch neu erzeugt). */
   remove: (kind: MediaKind, ownerId: number) =>
     api<{ media: { url: string | null } }>(`/v1/media/${kind}/${ownerId}`, { method: "DELETE" }),

@@ -5,6 +5,7 @@ struct AccountView: View {
     @Environment(AppModel.self) private var app
     @Environment(TravelStore.self) private var store
     @State private var confirmLogout = false
+    @AppStorage(EventImagePrefs.key) private var showGeneratedImages = true
 
     var body: some View {
         Form {
@@ -20,6 +21,16 @@ struct AccountView: View {
                 LabeledContent("Dieses Gerät") { Text(DeviceInfo.name).tbText(16) }
                 if store.isOffline { Label("Offline: Anzeige aus dem Zwischenspeicher", systemImage: "icloud.slash").tbText(14, color: Palette.mute) }
             } header: { TBLabel("Server") }.tbRow()
+
+            Section {
+                Toggle(isOn: $showGeneratedImages) {
+                    Text("KI-Bilder bei Ereignissen anzeigen").tbText(16)
+                }
+                .touchTarget()
+            } header: { TBLabel("Darstellung") } footer: {
+                Text("Blendet die automatisch erzeugten Bilder aus. Eigene, hochgeladene Bilder bleiben sichtbar. Gilt nur für dieses Gerät.")
+                    .tbText(12, color: Palette.mute)
+            }.tbRow()
 
             NotificationSettingsSection()
 

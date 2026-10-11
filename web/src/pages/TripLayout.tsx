@@ -26,6 +26,7 @@ import { MediaImage } from "../ui/MediaImage";
 import { CoverIllustration } from "../ui/IllustrationCard";
 import { coverIdFor } from "../lib/illustrations";
 import { ImageTools } from "../ui/ImageTools";
+import { BulkImages } from "../trip/BulkImages";
 import { Menu } from "../ui/Menu";
 import { useToast } from "../ui/Toast";
 import { PageHeader } from "../ui/bits";
@@ -79,6 +80,7 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
 
   const [form, setForm] = useState<{ open: boolean; event: TripEvent | null; defaultDate?: string | null; type?: string }>({ open: false, event: null });
   const [editOpen, setEditOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [view, setView] = useState<{ id: number; page?: number; title?: string } | null>(null);
   const [seed, setSeed] = useState<ExpenseSeed | null>(null);
 
@@ -155,6 +157,7 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
   const printItem = { label: "Drucken / Als PDF", icon: "file" as const, onSelect: () => nav(`/trips/${trip.id}/print`) };
   const adminMenu = [
     { label: "Reise bearbeiten", icon: "edit" as const, onSelect: () => setEditOpen(true) },
+    { label: "KI-Bilder für alle Ereignisse …", icon: "sparkle" as const, onSelect: () => setBulkOpen(true) },
     { label: "Kalender exportieren (ICS)", icon: "download" as const, onSelect: () => void downloadIcs() },
     {
       label: "Reise löschen",
@@ -292,6 +295,7 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
         onToLedger={isAdmin ? toLedger : undefined}
         onOpenDocument={(id, page) => setView({ id, page, title: documentTitle(id) })}
       />
+      {isAdmin ? <BulkImages tripId={trip.id} open={bulkOpen} onClose={() => setBulkOpen(false)} onDone={reload} /> : null}
       <TripEditSheet
         open={editOpen}
         data={data}

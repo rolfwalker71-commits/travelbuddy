@@ -17,6 +17,7 @@ import { Banner, EmptyState } from "../../ui/Feedback";
 import { Icon } from "../../ui/Icon";
 import { IllustrationCard } from "../../ui/IllustrationCard";
 import { ImageTools } from "../../ui/ImageTools";
+import { ImageLightbox } from "../../ui/ImageLightbox";
 import { MediaImage } from "../../ui/MediaImage";
 import { eventImageVisible, useShowGeneratedEventImages } from "../../lib/prefs";
 import { Provenance, ProvenanceLegend } from "../../ui/Provenance";
@@ -35,6 +36,7 @@ export function EventDetailPage() {
   const confirm = useConfirm();
   const e = data.events.find((x) => x.id === Number(eventId));
   const [showUpload, setShowUpload] = useState(false);
+  const [imgOpen, setImgOpen] = useState(false);
   useDocumentTitle(e?.title ?? "Ereignis");
   const showGenerated = useShowGeneratedEventImages();
 
@@ -152,13 +154,14 @@ export function EventDetailPage() {
             ) : null}
             <div className="evhero__illu evhero__media">
               {e.imageUrl && eventImageVisible(e.imageSource, showGenerated) ? (
-                <MediaImage src={e.imageUrl} variant="full" alt="" lazy={false} className="evhero__img" />
+                <MediaImage src={e.imageUrl} variant="full" alt={e.title} lazy={false} className="evhero__img" openLabel="Bild vergrössern" onOpen={() => setImgOpen(true)} />
               ) : (
                 <IllustrationCard id={`type-${getType(catalog, e.type)?.id ?? e.type}`} decorative compact />
               )}
               {isAdmin ? (
                 <ImageTools kind="event_image" ownerId={e.id} hasImage={Boolean(e.imageUrl)} onChanged={ctx.reload} />
               ) : null}
+              <ImageLightbox open={imgOpen} onClose={() => setImgOpen(false)} src={e.imageUrl} title={e.title} />
             </div>
           </TicketCard>
 

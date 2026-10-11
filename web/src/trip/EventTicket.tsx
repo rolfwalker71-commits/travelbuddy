@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Traveler, TripEvent } from "../api/types";
 import { getType, type Catalog } from "../lib/catalog";
 import { formatDate } from "../lib/dates";
@@ -7,6 +7,9 @@ import { shownLabel, shownTime } from "../lib/today";
 import { Chip } from "../ui/Chip";
 import { catalogIcon, eventIcon } from "../ui/Icon";
 import { TicketCard } from "../ui/TicketCard";
+import { ImageLightbox } from "../ui/ImageLightbox";
+import { MediaImage } from "../ui/MediaImage";
+import { eventImageVisible, useShowGeneratedEventImages } from "../lib/prefs";
 
 /** Typ-Angaben (Farbe, Icon, Beschriftung) eines Ereignisses aus dem Katalog; mit Rückfall für unbekannte Typen. */
 export function typeInfo(catalog: Catalog, e: Pick<TripEvent, "type">) {
@@ -30,6 +33,17 @@ export function statusChips(e: TripEvent): ReactNode {
  * Ereignis als Ticket-Karte: Kopfband mit Typ und Referenz, Zeiten gross, Wichtiges je Typ, Abrissstreifen.
  * Ohne `to` ist die Karte nicht anklickbar (Gast-Ansicht).
  */
+/** Kleines KI-/eigenes Bild des Ereignisses; Klick vergrössert. */
+function EventThumb({ event: e }: { event: TripEvent }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <MediaImage src={e.imageUrl} variant="thumb" alt={e.title} openLabel={`Bild vergrössern: ${e.title}`} onOpen={() => setOpen(true)} className="evthumb" />
+      <ImageLightbox open={open} onClose={() => setOpen(false)} src={e.imageUrl} title={e.title} />
+    </>
+  );
+}
+
 export function EventTicket({
   catalog,
   event: e,
@@ -57,6 +71,7 @@ export function EventTicket({
   badges?: ReactNode;
   maxFacts?: number;
 }) {
+  const showGenerated = useShowGeneratedEventImages();
   const info = typeInfo(catalog, e);
   const tl = timeLine(e, tripTz);
   const route = routeOf(e);
@@ -123,6 +138,7 @@ export function EventTicket({
       active={active}
       soft={soft}
       dashed={e.status === "proposed" || e.status === "needs_review"}
+      thumb={e.imageUrl && eventImageVisible(e.imageSource, showGenerated) ? <EventThumb event={e} /> : undefined}
     >
       {sum ? <p className="ticket__sum muted">{sum}</p> : null}
     </TicketCard>

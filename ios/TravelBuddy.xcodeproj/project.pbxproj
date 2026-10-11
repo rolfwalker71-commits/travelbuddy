@@ -158,6 +158,7 @@
 		EB79176C22976BA105D730BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4163DCC52425E1112E37DE /* APIClient.swift */; };
 		ECCC2CA6CFC2F18AAB982413 /* SharedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAB444F15DF4FE48B3FD067 /* SharedAPI.swift */; };
 		EFDFE1AD751772C6D9A97490 /* EventFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A70CB88AA201F9DD38AAD /* EventFormView.swift */; };
+		F040CC2F8DE64DB2D089C42E /* EventImageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96FEB2C8A2B2421D70CED075 /* EventImageViews.swift */; };
 		F0759F948974DDDA181B5247 /* SummarySync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88BF6FC40542CF8146280347 /* SummarySync.swift */; };
 		F10782C194C605D1E450AC60 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E1D7B5B9507C114F847D8D /* PlanView.swift */; };
 		F14932F15DDF7A8D4A33562A /* SharedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAB444F15DF4FE48B3FD067 /* SharedAPI.swift */; };
@@ -284,6 +285,7 @@
 		936F6488CB2F015B1842DF18 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		95815A415A0D5368F86F1236 /* AppClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
 		969E74A91A6A5126A4317F96 /* TodayWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayWidget.swift; sourceTree = "<group>"; };
+		96FEB2C8A2B2421D70CED075 /* EventImageViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventImageViews.swift; sourceTree = "<group>"; };
 		9754A4C57CA32697EB4618EC /* TodayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayModels.swift; sourceTree = "<group>"; };
 		97BCDACD281598A02743649B /* ParticipantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsView.swift; sourceTree = "<group>"; };
 		9A804B5377A0D0675116E947 /* Illustrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Illustrations.swift; sourceTree = "<group>"; };
@@ -565,6 +567,7 @@
 			children = (
 				0FDE5BEDA3EB6F0202D784B9 /* EventDetailView.swift */,
 				4C1A70CB88AA201F9DD38AAD /* EventFormView.swift */,
+				96FEB2C8A2B2421D70CED075 /* EventImageViews.swift */,
 				0A9589F153420057F0178752 /* FieldViews.swift */,
 				F9FD8EEA6FFF7182D3EB47DF /* PickerFields.swift */,
 			);
@@ -1000,6 +1003,7 @@
 				434F483BC362C2A56CAE14E0 /* EventDetailView.swift in Sources */,
 				3303F22118F10EE37C212858 /* EventDraft.swift in Sources */,
 				EFDFE1AD751772C6D9A97490 /* EventFormView.swift in Sources */,
+				F040CC2F8DE64DB2D089C42E /* EventImageViews.swift in Sources */,
 				17B3BB3B291EEFF85B642E19 /* ExpenseDraft.swift in Sources */,
 				A0160CC0DA079B2C92A0816C /* ExpenseFormView.swift in Sources */,
 				B4B1A338327E655175F0CFF0 /* FieldViews.swift in Sources */,
@@ -1142,7 +1146,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 9XZWUZ7Z26;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1315,7 +1319,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9XZWUZ7Z26;
 				ENABLE_NS_ASSERTIONS = NO;

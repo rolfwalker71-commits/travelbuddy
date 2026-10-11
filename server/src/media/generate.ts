@@ -44,14 +44,14 @@ export type OpenAiImagesConfig = {
   apiKey: string;
   /** Standard: https://api.openai.com/v1 */
   baseUrl?: string;
-  /** Standard: gpt-image-1 */
+  /** Standard: gpt-image-2 (wie die alte App: deutlich lesbarere Schrift im Bild) */
   model?: string;
   timeoutMs?: number;
 };
 
 type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
 
-export const DEFAULT_IMAGE_MODEL = "gpt-image-1";
+export const DEFAULT_IMAGE_MODEL = "gpt-image-2";
 
 /** Echte Implementierung gegen `POST {baseUrl}/images/generations` (Antwort `b64_json`). */
 export function openAiImages(cfg: OpenAiImagesConfig, doFetch: FetchFn = (url, init) => fetch(url, init)): ImageGenerator {
@@ -254,17 +254,25 @@ function eventDetails(e: EventPromptInput): string {
 }
 
 /**
- * Vorlage der alten App (familybrain, `lib/trips/event-image-prompt.ts`), Platzhalter in `{{…}}`.
- * Abweichung auf Wunsch: Logos und Marken dürfen vorkommen (dort stand «No logos»).
+ * Vorlage der alten App (familybrain, `lib/trips/event-image-prompt.ts`), Platzhalter in `{{…}}`, angepasst:
+ * ein passendes Bild und das Logo des Anbieters, sonst kein Text (die Angaben wären im Bild zu klein).
+ * Die Angaben dienen nur als Kontext für die Szene.
  */
-export const DEFAULT_EVENT_IMAGE_PROMPT = `Square travel illustration (not photorealistic) for a «{{type}}» activity.
-Title: {{title}}.
-Activity details: {{details}}.
+export const DEFAULT_EVENT_IMAGE_PROMPT = `Square travel illustration (not photorealistic) for a «{{type}}» activity: {{title}}.
+Context for the scene (do NOT write any of this as text in the image): {{details}}.
 Traveler notes: {{notes}}.
 Receipt context: {{beleg}}.
 Scene idea: {{scene}}.
-Style: clean modern editorial illustration, soft flat colors with gentle shading, friendly travel poster vibe. Any text in the image must be spelled correctly and clearly readable. Logos and brand marks of airlines, hotels, ships and other providers may appear. No watermarks, prices, or UI chrome. Suitable as a small card thumbnail.
-Timing rule: Only depict clock times, schedules, Abfahrt, Ankunft, departure or arrival times if Activity details explicitly list them. If details say Tagesausflug / all-day / no clock times, show NO times at all on the image.`;
+Show exactly one fitting, clean scene, and show the logo of the provider «{{provider}}» (airline, railway, hotel, cruise line, rental company or venue) clearly visible, for example on the vehicle or building or as a badge in a corner. If the provider is unknown, show no logo.
+IMPORTANT: apart from the provider logo the image must contain no text at all: no title, no dates, no times, no numbers, no routes, no captions, no labels, no info boxes.
+Style: clean modern editorial illustration, soft flat colors with gentle shading, friendly travel poster vibe. No watermarks, prices, or UI chrome. Suitable as a small card thumbnail.`;
+
+/** Anbieter für das Logo im Bild: Anbieter des Ereignisses, sonst Gesellschaft, Betreiber oder Unterkunft. */
+export function providerOf(e: { provider?: string | null; details: Record<string, unknown> }): string {
+  const d = e.details;
+  const pick = (k: string) => (typeof d[k] === "string" ? (d[k] as string).trim() : "");
+  return (e.provider ?? "").trim() || pick("airline") || pick("operator") || pick("rentalCompany") || pick("cruiseLine") || pick("shipName") || "";
+}
 
 function applyTemplate(template: string, vars: Record<string, string>): string {
   let out = template;
@@ -283,6 +291,7 @@ export function buildEventImagePrompt(e: EventPromptInput & { documentNotes?: st
     notes: clip(e.notes, 180),
     beleg,
     scene: sceneForType(e.type, cabin, allDay),
+    provider: providerOf(e),
   });
 }
 
@@ -437,6 +446,57 @@ export class MediaService {
     const done = () => map.delete(key);
     job.then(done, done);
     return job;
+  }
+
+  /** Laufende und letzte Sammelerzeugung je Reise (nur im Speicher). */
+  private readonly tripJobs = new Map<number, { total: number; done: number; failed: number; running: boolean; startedAt: string }>();
+
+  tripJob(tripId: number) {
+    return this.tripJobs.get(tripId) ?? null;
+  }
+
+  /**
+   * Ereignisbilder einer Reise gesamthaft erzeugen. `missing`: nur Ereignisse ohne Bild (entfernte bleiben entfernt),
+   * `all`: alle ausser eigenen, hochgeladenen Bildern neu erzeugen. Läuft nacheinander im Hintergrund.
+   */
+  startTripEvents(tripId: number, mode: "missing" | "all"): { queued: number; skipped: number } {
+    const { db } = this.deps;
+    if (!this.deps.images) throw conflict("Die KI-Bilderzeugung ist nicht aktiv (kein Schlüssel oder abgeschaltet)", "images_disabled");
+    const running = this.tripJobs.get(tripId);
+    if (running?.running) throw conflict("Für diese Reise läuft bereits eine Bilderzeugung", "already_running");
+    const rows = db
+      .prepare(
+        `SELECT e.id, m.file_name, m.source, m.attempts FROM trip_events e
+           LEFT JOIN media m ON m.kind = 'event_image' AND m.owner_id = e.id
+          WHERE e.trip_id = ? ORDER BY e.id`
+      )
+      .all(tripId) as Array<{ id: number; file_name: string | null; source: string | null; attempts: number | null }>;
+    const todo: number[] = [];
+    let skipped = 0;
+    for (const r of rows) {
+      const removed = r.source != null && !r.file_name && (r.attempts ?? 0) >= MAX_IMAGE_ATTEMPTS;
+      const has = Boolean(r.file_name);
+      if (r.source === "uploaded" && has) skipped += 1;
+      else if (mode === "missing" && (has || removed)) skipped += 1;
+      else todo.push(r.id);
+    }
+    const job = { total: todo.length, done: 0, failed: 0, running: todo.length > 0, startedAt: this.now().toISOString() };
+    this.tripJobs.set(tripId, job);
+    if (todo.length === 0) return { queued: 0, skipped };
+    const work = (async () => {
+      for (const id of todo) {
+        try {
+          await this.generate("event_image", id, { force: true });
+        } catch {
+          job.failed += 1;
+        }
+        job.done += 1;
+      }
+      job.running = false;
+    })();
+    if (this.deps.background) this.deps.background.run(work);
+    else void work;
+    return { queued: todo.length, skipped };
   }
 
   /** Nach dem Anlegen im Hintergrund erzeugen; Fehler werden nie weitergereicht. */

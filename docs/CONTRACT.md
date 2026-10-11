@@ -297,4 +297,8 @@ Unsichere Importfälle (Zeitzone nicht ableitbar, Typ unbekannt) werden `status 
 - `DELETE /v1/media/:kind/:ownerId` (Admin): Bild entfernen; wird danach nicht automatisch neu erzeugt.
 - Ereignis: `imageUrl` und `imageSource` (`generated` | `uploaded` | `imported` | `null`). Clients dürfen erzeugte Bilder
   ausblenden (Web: Einstellung «KI-Bilder bei Ereignissen anzeigen»), `uploaded` bleibt sichtbar.
-- Prompt der Ereignisbilder: Vorlage der alten App (familybrain), Logos und Marken sind erlaubt.
+- `POST /v1/trips/:id/event-images/generate` (Admin, Body `{ mode: "missing" | "all" }`): Ereignisbilder der Reise gesamthaft
+  erzeugen, Antwort `202 { queued, skipped, mode }`. `missing`: nur Ereignisse ohne Bild (entfernte bleiben entfernt);
+  `all`: alle ausser eigenen, hochgeladenen Bildern. Läuft nacheinander im Hintergrund; `409 already_running`, `409 images_disabled`.
+- `GET /v1/trips/:id/event-images/status` (Admin): `{ enabled, job: { total, done, failed, running } | null }`.
+- Prompt der Ereignisbilder: ein passendes Motiv und das Logo des Anbieters, sonst kein Text im Bild (Angaben nur als Kontext).

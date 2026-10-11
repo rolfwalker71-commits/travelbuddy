@@ -291,3 +291,13 @@
 .imagetools { display: inline-flex; align-items: center; gap: 8px; }
 .evhero__media { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
 .evhero__media .evhero__img, .evhero__media .media--full { width: 100%; border-radius: var(--r-m); }
+
+/* Vorschaubild auf der Ereigniskarte: absolut, ändert die Kartenhöhe nicht */
+.ticket__body { position: relative; }
+.ticket__thumb { position: absolute; top: 12px; right: 14px; z-index: 2; width: 64px; height: 64px; }
+.ticket__thumb .evthumb { width: 64px; height: 64px; border-radius: var(--r-m); overflow: hidden; display: block; }
+.ticket__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ticket.has-thumb .ticket__title, .ticket.has-thumb .ticket__main { padding-right: 76px; }
+.lightbox { display: grid; place-items: center; }
+.lightbox .media--full img { max-width: 100%; max-height: 78dvh; border-radius: var(--r-m); }
+.evhero__img img { cursor: zoom-in; }

@@ -192,6 +192,7 @@ struct EventRowView: View {
     let tripZoneID: String?
     let action: () -> Void
     @Environment(TravelStore.self) private var store
+    @AppStorage(EventImagePrefs.key) private var showGeneratedImages = true
 
     var body: some View {
         let type = store.catalog.typeOrFallback(for: event.type)
@@ -226,9 +227,16 @@ struct EventRowView: View {
                 Spacer(minLength: 0)
             }
             .padding(12)
+            .padding(.trailing, EventImagePrefs.isVisible(event, showGenerated: showGeneratedImages) ? 60 : 0)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .overlay(alignment: .topTrailing) {
+            // Die Vorschau liegt über der Zeile, damit sich die Zeilenhöhe nicht ändert.
+            if EventImagePrefs.isVisible(event, showGenerated: showGeneratedImages) {
+                EventImageThumb(event: event, size: 48).padding(.top, 12).padding(.trailing, 12)
+            }
+        }
         .accessibilityElement(children: .combine)
         .accessibilityHint("Öffnet das Ereignis")
     }

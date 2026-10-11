@@ -177,6 +177,35 @@ export function mediaRoutes(deps: ModuleDeps) {
     return c.json({ media: serializeMedia(row) });
   });
 
+  /** Ereignisbilder einer Reise gesamthaft erzeugen (Admin): `{ mode: "missing" | "all" }`, Antwort 202. */
+  r.post("/v1/trips/:id/event-images/generate", async (c) => {
+    admin(c);
+    const tripId = ownerSchema.safeParse(c.req.param("id"));
+    if (!tripId.success) throw badRequest("Ungültiger Parameter id");
+    if (!db.prepare("SELECT 1 FROM trips WHERE id = ?").get(tripId.data)) throw notFound("Reise");
+    const text = await c.req.text();
+    let raw: unknown = {};
+    if (text.trim()) {
+      try {
+        raw = JSON.parse(text);
+      } catch {
+        throw new HttpError(400, "invalid_json", "Ungültiger JSON-Body");
+      }
+    }
+    const { mode } = parseWith(raw, z.object({ mode: z.enum(["missing", "all"]).default("missing") }));
+    const res = service.startTripEvents(tripId.data, mode);
+    return c.json({ ...res, mode }, 202);
+  });
+
+  /** Stand der Sammelerzeugung einer Reise (nur Admin). */
+  r.get("/v1/trips/:id/event-images/status", (c) => {
+    admin(c);
+    const tripId = ownerSchema.safeParse(c.req.param("id"));
+    if (!tripId.success) throw badRequest("Ungültiger Parameter id");
+    const job = service.tripJob(tripId.data);
+    return c.json({ enabled: service.enabled, job });
+  });
+
   /** Eigenes Bild hochladen (Admin, multipart `file`): ersetzt ein vorhandenes, wird nie automatisch überschrieben. */
   r.put("/v1/media/:kind/:ownerId", async (c) => {
     admin(c);

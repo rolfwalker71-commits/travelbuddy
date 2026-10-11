@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { trips as tripsApi } from "../api/endpoints";
 import type { Traveler, TripDetail, TripEvent } from "../api/types";
@@ -17,6 +17,8 @@ import { Button } from "../ui/Button";
 import { ErrorState, Spinner } from "../ui/Feedback";
 import { Icon } from "../ui/Icon";
 import type { Catalog } from "../lib/catalog";
+import { loadMedia } from "../lib/media";
+import { eventImageVisible, useShowGeneratedEventImages } from "../lib/prefs";
 import "../styles/print.css";
 
 type Variant = "full" | "compact";
@@ -59,6 +61,24 @@ export function PrintView({ data }: { data: TripDetail }) {
   const groups = useMemo(() => groupEventsByDay(events), [events]);
   const span = tripSpan(trip, events);
 
+  const showGenerated = useShowGeneratedEventImages();
+  const imgOf = (e: TripEvent): string | null => (e.imageUrl && eventImageVisible(e.imageSource, showGenerated) ? e.imageUrl : null);
+  // Bilder vor dem Drucken laden (sie kommen mit Anmeldung und sind sonst beim Druck evtl. noch leer)
+  const urls = useMemo(
+    () => [trip.coverUrl, ...events.map(imgOf)].filter((u): u is string => Boolean(u)),
+    [events, trip.coverUrl, showGenerated] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const [imagesReady, setImagesReady] = useState(urls.length === 0);
+  useEffect(() => {
+    let alive = true;
+    setImagesReady(urls.length === 0);
+    if (urls.length === 0) return;
+    void Promise.allSettled(urls.map((u) => loadMedia(u))).then(() => alive && setImagesReady(true));
+    return () => {
+      alive = false;
+    };
+  }, [urls]);
+
   const counts = useMemo(() => {
     const m = new Map<string, [number, IconName]>();
     for (const e of events) {
@@ -84,8 +104,8 @@ export function PrintView({ data }: { data: TripDetail }) {
             </button>
           ))}
         </div>
-        <Button variant="primary" icon="download" onClick={() => window.print()}>
-          Drucken / Als PDF
+        <Button variant="primary" icon="download" disabled={!imagesReady} onClick={() => window.print()}>
+          {imagesReady ? "Drucken / Als PDF" : "Bilder werden geladen …"}
         </Button>
         <p className="print-toolbar__hint">Im Druckdialog «Kopf- und Fusszeilen» ausschalten und «Hintergrundgrafiken» einschalten.</p>
       </div>
@@ -120,8 +140,8 @@ export function PrintView({ data }: { data: TripDetail }) {
               {g.date && span ? <span className="day__n">Tag {daysBetween(span.start, g.date) + 1}</span> : null}
             </h2>
             {variant === "full"
-              ? g.events.map((e) => <FullEvent key={e.id} e={e} catalog={catalog} travelers={travelers} />)
-              : <CompactDay events={g.events} catalog={catalog} travelers={travelers} />}
+              ? g.events.map((e) => <FullEvent key={e.id} e={e} img={imgOf(e)} catalog={catalog} travelers={travelers} />)
+              : <CompactDay events={g.events} imgOf={imgOf} catalog={catalog} travelers={travelers} />}
           </section>
         ))}
 
@@ -194,18 +214,19 @@ function rowsOf(catalog: Catalog, e: TripEvent, travelers: Traveler[]): DetailRo
   return out;
 }
 
-function FullEvent({ e, catalog, travelers }: { e: TripEvent; catalog: Catalog; travelers: Traveler[] }) {
+function FullEvent({ e, img, catalog, travelers }: { e: TripEvent; img: string | null; catalog: Catalog; travelers: Traveler[] }) {
   const info = typeInfo(catalog, e);
   const ref = referenceOf(e);
   const sum = summaryLine(catalog, e);
   const rows = rowsOf(catalog, e, travelers);
   return (
-    <article className="ev" style={{ ["--c" as string]: `var(--k-${info.color})` }}>
+    <article className={`ev${img ? " ev--img" : ""}`} style={{ ["--c" as string]: `var(--k-${info.color})` }}>
       <header>
         <span className="ev__ico"><Icon name={info.icon} size={21} /></span>
         <span className="ev__typ">{info.label}</span>
         {ref ? <span className="ev__ref">{ref}</span> : null}
       </header>
+      {img ? <MediaImage src={img} variant="thumb" lazy={false} className="ev__img" /> : null}
       <div className="ev__main">
         <div className="ev__time">{timeOf(e) || "–"}</div>
         <div className="ev__ttl">
@@ -227,7 +248,7 @@ function FullEvent({ e, catalog, travelers }: { e: TripEvent; catalog: Catalog; 
   );
 }
 
-function CompactDay({ events, catalog, travelers }: { events: TripEvent[]; catalog: Catalog; travelers: Traveler[] }) {
+function CompactDay({ events, imgOf, catalog, travelers }: { events: TripEvent[]; imgOf: (e: TripEvent) => string | null; catalog: Catalog; travelers: Traveler[] }) {
   return (
     <table className="cmp">
       <tbody>
@@ -255,6 +276,7 @@ function CompactDay({ events, catalog, travelers }: { events: TripEvent[]; catal
                 ) : null}
               </td>
               <td className="cmp__ref mono">{ref}</td>
+              <td className="cmp__img">{imgOf(e) ? <MediaImage src={imgOf(e)} variant="thumb" lazy={false} /> : null}</td>
             </tr>
           );
         })}

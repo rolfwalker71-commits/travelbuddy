@@ -221,8 +221,9 @@ test("bilder: eigenes Bild hochladen, entfernen, mit Zusatzhinweis neu erzeugen 
   const used = prompts.at(-1)!;
   assert.match(used, /Square travel illustration/);
   assert.match(used, /bei Sonnenuntergang/);
-  assert.match(used, /Logos and brand marks/);
-  assert.doesNotMatch(used, /No logos/);
+  assert.match(used, /logo of the provider «Beispiel Air»/);
+  assert.match(used, /no text at all/);
+  assert.doesNotMatch(used, /Timing rule/);
   assert.equal((await call("POST", `/v1/media/event_image/${eventId}/regenerate`, { token: ben })).status, 403);
 
   // Entfernen: Datei weg, keine automatische Neuerzeugung
@@ -247,5 +248,36 @@ test("prompt: Vorlage der alten App mit Beleg, Logos erlaubt", () => {
   });
   assert.match(p, /Receipt context: Bestätigung für 5 Nächte\./);
   assert.match(p, /Scene idea: welcoming hotel/);
-  assert.match(p, /Logos and brand marks/);
+  assert.match(p, /logo of the provider «Beispiel Hotels»/);
+  assert.match(p, /do NOT write any of this as text/);
+});
+
+test("sammelerzeugung: nur Fehlendes, eigene Bilder und entfernte bleiben, Stand abrufbar", async () => {
+  const { gen, prompts } = fakeImages();
+  const { call, anna, tokens, db, mediaDir, background } = await mediaSetup(gen);
+  const ben = await tokens.ben();
+  const t = await call("POST", "/v1/trips", { token: anna, json: { title: "Sammel" } });
+  const tripId = t.body.trip.id as number;
+  const mk = async (title: string) =>
+    (await call("POST", `/v1/trips/${tripId}/events`, { token: anna, json: { type: "Ausflug", title, startDate: "2026-11-02" } })).body.eventId as number;
+  const a = await mk("A");
+  const b = await mk("B");
+  const c = await mk("C");
+  await background.idle?.();
+  prompts.length = 0;
+  saveMedia(db, mediaDir, { kind: "event_image", ownerId: b, bytes: PNG2, source: "uploaded" });
+  await call("DELETE", `/v1/media/event_image/${c}`, { token: anna });
+
+  assert.equal((await call("POST", `/v1/trips/${tripId}/event-images/generate`, { token: ben, json: {} })).status, 403);
+  const res = await call("POST", `/v1/trips/${tripId}/event-images/generate`, { token: anna, json: { mode: "all" } });
+  assert.equal(res.status, 202);
+  // b ist eigen (bleibt), c wurde entfernt, aber «alle» erzeugt es auf ausdrücklichen Wunsch neu
+  assert.equal(res.body.skipped, 1);
+  await background.idle?.();
+  assert.equal(getMedia(db, "event_image", b)!.source, "uploaded");
+  assert.equal(getMedia(db, "event_image", a)!.source, "generated");
+  assert.equal(getMedia(db, "event_image", c)!.source, "generated");
+  const st = await call("GET", `/v1/trips/${tripId}/event-images/status`, { token: anna });
+  assert.equal(st.body.job.running, false);
+  assert.equal(st.body.job.total, 2);
 });

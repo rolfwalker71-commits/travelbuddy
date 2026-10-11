@@ -17,6 +17,7 @@ struct EventDetailView: View {
     @State private var confirmDelete = false
     @State private var triggerRoute = false
     @State private var ledgerMessage: String?
+    @AppStorage(EventImagePrefs.key) private var showGeneratedImages = true
 
     private var detail: TripDetail? { store.detail(id: ref.tripID) }
     private var event: TripEvent? { detail?.event(id: ref.eventID) }
@@ -101,8 +102,16 @@ struct EventDetailView: View {
         let facts = EventFacts.big(for: e, catalog: catalog, participantId: store.myParticipantID(tripID: ref.tripID), limit: 4)
         return TicketCard(icon: type.icon, color: type.color, typeLabel: type.label, reference: e.bookingReference, status: e.status) {
             VStack(alignment: .leading, spacing: 12) {
-                Text(e.title).tbTitle(26, weight: .bold, relativeTo: .title)
-                if let p = e.provider { Text(p).tbText(16, color: Palette.mute) }
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(e.title).tbTitle(26, weight: .bold, relativeTo: .title)
+                        if let p = e.provider { Text(p).tbText(16, color: Palette.mute) }
+                    }
+                    Spacer(minLength: 0)
+                    if EventImagePrefs.isVisible(e, showGenerated: showGeneratedImages) {
+                        EventImageThumb(event: e, size: 96)
+                    }
+                }
                 timeLine(label: type.startLabel, date: e.startDate, time: e.startTime, zone: e.startTz, tripZone: tripZoneID)
                 if e.endDate != nil || e.endTime != nil, !type.endLabel.isEmpty {
                     timeLine(label: type.endLabel, date: e.endDate ?? e.startDate, time: e.endTime, zone: e.endTz ?? e.startTz, tripZone: tripZoneID)

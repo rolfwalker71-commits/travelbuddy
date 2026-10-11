@@ -322,6 +322,8 @@ struct TripEvent: Codable, Equatable, Hashable, Sendable, Identifiable {
     var documents: [TBDocument] = []
     var comments: [TripComment] = []
     var imageUrl: String?
+    /// Herkunft des Bildes: `generated`, `uploaded` oder `imported`.
+    var imageSource: String?
     var mapUrl: String?
     var status: EventStatus = .confirmed
     var participantIds: [Int] = []
@@ -379,6 +381,7 @@ extension TripEvent {
         documents = (try? c.decodeIfPresent([TBDocument].self, forKey: .documents)) ?? []
         comments = (try? c.decodeIfPresent([TripComment].self, forKey: .comments)) ?? []
         imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+        imageSource = try c.decodeIfPresent(String.self, forKey: .imageSource)
         mapUrl = try c.decodeIfPresent(String.self, forKey: .mapUrl)
         status = (try? c.decodeIfPresent(EventStatus.self, forKey: .status)) ?? .confirmed
         participantIds = (try? c.decodeIfPresent([Int].self, forKey: .participantIds)) ?? []
