@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="de-CH" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TravelBuddy – Web-Mockup (Richtung B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECE5D7;--surface:#FBF8F1;--surface2:#F1EBDD;--line:#D4C9B4;--ink:#1D1B18;--mute:#6F675A;--accent:#D8452B;--onaccent:#fff;--pos:#2F7D4F;--neg:#B3261E;
+  --air:#D8452B;--ship:#1F4E5F;--stay:#B48A2B;--car:#5B8C5A;--rail:#3C6E8F;--transfer:#7A5C99;--activity:#C46A2D;--food:#A8433F;--doc:#6F675A;
+  --hero:#1D1B18;--heroink:#FBF8F1;--heroacc:#FFB347;
+  --m-land:#EFE9DB;--m-block:#E3DAC6;--m-road:#FBF8F1;--m-water:#BFD3D8;--m-park:#CBD9B5;--m-label:#6F675A;
+  --page:#0f1114;
+  --sans:"Barlow","Helvetica Neue",Arial,sans-serif;--cond:"Barlow Semi Condensed","Barlow","Arial Narrow",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+:root[data-theme=dark]{
+  --bg:#151412;--surface:#1F1D1A;--surface2:#2A2723;--line:#3A362F;--ink:#F1EBDD;--mute:#A59C8B;--accent:#F0653F;--onaccent:#1A0E0A;--pos:#6FCF97;--neg:#F28B82;
+  --air:#F0653F;--ship:#5FA3B8;--stay:#D6B04E;--car:#7FB47E;--rail:#6FA3C4;--transfer:#A68BC4;--activity:#E08F55;--food:#D97671;--doc:#A59C8B;
+  --hero:#2A2723;--heroink:#F1EBDD;--heroacc:#FFB347;
+  --m-land:#23211D;--m-block:#2C2924;--m-road:#3A362F;--m-water:#1E3A44;--m-park:#2B3A2A;--m-label:#A59C8B;
+  --page:#080908;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:#e9e5dc;font:15px/1.5 var(--sans)}
+.top{position:sticky;top:0;z-index:20;display:flex;gap:14px;align-items:center;padding:10px 22px;background:#16181c;border-bottom:1px solid #2a2e35}
+.top b{font-family:var(--cond);font-size:18px}
+.top a{color:#e9e5dc;text-decoration:none;padding:6px 12px;border:1px solid #333840;border-radius:999px;font-size:13px}
+.top a:hover{background:#22262c}
+.top .sp{flex:1}
+.top button{font:600 13px var(--sans);padding:7px 14px;border-radius:999px;border:1px solid #333840;background:#22262c;color:#fff;cursor:pointer}
+.wrapper{padding:26px 22px 80px;max-width:1360px;margin:0 auto}
+h2.sc{font-family:var(--cond);font-size:26px;margin:46px 0 4px;font-weight:600}
+p.sd{margin:0 0 14px;color:#a8aeb8;max-width:90ch}
+.scroll{overflow:auto;border-radius:14px;border:1px solid #2a2e35}
+.frame{width:1280px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px}
+.chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--line)}
+.chrome i{width:11px;height:11px;border-radius:50%;background:var(--line);display:inline-block}
+.chrome .url{margin-left:12px;flex:1;max-width:520px;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:3px 10px;font:12px var(--mono);color:var(--mute)}
+.app{display:grid;grid-template-columns:216px 1fr;min-height:760px}
+/* Seitenleiste */
+.side{background:var(--surface);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+.logo{display:flex;align-items:center;gap:9px;padding:4px 8px 14px;font:700 19px var(--cond);letter-spacing:.01em}
+.logo svg{width:26px;height:26px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--mute);font-weight:500}
+.nav a.on{background:var(--surface2);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent)}
+.nav .badge{margin-left:auto;background:var(--accent);color:var(--onaccent);font:600 11px var(--mono);padding:1px 7px;border-radius:999px}
+.ico{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.side .trip{margin-top:auto;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface2)}
+.lab{font:600 10.5px var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+/* Hauptbereich */
+.main{padding:0 26px 26px}
+.bar{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);margin-bottom:20px}
+.bar h1{margin:0;font:600 26px var(--cond);letter-spacing:.005em}
+.bar .crumb{color:var(--mute);font-size:13px}
+.bar .sp{flex:1}
+.search{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--mute);width:230px;font-size:13px}
+.av{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 12px var(--cond)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font:600 13px var(--sans);color:var(--ink)}
+.btn.pr{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.card h3{margin:0 0 10px;font:600 11px var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.stack{display:flex;flex-direction:column;gap:16px}
+/* Hero */
+.hero{background:var(--hero);color:var(--heroink);border-radius:12px;padding:20px 22px;display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px);background-size:14px 14px}
+.hero>*{position:relative;z-index:1}
+.hero .lab{color:var(--heroink);opacity:.7}
+.hero h2{margin:4px 0 2px;font:700 30px/1.1 var(--cond)}
+.hero .sub{opacity:.85}
+.ring{width:96px;height:96px}
+.ring .r0{fill:none;stroke:currentColor;opacity:.2;stroke-width:7}
+.ring .r1{fill:none;stroke:var(--heroacc);stroke-width:7;stroke-linecap:round}
+.ring .t{font:600 20px var(--mono);fill:currentColor}.ring .s{font:500 10px var(--mono);fill:currentColor;opacity:.8}
+.hero .acts{display:flex;flex-direction:column;gap:8px}
+.hero .btn{background:transparent;color:var(--heroink);border-color:rgba(255,255,255,.3)}
+.hero .btn.pr{background:var(--heroacc);color:#1D1B18;border-color:var(--heroacc)}
+/* Tagesband */
+.dband{position:relative;height:74px;margin-top:6px}
+.dband .axis{position:absolute;left:0;right:0;top:34px;height:2px;background:var(--line)}
+.dband .tick{position:absolute;top:38px;font:500 10.5px var(--mono);color:var(--mute);transform:translateX(-50%)}
+.dband .seg{position:absolute;top:22px;height:26px;border-radius:5px;color:#fff;font:600 11px/26px var(--cond);padding:0 8px;white-space:nowrap;overflow:hidden}
+.dband .pt{position:absolute;top:18px;width:2px;height:34px;background:var(--ink)}
+.dband .pt span{position:absolute;top:-16px;left:-30px;width:62px;text-align:center;font:600 10.5px var(--mono)}
+.dband .now{position:absolute;top:8px;height:58px;width:2px;background:var(--accent)}
+.dband .now::before{content:"JETZT";position:absolute;top:-2px;left:5px;font:700 9.5px var(--cond);letter-spacing:.1em;color:var(--accent)}
+/* Ticket */
+.ticket{display:grid;grid-template-columns:1fr 168px;background:var(--surface);border:1px solid var(--line);border-radius:10px;position:relative}
+.ticket+.ticket{margin-top:12px}
+.tk-main{padding:0}
+.tk-head{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);border-radius:10px 0 0 0}
+.tk-head .tg{display:flex;align-items:center;gap:7px;color:#fff;padding:3px 9px 3px 7px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.1em;text-transform:uppercase}
+.tk-head .tg .ico{width:14px;height:14px}
+.tk-head .ref{margin-left:auto;font:500 12px var(--mono);color:var(--mute)}
+.tk-body{padding:12px 14px 14px}
+.tk-body h4{margin:0 0 2px;font:600 20px/1.2 var(--cond)}
+.tk-body .sub{color:var(--mute);font-size:13px}
+.times{display:flex;align-items:center;gap:14px;margin:8px 0 10px}
+.times .t{font:600 26px var(--mono);letter-spacing:-.02em}
+.times .ar{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 11px);position:relative}
+.times .ar::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:8px solid var(--mute)}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 16px}
+.kv .k{font:600 10px var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.kv .v{font:500 14px var(--mono)}
+.stub{border-left:2px dashed var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;position:relative;background:var(--surface2);border-radius:0 10px 10px 0}
+.stub::before,.stub::after{content:"";position:absolute;left:-9px;width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
+.stub::before{top:-9px;clip-path:inset(50% 0 0 0)}.stub::after{bottom:-9px;clip-path:inset(0 0 50% 0)}
+.doc{display:flex;gap:8px;align-items:center;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--surface);font-size:12px}
+.doc .pg{width:22px;height:28px;border:1px solid var(--line);background:#fff;border-radius:2px;flex:none;position:relative}
+.doc .pg::after{content:"";position:absolute;left:4px;right:4px;top:6px;height:2px;background:var(--line);box-shadow:0 5px 0 var(--line),0 10px 0 var(--line)}
+.qr{width:62px;height:62px;background:conic-gradient(var(--ink) 25%,transparent 0 50%,var(--ink) 0 75%,transparent 0) 0 0/12px 12px;opacity:.85;border:5px solid var(--surface);outline:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--cond);letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px dashed var(--mute);color:var(--mute)}
+.chip.warn{border-style:solid;border-color:var(--neg);color:var(--neg)}
+.chip.ok{border-style:solid;border-color:var(--pos);color:var(--pos)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--accent)}.dot.h{background:transparent;border:1.5px solid var(--mute)}
+/* Karte */
+.map{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--m-land)}
+.map svg{display:block;width:100%;height:auto}
+.map .call{position:absolute;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.map .call b{display:block;font:600 14px var(--cond)}
+.map .tools{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.map .tools span{width:30px;height:30px;border-radius:7px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font:600 14px var(--mono)}
+.map .attr{position:absolute;left:10px;bottom:8px;font:500 10px var(--sans);color:var(--m-label)}
+.list .row{display:grid;grid-template-columns:62px 1fr auto;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
+.list .row:first-child{border-top:0}
+.list .t{font:600 14px var(--mono)}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs span{padding:9px 16px;color:var(--mute);font-weight:600;border-bottom:3px solid transparent}
+.tabs span.on{color:var(--ink);border-bottom-color:var(--accent)}
+.cover{height:150px;border-radius:12px;position:relative;overflow:hidden;background:linear-gradient(180deg,#2f6b82,#1F4E5F 60%,#173a47);margin-bottom:16px;color:#fff}
+.cover::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.14) 1px,transparent 1.5px);background-size:14px 14px}
+.cover .tt{position:absolute;left:22px;bottom:16px;z-index:2}
+.cover h2{margin:0;font:700 34px var(--cond)}
+.cover .st{position:absolute;right:22px;bottom:16px;z-index:2;display:flex;gap:22px}
+.cover .st b{display:block;font:600 24px var(--mono)}.cover .st span{font:600 10.5px var(--cond);letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+.fld{border:1px solid var(--line);border-radius:6px;padding:7px 10px;background:var(--surface);position:relative}
+.fld .k{font:600 10px var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.fld .v{font:500 14px var(--sans)}
+.fld .dot{position:absolute;right:8px;top:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.drop{border:2px dashed var(--accent);border-radius:12px;padding:22px;display:flex;align-items:center;gap:18px;background:var(--surface)}
+.drop .big{font:600 20px var(--cond)}
+.pdfpage{background:#fff;color:#222;border:1px solid var(--line);border-radius:4px;padding:14px;font:11px/1.55 var(--mono);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.pdfpage mark{background:#FFE08A;color:#1d1b18;padding:0 2px}
+.prop{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.prop+.prop{margin-top:12px}
+.prop .hd{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.conf{font:700 11px var(--mono);padding:2px 7px;border-radius:5px;color:#fff;margin-left:auto}
+.bar-s{display:flex;height:30px;border-radius:5px;overflow:hidden;gap:2px}
+.bar-s i{display:block;height:100%}
+table.tb{width:100%;border-collapse:collapse;font-size:13.5px}
+table.tb th{font:600 10.5px var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+table.tb td{padding:9px 6px;border-bottom:1px solid var(--line)}
+td.n,th.n{text-align:right;font-family:var(--mono)}
+.ledger{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+small.note{display:block;color:#8d939c;margin-top:8px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="top">
+  <b>TravelBuddy · Web-Mockup</b><span style="color:#8d939c">Richtung B «Ticket»</span>
+  <a href="#heute">Heute</a><a href="#plan">Plan</a><a href="#detail">Ereignis-Detail</a><a href="#dok">Dokumente</a><a href="#kasse">Reisekasse</a>
+  <span class="sp"></span>
+  <button id="tg" type="button">Dunkel / Hell</button>
+</div>
+<div class="wrapper">
+  <p class="sd">Desktop-Ansicht der Web-App am Beispiel «Ferien 2026», Sonntag 25.10.2026, 11:20. Zeiten und Orte stammen aus den echten Reisedaten; Beträge der Reisekasse sind Beispielwerte. Karten sind hier schematisch gezeichnet, in der App liefert Apple Karten (MapKit JS) die Karte. Die Schriften werden in der App selbst ausgeliefert.</p>
+
+<!-- ============ 1 HEUTE ============ -->
+<h2 class="sc" id="heute">1 · Heute</h2>
+<p class="sd">Erscheint nur bei aktiver Reise. Das Wichtigste des Tages gross: nächster Termin mit Countdown, Tagesband, Tickets mit den relevanten Daten, Karte der heutigen Stationen.</p>
+<div class="scroll"><div class="frame">
+  <div class="chrome"><i></i><i></i><i></i><span class="url">travelbuddy · /heute</span></div>
+  <div class="app">
+    <aside class="side">
+      <div class="logo"><svg viewBox="0 0 32 32"><rect x="2" y="7" width="28" height="18" rx="3" fill="var(--accent)"/><circle cx="2" cy="16" r="3.2" fill="var(--bg)"/><circle cx="30" cy="16" r="3.2" fill="var(--bg)"/><path d="M11 16h10" stroke="#fff" stroke-width="2" stroke-dasharray="2 2.4"/></svg>TravelBuddy</div>
+      <nav class="nav">
+        <a class="on"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Heute</a>
+        <a><svg class="ico" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg>Reisen</a>
+        <a><svg class="ico" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v4h4"/></svg>Dokumente<span class="badge">2</span></a>
+        <a><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3"/></svg>Kasse</a>
+        <a><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg>Konto</a>
+      </nav>
+      <div class="trip"><div class="lab">Aktive Reise</div><b style="font:600 16px var(--cond)">Ferien 2026</b><div class="mono" style="font-size:12px;color:var(--mute)">Tag 3 von 29</div>
+        <div style="display:flex;gap:2px;margin-top:8px">__DOTS__</div></div>
+    </aside>
+    <main class="main">
+      <div class="bar"><div><div class="crumb">Ferien 2026</div><h1>Sonntag, 25.10.2026</h1></div><span class="sp"></span><span class="search">Suchen …</span><span class="btn pr">+ Ereignis</span><span class="av">RW</span></div>
+      <div class="grid">
+        <div class="stack">
+          <div class="hero">
+            <svg class="ring" viewBox="0 0 100 100"><circle class="r0" cx="50" cy="50" r="42"/><circle class="r1" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="180" transform="rotate(-90 50 50)"/><text class="t" x="50" y="52" text-anchor="middle">0:40</text><text class="s" x="50" y="68" text-anchor="middle">Std.</text></svg>
+            <div><div class="lab">Als Nächstes · Ortszeit Barcelona 11:20</div><h2>Check-out Hotel Negresco Princess</h2><div class="sub mono">12:00 · Zimmer räumen, Gepäck zum Terminal</div></div>
+            <div class="acts"><span class="btn pr">Dokument öffnen</span><span class="btn">Route zum Hotel</span></div>
+          </div>
+          <div class="card"><h3>Tagesband · 25.10.2026 (Ortszeit)</h3>
+            <div class="dband">
+              <div class="axis"></div>
+              __TICKS__
+              <div class="now" style="left:__NOW__%"></div>
+              <div class="pt" style="left:__P12__%"><span>12:00</span></div>
+              <div class="seg" style="left:__S13__%;width:__W13__%;background:var(--ship)">Einschiffung 13:00–16:30</div>
+              <div class="pt" style="left:__P17__%;background:var(--accent)"><span style="color:var(--accent)">17:00</span></div>
+            </div>
+          </div>
+          <div>
+            <!-- Hotel -->
+            <div class="ticket"><div class="tk-main">
+              <div class="tk-head"><span class="tg" style="background:var(--stay)"><svg class="ico" viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.5"/></svg>Hotel</span><b style="font:600 13px var(--cond)">Check-out</b><span class="ref">884-221-905</span></div>
+              <div class="tk-body"><h4>Hotel Negresco Princess 4*</h4><div class="sub">Barcelona · 23.10.2026 – 25.10.2026 · 2 Nächte</div>
+                <div class="kv" style="margin-top:10px"><div><div class="k">Check-out bis</div><div class="v">12:00</div></div><div><div class="k">Zimmer</div><div class="v">Doppel</div></div><div><div class="k">Verpflegung</div><div class="v">Frühstück</div></div><div><div class="k">Zahlung</div><div class="v pos">Bezahlt</div></div></div></div></div>
+              <div class="stub"><div class="doc"><span class="pg"></span><span>Booking-Bestätigung.pdf</span></div><span class="btn sm">Karte</span><span class="btn sm">Anrufen</span></div></div>
+            <!-- Kreuzfahrt -->
+            <div class="ticket"><div class="tk-main">
+              <div class="tk-head"><span class="tg" style="background:var(--ship)"><svg class="ico" viewBox="0 0 24 24"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg>Kreuzfahrt</span><b style="font:600 13px var(--cond)">Einschiffung</b><span class="ref">RCL-••••</span></div>
+              <div class="tk-body"><h4>Legend of the Seas · Royal Caribbean</h4><div class="sub">13 Night Spanish Transatlantic Cruise · Terminal Port Nou</div>
+                <div class="times"><span class="t">13:00</span><span class="ar"></span><span class="t" style="color:var(--accent)">16:30</span></div>
+                <div class="kv"><div><div class="k">Einschiffung</div><div class="v">13:00 – 16:30</div></div><div><div class="k">Alle an Bord</div><div class="v">16:30</div></div><div><div class="k">Abfahrt</div><div class="v">17:00</div></div><div><div class="k">Kabine</div><div class="v">Deck 8 · ••••</div></div></div></div></div>
+              <div class="stub"><div class="qr"></div><div class="doc"><span class="pg"></span><span>Bordkarte.pdf</span></div><span class="btn sm">Route zum Terminal</span></div></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="card" style="padding:12px"><h3>Karte · heute</h3><div class="map" id="map1"></div></div>
+          <div class="card"><h3>Morgen · Montag, 26.10.2026</h3><div class="list">
+            <div class="row"><span class="t">07:30</span><div><b>Palma de Mallorca</b><div style="color:var(--mute);font-size:12.5px">Marina Port de Mallorca · bis 15:30</div></div><span class="chip">Hafentag</span></div></div></div>
+          <div class="card"><h3>Zu prüfen</h3>
+            <div style="display:flex;gap:10px;align-items:center"><span class="chip warn">2 Vorschläge</span><span style="color:var(--mute);font-size:13px">aus «Booking-Bestätigung.pdf»</span><span class="btn sm" style="margin-left:auto">Prüfen</span></div></div>
+          <div class="card"><h3>Reise in Zahlen</h3>
+            <div class="g3" style="text-align:center"><div><div class="mono" style="font-size:24px;font-weight:600">29</div><div class="lab">Tage</div></div><div><div class="mono" style="font-size:24px;font-weight:600">26</div><div class="lab">Nächte</div></div><div><div class="mono" style="font-size:24px;font-weight:600">9</div><div class="lab">Häfen</div></div></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div></div>
+
+<!-- ============ 2 PLAN ============ -->
+<h2 class="sc" id="plan">2 · Reise: Plan, Zeitband und Routenkarte</h2>
+<p class="sd">Die ganze Reise auf einen Blick: Kopf mit Kennzahlen, Zeitband, Routenbogen über die Karte und der Plan in Tagen. Tabs führen zu Dokumenten, Kasse, Team und Karte.</p>
+<div class="scroll"><div class="frame">
+  <div class="chrome"><i></i><i></i><i></i><span class="url">travelbuddy · /reisen/1</span></div>
+  <div class="app">
+    <aside class="side">__SIDE__</aside>
+    <main class="main">
+      <div class="bar"><div><div class="crumb">Reisen ›</div><h1>Ferien 2026</h1></div><span class="sp"></span><span class="chip ok">Aktiv</span><span class="btn">Teilen</span><span class="btn pr">+ Ereignis</span></div>
+      <div class="cover"><div class="tt"><div class="lab" style="color:#fff;opacity:.85">Kreuzfahrt Barcelona → Florida</div><h2>Ferien 2026</h2><div class="mono" style="opacity:.9">23.10.2026 – 20.11.2026</div></div>
+        <div class="st"><div><b>29</b><span>Tage</span></div><div><b>4</b><span>Personen</span></div><div><b>43</b><span>Ereignisse</span></div></div></div>
+      <div class="tabs"><span class="on">Plan</span><span>Dokumente</span><span>Kasse</span><span>Team</span><span>Karte</span></div>
+      <div class="grid" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)">
+        <div class="stack">
+          <div class="card"><h3>Zeitband · 23.10. bis 20.11.2026</h3>__ZEITBAND__</div>
+          <div class="card"><h3>Plan</h3><div class="list">
+            <div class="row"><span class="t">23.10.</span><div><b>Erstfeld/Altdorf → Zürich Flughafen</b><div style="color:var(--mute);font-size:12.5px">Zug 08:39 – 10:11</div></div><span class="tg" style="background:var(--rail);color:#fff;padding:2px 8px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.08em">ZUG</span></div>
+            <div class="row"><span class="t">23.10.</span><div><b>Flug Zürich → Barcelona</b><div style="color:var(--mute);font-size:12.5px">12:20 – 14:05 · ZRH → BCN</div></div><span class="tg" style="background:var(--air);color:#fff;padding:2px 8px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.08em">FLUG</span></div>
+            <div class="row"><span class="t">23.10.</span><div><b>Hotel Negresco Princess 4*</b><div style="color:var(--mute);font-size:12.5px">Check-in 15:00 · bis 25.10.2026 12:00</div></div><span class="tg" style="background:var(--stay);color:#fff;padding:2px 8px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.08em">HOTEL</span></div>
+            <div class="row"><span class="t">25.10.</span><div><b>Legend of the Seas · Einschiffung</b><div style="color:var(--mute);font-size:12.5px">Terminal Port Nou · Abfahrt 17:00</div></div><span class="tg" style="background:var(--ship);color:#fff;padding:2px 8px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.08em">SCHIFF</span></div>
+            <div class="row"><span class="t">26.10.</span><div><b>Palma de Mallorca</b><div style="color:var(--mute);font-size:12.5px">07:30 – 15:30</div></div><span class="chip">Hafentag</span></div>
+            <div class="row"><span class="t">29.10.</span><div><b>Seetag · Atlantik</b><div style="color:var(--mute);font-size:12.5px">9 Seetage bis 06.11.2026</div></div><span class="chip">Seetag</span></div>
+            <div class="row"><span class="t">07.11.</span><div><b>Miami Marriott Biscayne Bay</b><div style="color:var(--mute);font-size:12.5px">Check-in 16:00 · Transfer Port Everglades</div></div><span class="tg" style="background:var(--stay);color:#fff;padding:2px 8px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.08em">HOTEL</span></div>
+            <div class="row"><span class="t">19.11.</span><div><b>Flug Miami → Lissabon</b><div style="color:var(--mute);font-size:12.5px">16:50 – 06:00 (+1) · MIA → LIS</div></div><span class="tg" style="background:var(--air);color:#fff;padding:2px 8px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.08em">FLUG</span></div>
+          </div></div>
+        </div>
+        <div class="stack">
+          <div class="card" style="padding:12px"><h3>Routenbogen</h3><div class="map" id="map2"></div>
+            <div class="legend"><span><i style="background:var(--ship)"></i>Schiff</span><span><i style="background:var(--air)"></i>Flug</span><span><i style="background:var(--rail)"></i>Bahn</span><span><i style="background:var(--stay)"></i>Unterkunft</span></div></div>
+          <div class="card"><h3>Offene Punkte</h3><div class="list">
+            <div class="row" style="grid-template-columns:1fr auto"><div><b>Online-Check-in Flug MIA → LIS</b><div style="color:var(--mute);font-size:12.5px">öffnet 18.11.2026 16:50</div></div><span class="chip">Aufgabe</span></div>
+            <div class="row" style="grid-template-columns:1fr auto"><div><b>Mietwagen kostenlos stornierbar</b><div style="color:var(--mute);font-size:12.5px">bis 13.11.2026</div></div><span class="chip warn">Frist</span></div></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div></div>
+
+<!-- ============ 3 DETAIL ============ -->
+<h2 class="sc" id="detail">3 · Ereignis-Detail mit Adresskarte</h2>
+<p class="sd">Die Adresse aus dem PDF wird erkannt, geokodiert und als Karte direkt über den Buchungsdaten gezeigt. Jedes Feld zeigt seine Herkunft (gefüllter Punkt = aus Dokument, Ring = von Hand); Klick öffnet die Fundstelle im PDF.</p>
+<div class="scroll"><div class="frame">
+  <div class="chrome"><i></i><i></i><i></i><span class="url">travelbuddy · /reisen/1/ereignisse/8</span></div>
+  <div class="app">
+    <aside class="side">__SIDE__</aside>
+    <main class="main">
+      <div class="bar"><div><div class="crumb">Ferien 2026 › Plan ›</div><h1>Hotel Negresco Princess 4*</h1></div><span class="sp"></span><span class="chip ok">Bestätigt</span><span class="btn">Bearbeiten</span><span class="btn">Dokument</span></div>
+      <div class="grid" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+        <div class="stack">
+          <div class="card" style="padding:12px"><h3>Karte</h3><div class="map" id="map3"></div>
+            <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+              <div><b style="font:600 16px var(--cond)">Hotel Negresco Princess</b><div style="color:var(--mute)">Carrer de Pere IV 1, 08005 Barcelona, Spanien <span class="dot" style="margin-left:6px"></span> <span style="font-size:12px">aus Dokument · Seite 1</span></div></div>
+              <span style="flex:1"></span><span class="btn">In Karten öffnen</span><span class="btn pr">Route</span><span class="btn">Adresse kopieren</span></div></div>
+          <div class="card"><h3>Buchung</h3>
+            <div class="g3">
+              <div class="fld"><span class="dot"></span><div class="k">Check-in ab</div><div class="v mono">15:00</div></div>
+              <div class="fld"><span class="dot"></span><div class="k">Check-out bis</div><div class="v mono">12:00</div></div>
+              <div class="fld"><span class="dot"></span><div class="k">Nächte</div><div class="v mono">2</div></div>
+              <div class="fld"><span class="dot"></span><div class="k">Zimmerart</div><div class="v">Doppelzimmer</div></div>
+              <div class="fld"><span class="dot"></span><div class="k">Verpflegung</div><div class="v">Frühstück</div></div>
+              <div class="fld"><span class="dot"></span><div class="k">Bestätigungsnr.</div><div class="v mono">884-221-905</div></div>
+              <div class="fld"><span class="dot h"></span><div class="k">Plattform</div><div class="v">Booking.com</div></div>
+              <div class="fld"><span class="dot h"></span><div class="k">Türcode / Schlüssel</div><div class="v" style="color:var(--mute)">Leer</div></div>
+              <div class="fld"><span class="dot h"></span><div class="k">Parkplatz</div><div class="v" style="color:var(--mute)">Leer</div></div>
+            </div></div>
+        </div>
+        <div class="stack">
+          <div class="card"><h3>Quelle</h3>
+            <div class="doc" style="margin-bottom:10px"><span class="pg"></span><span><b>Booking-Bestätigung.pdf</b><br><span style="color:var(--mute)">Seite 1 von 2 · ausgewertet 11.10.2026 14:30</span></span></div>
+            <div class="pdfpage">Hotel Negresco Princess 4*<br><mark>Carrer de Pere IV 1, 08005 Barcelona</mark><br>Bestätigungsnummer <mark>884-221-905</mark><br>Check-in ab <mark>15:00</mark> · Check-out bis <mark>12:00</mark><br>Frühstück inklusive</div></div>
+          <div class="card"><h3>Kosten</h3>
+            <div style="display:flex;align-items:baseline;gap:10px"><span class="mono" style="font-size:26px;font-weight:600">CHF 412.00</span><span class="chip ok">Bezahlt</span></div>
+            <div style="color:var(--mute);margin:4px 0 12px">Bezahlt von Rolf · 4 Personen</div><span class="btn pr">In Reisekasse übernehmen</span></div>
+          <div class="card"><h3>Dabei</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">Rolf</span><span class="chip">Valentyna</span><span class="chip">Eliane</span><span class="chip">Harald</span></div></div>
+          <div class="card"><h3>Kommentare</h3><div style="color:var(--mute)">Noch keine Kommentare.</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div></div>
+
+<!-- ============ 4 DOKUMENTE ============ -->
+<h2 class="sc" id="dok">4 · Dokumente und Vorschläge</h2>
+<p class="sd">PDF hochladen oder aus dem Teilen-Menü einwerfen. Die Auswertung schlägt Ereignisse vor, mit Fundstelle und Sicherheit. Nichts wird still übernommen oder überschrieben.</p>
+<div class="scroll"><div class="frame">
+  <div class="chrome"><i></i><i></i><i></i><span class="url">travelbuddy · /dokumente</span></div>
+  <div class="app">
+    <aside class="side">__SIDE__</aside>
+    <main class="main">
+      <div class="bar"><h1>Dokumente</h1><span class="sp"></span><span class="chip warn">2 zu prüfen</span><span class="search">Suchen …</span></div>
+      <div class="drop"><svg class="ico" style="width:40px;height:40px;color:var(--accent)" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+        <div><div class="big">PDF hier ablegen oder auswählen</div><div style="color:var(--mute)">Flug, Hotel, Mietwagen, Kreuzfahrt, Ticket. Wird erkannt und als Vorschlag in die passende Reise eingefügt.</div></div>
+        <span style="flex:1"></span><span class="btn pr">Datei wählen</span></div>
+      <div class="grid" style="grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);margin-top:20px">
+        <div class="stack">
+          <div class="card"><h3>Zu prüfen</h3>
+            <div class="prop"><div class="hd"><span class="tg" style="background:var(--stay);color:#fff;padding:3px 9px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.1em">HOTEL</span><b style="font:600 16px var(--cond)">Hotel Negresco Princess</b><span class="conf" style="background:var(--pos)">98 %</span></div>
+              <div style="padding:14px"><div class="g3"><div class="fld"><span class="dot"></span><div class="k">Check-in</div><div class="v mono">23.10.2026 15:00</div></div><div class="fld"><span class="dot"></span><div class="k">Check-out</div><div class="v mono">25.10.2026 12:00</div></div><div class="fld"><span class="dot"></span><div class="k">Referenz</div><div class="v mono">884-221-905</div></div></div>
+                <div style="display:flex;gap:8px;margin-top:12px"><span class="btn pr">Übernehmen</span><span class="btn">Bearbeiten</span><span class="btn">Verwerfen</span></div></div></div>
+            <div class="prop"><div class="hd"><span class="tg" style="background:var(--air);color:#fff;padding:3px 9px;border-radius:5px;font:700 11px var(--cond);letter-spacing:.1em">FLUG</span><b style="font:600 16px var(--cond)">Flug ZRH → BCN</b><span class="chip warn">Zeit prüfen</span><span class="conf" style="background:var(--neg);margin-left:8px">71 %</span></div>
+              <div style="padding:14px"><div style="color:var(--mute);margin-bottom:10px">Ankunftszeit nicht eindeutig. Vorschlag 14:05 (Seite 2). <b style="color:var(--ink)">Passt zu vorhandenem Ereignis</b> «Flug von Zürich nach Barcelona».</div>
+                <div style="display:flex;gap:8px"><span class="btn pr">Zusammenführen</span><span class="btn">Als neu anlegen</span><span class="btn">Verwerfen</span></div></div></div>
+          </div>
+          <div class="card"><h3>Alle Dokumente</h3>
+            <table class="tb"><thead><tr><th>Dokument</th><th>Reise</th><th>Status</th><th class="n">Erfasst</th></tr></thead><tbody>
+              <tr><td><b>Booking-Bestätigung.pdf</b></td><td>Ferien 2026</td><td><span class="chip warn">Zu prüfen</span></td><td class="n">11.10.2026 14:30</td></tr>
+              <tr><td><b>Royal Caribbean Reiseunterlagen.pdf</b></td><td>Ferien 2026</td><td><span class="chip ok">Übernommen · 25 Ereignisse</span></td><td class="n">02.10.2026 09:12</td></tr>
+              <tr><td><b>Flugticket ZRH–BCN.pdf</b></td><td>Ferien 2026</td><td><span class="chip ok">Übernommen</span></td><td class="n">02.10.2026 09:14</td></tr>
+              <tr><td><b>Mietwagen Miami.pdf</b></td><td>Ferien 2026</td><td><span class="chip">In Arbeit …</span></td><td class="n">11.10.2026 14:31</td></tr>
+            </tbody></table></div>
+        </div>
+        <div class="card"><h3>Fundstelle · Seite 1</h3>
+          <div class="pdfpage" style="min-height:360px">BOOKING.COM · Buchungsbestätigung<br><br>Hotel Negresco Princess 4* Sup<br><mark>Carrer de Pere IV 1, 08005 Barcelona</mark><br>Spanien<br><br>Anreise <mark>23.10.2026</mark> ab <mark>15:00</mark><br>Abreise <mark>25.10.2026</mark> bis <mark>12:00</mark><br>2 Nächte · 1 Doppelzimmer · 2 Erwachsene<br>Frühstück inklusive<br><br>Bestätigungsnummer: <mark>884-221-905</mark><br>Gesamtpreis: CHF 412.00 (bezahlt)</div>
+          <small class="note">Markiert = von der Auswertung gelesen. Die Adresse wird geokodiert und im Ereignis auf der Karte gezeigt.</small></div>
+      </div>
+    </main>
+  </div>
+</div></div>
+
+<!-- ============ 5 KASSE ============ -->
+<h2 class="sc" id="kasse">5 · Reisekasse</h2>
+<p class="sd">Dieselbe Fachlogik wie in HomeBuddy (Aufteilung, Fremdwährung, minimale Überweisungen), neu mit Infografiken: Kategorien, Salden um die Mittelachse, Ausgleich.</p>
+<div class="scroll"><div class="frame">
+  <div class="chrome"><i></i><i></i><i></i><span class="url">travelbuddy · /reisen/1/kasse</span></div>
+  <div class="app">
+    <aside class="side">__SIDE__</aside>
+    <main class="main">
+      <div class="bar"><div><div class="crumb">Ferien 2026 ›</div><h1>Reisekasse</h1></div><span class="sp"></span><span class="chip">CHF · 4 Personen</span><span class="btn">Rückzahlung</span><span class="btn pr">+ Ausgabe</span></div>
+      <div class="ledger">
+        <div class="stack">
+          <div class="card"><h3>Ausgaben nach Kategorie · CHF 27’550</h3>
+            <div class="bar-s"><i style="width:66.8%;background:var(--ship)"></i><i style="width:14.3%;background:var(--air)"></i><i style="width:11.3%;background:var(--stay)"></i><i style="width:3.8%;background:var(--car)"></i><i style="width:2.8%;background:var(--activity)"></i><i style="width:.9%;background:var(--transfer)"></i></div>
+            <div class="legend"><span><i style="background:var(--ship)"></i>Schiff 18’400</span><span><i style="background:var(--air)"></i>Flug 3’950</span><span><i style="background:var(--stay)"></i>Hotel 3’120</span><span><i style="background:var(--car)"></i>Mietwagen 1’040</span><span><i style="background:var(--activity)"></i>Aktivität 780</span><span><i style="background:var(--transfer)"></i>Transfer 260</span></div></div>
+          <div class="card"><h3>Ausgaben</h3>
+            <table class="tb"><thead><tr><th>Datum</th><th>Beschreibung</th><th>Bezahlt von</th><th class="n">Betrag</th></tr></thead><tbody>
+              <tr><td class="mono">02.10.2026</td><td>Kreuzfahrt Royal Caribbean</td><td>Rolf</td><td class="n">CHF 18’400.00</td></tr>
+              <tr><td class="mono">02.10.2026</td><td>Flug Zürich–Barcelona</td><td>Rolf</td><td class="n">CHF 1’240.00</td></tr>
+              <tr><td class="mono">05.10.2026</td><td>Hotel Negresco Princess</td><td>Valentyna</td><td class="n">CHF 412.00</td></tr>
+              <tr><td class="mono">07.10.2026</td><td>Mietwagen Miami</td><td>Eliane</td><td class="n">USD 1’132.40 <span style="color:var(--mute)">· CHF 1’040.00</span></td></tr>
+            </tbody></table></div>
+        </div>
+        <div class="stack">
+          <div class="card"><h3>Saldo je Person</h3>
+            <svg viewBox="0 0 400 150" style="width:100%"><line x1="200" y1="0" x2="200" y2="150" stroke="var(--mute)"/>
+              <text x="0" y="24" fill="var(--mute)" font-size="12">Rolf</text><rect x="200" y="8" width="150" height="24" rx="3" fill="var(--pos)"/><text x="358" y="25" font-family="IBM Plex Mono" font-size="12" fill="var(--ink)">+1’240</text>
+              <text x="0" y="60" fill="var(--mute)" font-size="12">Valentyna</text><rect x="163" y="44" width="37" height="24" rx="3" fill="var(--neg)"/><text x="60" y="61" font-family="IBM Plex Mono" font-size="12" fill="var(--ink)">−310</text>
+              <text x="0" y="96" fill="var(--mute)" font-size="12">Eliane</text><rect x="138" y="80" width="62" height="24" rx="3" fill="var(--neg)"/><text x="60" y="97" font-family="IBM Plex Mono" font-size="12" fill="var(--ink)">−520</text>
+              <text x="0" y="132" fill="var(--mute)" font-size="12">Harald</text><rect x="151" y="116" width="49" height="24" rx="3" fill="var(--neg)"/><text x="60" y="133" font-family="IBM Plex Mono" font-size="12" fill="var(--ink)">−410</text></svg></div>
+          <div class="card"><h3>Ausgleich · 3 Überweisungen</h3><div class="list">
+            <div class="row" style="grid-template-columns:1fr auto auto"><b>Eliane → Rolf</b><span class="mono">CHF 520</span><span class="btn sm">Erfassen</span></div>
+            <div class="row" style="grid-template-columns:1fr auto auto"><b>Harald → Rolf</b><span class="mono">CHF 410</span><span class="btn sm">Erfassen</span></div>
+            <div class="row" style="grid-template-columns:1fr auto auto"><b>Valentyna → Rolf</b><span class="mono">CHF 310</span><span class="btn sm">Erfassen</span></div></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div></div>
+<small class="note">Version dieses Mockups: Richtung B «Ticket», Stand 11.10.2026. Die fertige App zeigt ihre Versionsnummer unten in den Einstellungen.</small>
+</div>
+
+<script>
+document.getElementById('tg').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'};
+const SIDE=`<div class="logo"><svg viewBox="0 0 32 32"><rect x="2" y="7" width="28" height="18" rx="3" fill="var(--accent)"/><circle cx="2" cy="16" r="3.2" fill="var(--bg)"/><circle cx="30" cy="16" r="3.2" fill="var(--bg)"/><path d="M11 16h10" stroke="#fff" stroke-width="2" stroke-dasharray="2 2.4"/></svg>TravelBuddy</div>
+<nav class="nav"><a><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Heute</a><a class="on"><svg class="ico" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg>Reisen</a><a><svg class="ico" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v4h4"/></svg>Dokumente<span class="badge">2</span></a><a><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3"/></svg>Kasse</a><a><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg>Konto</a></nav>
+<div class="trip"><div class="lab">Aktive Reise</div><b style="font:600 16px var(--cond)">Ferien 2026</b><div class="mono" style="font-size:12px;color:var(--mute)">Tag 3 von 29</div></div>`;
+document.querySelectorAll('aside.side').forEach(a=>{if(!a.innerHTML.trim().length||a.innerHTML.includes('__SIDE__'))a.innerHTML=SIDE});
+
+// Tagesband: 06:00–24:00
+const pct=h=>((h-6)/18*100);
+let h=document.body.innerHTML;
+h=h.replace('__NOW__',pct(11+20/60).toFixed(2)).replace('__P12__',pct(12).toFixed(2)).replace('__S13__',pct(13).toFixed(2)).replace('__W13__',(pct(16.5)-pct(13)).toFixed(2)).replace('__P17__',pct(17).toFixed(2));
+let ticks='';for(let t=6;t<=24;t+=3){if(t===12)continue;ticks+=`<span class="tick" style="left:${pct(t)}%">${String(t%24).padStart(2,'0')}:00</span>`}
+h=h.replace('__TICKS__',ticks);
+let dots='';for(let i=0;i<29;i++){dots+=`<i style="flex:1;height:5px;border-radius:2px;background:${i<2?'var(--accent)':i===2?'var(--accent)':'var(--line)'};opacity:${i<2?.5:1}"></i>`}
+h=h.replace('__DOTS__',dots);
+// Zeitband (Reise)
+const D=17,X0=84;
+const seg=(d0,n,y,col,label)=>`<rect x="${X0+d0*D}" y="${y}" width="${n*D-2}" height="22" rx="3" fill="var(--${col})"/>${label?`<text x="${X0+d0*D+7}" y="${y+15}" fill="#fff" font-size="11" font-weight="600" font-family="Barlow Semi Condensed,Barlow,sans-serif">${label}</text>`:''}`;
+let zb=`<svg viewBox="0 0 580 170" style="width:100%">`;
+[[0,'23.10.'],[7,'30.10.'],[14,'06.11.'],[21,'13.11.'],[28,'20.11.']].forEach(([d,l],i)=>{zb+=`<line x1="${X0+d*D}" y1="22" x2="${X0+d*D}" y2="150" stroke="var(--line)" stroke-dasharray="2 4"/><text x="${X0+d*D}" y="14" font-size="10.5" fill="var(--mute)" font-family="IBM Plex Mono" ${i===4?'text-anchor="end" dx="14"':''}>${l}</text>`});
+[['Unterwegs',46],['Schiff',80],['Unterkunft',114],['Mietwagen',148]].forEach(([l,y])=>{zb+=`<text x="2" y="${y-12+14}" font-size="11.5" fill="var(--mute)" font-family="Barlow,sans-serif">${l}</text>`});
+zb+=seg(0,1,32,'air','Zug+Flug')+seg(27,2,32,'air','Heimflug')+seg(2,13,66,'ship','Legend of the Seas · 13 Nächte')+seg(16,7,66,'ship','Karibik · 7 Nächte')+seg(0,2,100,'stay','Barcelona')+seg(15,1,100,'stay','')+seg(23,4,100,'stay','Pool Oasis')+seg(23,4,134,'car','Miami');
+zb+=`<rect x="${X0+2*D}" y="20" width="2" height="132" fill="var(--accent)"/><text x="${X0+2*D+6}" y="164" font-size="10.5" fill="var(--accent)" font-family="IBM Plex Mono">heute · Tag 3</text></svg>`;
+h=h.replace('__ZEITBAND__',zb);
+document.body.innerHTML=h;
+document.querySelectorAll('aside.side').forEach(a=>{if(a.innerHTML.includes('__SIDE__'))a.innerHTML=SIDE});
+document.getElementById('tg').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'};
+
+// Schematische Stadtkarte (Platzhalter für Apple Karten)
+function cityMap(id,o){
+  const W=600,H=o.h||380;let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.alt}">`;
+  s+=`<rect width="${W}" height="${H}" fill="var(--m-land)"/>`;
+  for(let r=0;r<9;r++)for(let c=0;c<13;c++){const x=c*48+5,y=r*42+5;
+    if(y+34>H-70+Math.sin(c*.7)*26+ (c>8?-50:0))continue;
+    s+=`<rect x="${x}" y="${y}" width="38" height="32" rx="3" fill="var(--m-block)" transform="rotate(${o.rot||-8} ${x+19} ${y+16})"/>`}
+  s+=`<path d="M0 ${H-90} C120 ${H-120} 220 ${H-60} 340 ${H-100} S520 ${H-150} ${W} ${H-110} L${W} ${H} L0 ${H} Z" fill="var(--m-water)"/>`;
+  s+=`<ellipse cx="${o.parkX||150}" cy="${o.parkY||110}" rx="70" ry="38" fill="var(--m-park)"/>`;
+  s+=`<path d="M0 ${H*.42} L${W} ${H*.3}" stroke="var(--m-road)" stroke-width="9"/><path d="M${W*.3} 0 L${W*.45} ${H}" stroke="var(--m-road)" stroke-width="7"/><path d="M${W*.7} 0 L${W*.62} ${H-90}" stroke="var(--m-road)" stroke-width="6"/>`;
+  (o.labels||[]).forEach(l=>{s+=`<text x="${l[0]}" y="${l[1]}" font-size="12" fill="var(--m-label)" font-family="Barlow,sans-serif" font-weight="600" letter-spacing=".5">${l[2]}</text>`});
+  if(o.route){s+=`<path d="${o.route}" fill="none" stroke="var(--${o.routeColor||'accent'})" stroke-width="4" stroke-linecap="round" stroke-dasharray="${o.dash||''}"/>`}
+  (o.markers||[]).forEach((m,i)=>{s+=`<g transform="translate(${m.x} ${m.y})"><path d="M0 0 C-14 -16 -16 -34 0 -40 C16 -34 14 -16 0 0Z" fill="var(--${m.c})" stroke="var(--surface)" stroke-width="2.4"/><circle cx="0" cy="-26" r="6.5" fill="#fff"/><text x="0" y="-22" text-anchor="middle" font-size="10" font-weight="700" fill="var(--${m.c})" font-family="IBM Plex Mono">${m.n}</text></g>`});
+  s+=`</svg>`;
+  const el=document.getElementById(id);
+  el.innerHTML=s+(o.call||'')+`<div class="tools"><span>+</span><span>−</span></div><div class="attr">Apple Karten (MapKit JS) · schematische Darstellung</div>`;
+}
+cityMap('map1',{alt:'Karte der heutigen Stationen in Barcelona',h:360,parkX:130,parkY:100,labels:[[40,40,'EIXAMPLE'],[380,70,'GRÀCIA'],[40,300,'BARCELONA'],[400,330,'MITTELMEER']],
+  route:'M170 150 C240 170 330 200 410 252',routeColor:'accent',
+  markers:[{x:170,y:150,c:'stay',n:1},{x:410,y:252,c:'ship',n:2}],
+  call:'<div class="call" style="left:6%;top:6%;max-width:52%"><b>1 · Hotel Negresco Princess</b>Check-out 12:00</div><div class="call" style="left:34%;top:66%;max-width:60%"><b>2 · Terminal Port Nou</b>Einschiffung 13:00–16:30</div>'});
+cityMap('map3',{alt:'Karte der Hotel-Adresse in Barcelona',h:330,parkX:470,parkY:80,labels:[[40,40,'EIXAMPLE'],[60,260,'Carrer de Pere IV'],[400,300,'MITTELMEER']],
+  markers:[{x:300,y:170,c:'stay',n:'H'}],
+  call:'<div class="call" style="left:56%;top:18%;max-width:40%"><b>Hotel Negresco Princess</b>Carrer de Pere IV 1, 08005 Barcelona</div>'});
+// Routenbogen (Welt, schematisch)
+(function(){const el=document.getElementById('map2');
+ el.innerHTML=`<svg viewBox="0 0 630 232" role="img" aria-label="Routenbogen"><rect width="630" height="232" fill="var(--m-water)"/>
+ <g stroke="var(--m-road)" stroke-opacity=".5" stroke-dasharray="2 5">${[60,120,180,240,300,360,420,480,540,600].map(x=>`<line x1="${x}" y1="0" x2="${x}" y2="232"/>`).join('')}${[12,72,132,192].map(y=>`<line x1="0" y1="${y}" x2="630" y2="${y}"/>`).join('')}</g>
+ <path d="M520 20 L630 20 L630 120 L560 100 L520 70 Z" fill="var(--m-land)"/><path d="M0 120 L40 100 L90 130 L110 232 L0 232Z" fill="var(--m-land)"/><path d="M540 170 L630 150 L630 232 L560 232Z" fill="var(--m-land)"/>
+ <path d="M591 27 L553 64" stroke="var(--rail)" stroke-width="3" fill="none"/>
+ <path d="M553 64 L556 74 L514 92 L502 93 Q280 30 59 157 L79 152 Q110 170 143 201 L150 202 Q110 188 59 157" fill="none" stroke="var(--ship)" stroke-width="3" stroke-linecap="round"/>
+ <path d="M59 157 Q270 -10 485 80 Q540 40 591 27" fill="none" stroke="var(--air)" stroke-width="2.4" stroke-dasharray="7 5"/>
+ ${[[591,27,'Zürich','end',-8],[553,64,'Barcelona','end',-8],[485,80,'Lissabon','end',-8],[59,157,'Miami','end',-8],[143,201,'San Juan','start',8]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><text x="${p[0]+p[4]}" y="${p[1]+4}" text-anchor="${p[3]}" font-size="11.5" font-weight="600" fill="var(--ink)" font-family="Barlow,sans-serif">${p[2]}</text>`).join('')}
+ </svg><div class="attr">Apple Karten (MapKit JS) · schematische Darstellung</div>`;})();
+</script>
+</body>
+</html>

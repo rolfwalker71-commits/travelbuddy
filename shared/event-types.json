@@ -1,0 +1,310 @@
+{
+  "version": 2,
+  "doc": "Einzige Quelle der Wahrheit fuer Ereignistypen und ihre Felder. Server (Validierung, KI-Schema), Web und iOS erzeugen daraus ihre Formulare. Typ-Felder liegen in event.details (JSON). Gemeinsame Felder sind Spalten des Ereignisses und stehen unter commonFields.",
+  "kinds": {
+    "text": "Einzeilig", "longtext": "Mehrzeilig", "date": "YYYY-MM-DD", "time": "HH:mm",
+    "number": "ganze Zahl", "money": "Betrag in Minor Units plus Waehrung", "select": "Auswahl aus options",
+    "bool": "Ja/Nein", "airport": "IATA-Code mit Suche", "place": "Ort mit Kartensuche",
+    "passengers": "Liste je Teilnehmer, Unterfelder in fields"
+  },
+  "commonFields": [
+    {"key": "title", "label": "Titel", "kind": "text", "required": true, "important": true},
+    {"key": "startDate", "label": "Beginn", "kind": "date", "important": true},
+    {"key": "startTime", "label": "Uhrzeit Beginn", "kind": "time", "important": true},
+    {"key": "startTz", "label": "Zeitzone Beginn", "kind": "select", "options": "iana", "note": "Vorbelegt aus Ort/Flughafen"},
+    {"key": "endDate", "label": "Ende", "kind": "date"},
+    {"key": "endTime", "label": "Uhrzeit Ende", "kind": "time"},
+    {"key": "endTz", "label": "Zeitzone Ende", "kind": "select", "options": "iana"},
+    {"key": "location", "label": "Ort", "kind": "place", "important": true},
+    {"key": "address", "label": "Adresse", "kind": "text"},
+    {"key": "provider", "label": "Anbieter", "kind": "text", "important": true},
+    {"key": "bookingReference", "label": "Buchungsreferenz", "kind": "text", "important": true, "transform": "upper"},
+    {"key": "website", "label": "Website", "kind": "text"},
+    {"key": "phone", "label": "Telefon", "kind": "text"},
+    {"key": "participantIds", "label": "Wer ist dabei", "kind": "participants", "important": true},
+    {"key": "priceMinor", "label": "Preis", "kind": "money"},
+    {"key": "paymentStatus", "label": "Zahlung", "kind": "select", "options": ["open", "paid", "deposit", "onsite"], "optionLabels": ["Offen", "Bezahlt", "Anzahlung", "Vor Ort"]},
+    {"key": "paidByParticipantId", "label": "Bezahlt von", "kind": "participant"},
+    {"key": "cancelUntil", "label": "Kostenlos stornierbar bis", "kind": "date"},
+    {"key": "notes", "label": "Notizen", "kind": "longtext"}
+  ],
+  "colors": ["air", "rail", "car", "transfer", "stay", "ship", "activity", "food", "ticket", "safety", "doc", "task"],
+  "types": [
+    {
+      "id": "Flug", "label": "Flug", "icon": "plane", "color": "air",
+      "startLabel": "Abflug", "endLabel": "Ankunft", "titleHint": "Flug von Zuerich nach Barcelona",
+      "summary": ["airline", "flightNumber", "departureAirport", "arrivalAirport"],
+      "sections": [
+        {"id": "flug", "title": "Flug", "fields": [
+          {"key": "airline", "label": "Fluggesellschaft", "kind": "text", "important": true, "maxLength": 80},
+          {"key": "flightNumber", "label": "Flugnummer", "kind": "text", "important": true, "placeholder": "LX 1952", "maxLength": 20, "transform": "upper", "pattern": "^[A-Z0-9]{2}\\s?\\d{1,4}[A-Z]?$"},
+          {"key": "operatedBy", "label": "Durchgefuehrt von", "kind": "text", "maxLength": 80},
+          {"key": "cabinClass", "label": "Klasse", "kind": "select", "important": true, "options": ["Economy", "Premium Economy", "Business", "First"]},
+          {"key": "durationMinutes", "label": "Dauer", "kind": "number", "unit": "Min."},
+          {"key": "aircraftType", "label": "Flugzeugtyp", "kind": "text", "maxLength": 60},
+          {"key": "aircraftReg", "label": "Kennzeichen", "kind": "text", "maxLength": 20},
+          {"key": "meal", "label": "Verpflegung", "kind": "text", "maxLength": 80},
+          {"key": "flightStatus", "label": "Status", "kind": "select", "options": ["planmaessig", "verspaetet", "gestrichen"], "optionLabels": ["Planmässig", "Verspätet", "Gestrichen"]}
+        ]},
+        {"id": "abflug", "title": "Abflug", "fields": [
+          {"key": "departureAirport", "label": "Flughafen", "kind": "airport", "important": true, "maxLength": 10},
+          {"key": "departureTerminal", "label": "Terminal", "kind": "text", "important": true, "maxLength": 20},
+          {"key": "departureGate", "label": "Gate", "kind": "text", "important": true, "maxLength": 20},
+          {"key": "checkInDesk", "label": "Check-in-Schalter", "kind": "text", "maxLength": 40},
+          {"key": "checkInOpens", "label": "Check-in öffnet", "kind": "time"},
+          {"key": "checkInCloses", "label": "Check-in schliesst", "kind": "time"},
+          {"key": "boardingTime", "label": "Boarding", "kind": "time", "important": true}
+        ]},
+        {"id": "ankunft", "title": "Ankunft", "fields": [
+          {"key": "arrivalAirport", "label": "Flughafen", "kind": "airport", "important": true, "maxLength": 10},
+          {"key": "arrivalTerminal", "label": "Terminal", "kind": "text", "maxLength": 20},
+          {"key": "arrivalGate", "label": "Gate", "kind": "text", "maxLength": 20},
+          {"key": "baggageBelt", "label": "Gepäckband", "kind": "text", "maxLength": 20}
+        ]},
+        {"id": "personen", "title": "Sitze und Tickets", "fields": [
+          {"key": "passengers", "label": "Pro Person", "kind": "passengers", "important": true, "fields": [
+            {"key": "seat", "label": "Sitz", "kind": "text", "maxLength": 10},
+            {"key": "ticketNumber", "label": "Ticketnummer", "kind": "text", "maxLength": 30},
+            {"key": "frequentFlyer", "label": "Vielfliegernummer", "kind": "text", "maxLength": 30}
+          ]},
+          {"key": "baggageHand", "label": "Handgepäck", "kind": "text", "placeholder": "1 x 8 kg", "maxLength": 60},
+          {"key": "baggageChecked", "label": "Aufgabegepäck", "kind": "text", "placeholder": "1 x 23 kg", "maxLength": 60}
+        ]}
+      ]
+    },
+    {
+      "id": "Zugreisen", "label": "Zug", "icon": "train", "color": "rail",
+      "startLabel": "Abfahrt", "endLabel": "Ankunft", "titleHint": "Zuerich HB nach Bern",
+      "summary": ["trainNumber", "originPlace", "destinationPlace", "departurePlatform"],
+      "sections": [
+        {"id": "zug", "title": "Zug", "fields": [
+          {"key": "operator", "label": "Bahnunternehmen", "kind": "text", "maxLength": 80},
+          {"key": "trainNumber", "label": "Zugnummer", "kind": "text", "important": true, "placeholder": "IC 8", "maxLength": 40},
+          {"key": "cabinClass", "label": "Klasse", "kind": "select", "important": true, "options": ["Economy", "Premium Economy", "Business", "First"], "optionLabels": ["2. Klasse", "Premium", "Business", "1. Klasse"]},
+          {"key": "ticketType", "label": "Ticketart", "kind": "text", "placeholder": "Sparbillett, Zugbindung", "maxLength": 80},
+          {"key": "validity", "label": "Gültigkeit", "kind": "text", "maxLength": 80},
+          {"key": "changes", "label": "Umstiege", "kind": "number"},
+          {"key": "durationMinutes", "label": "Dauer", "kind": "number", "unit": "Min."}
+        ]},
+        {"id": "abfahrt", "title": "Abfahrt", "fields": [
+          {"key": "originPlace", "label": "Bahnhof", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "originAddress", "label": "Adresse Abfahrt", "kind": "text", "maxLength": 300},
+          {"key": "departurePlatform", "label": "Gleis", "kind": "text", "important": true, "maxLength": 20}
+        ]},
+        {"id": "ankunft", "title": "Ankunft", "fields": [
+          {"key": "destinationPlace", "label": "Bahnhof", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "destinationAddress", "label": "Adresse Ankunft", "kind": "text", "maxLength": 300},
+          {"key": "arrivalPlatform", "label": "Gleis", "kind": "text", "maxLength": 20}
+        ]},
+        {"id": "personen", "title": "Wagen und Sitze", "fields": [
+          {"key": "passengers", "label": "Pro Person", "kind": "passengers", "important": true, "fields": [
+            {"key": "coach", "label": "Wagen", "kind": "text", "maxLength": 10},
+            {"key": "seat", "label": "Sitz", "kind": "text", "maxLength": 10},
+            {"key": "ticketNumber", "label": "Ticketnummer", "kind": "text", "maxLength": 30}
+          ]}
+        ]}
+      ]
+    },
+    {
+      "id": "Mietauto", "label": "Mietauto", "icon": "car", "color": "car",
+      "startLabel": "Abholung", "endLabel": "Rückgabe", "titleHint": "Mietwagen Miami",
+      "summary": ["vehicleCategory", "pickupPlace", "returnPlace"],
+      "sections": [
+        {"id": "fahrzeug", "title": "Fahrzeug", "fields": [
+          {"key": "vehicleCategory", "label": "Kategorie", "kind": "text", "important": true, "placeholder": "Kompakt SUV", "maxLength": 80},
+          {"key": "vehicleModel", "label": "Modell", "kind": "text", "maxLength": 80},
+          {"key": "transmission", "label": "Getriebe", "kind": "select", "options": ["Automat", "Schaltung"]},
+          {"key": "fuelPolicy", "label": "Tankregel", "kind": "text", "placeholder": "voll/voll", "maxLength": 80},
+          {"key": "mileage", "label": "Kilometer inklusive", "kind": "text", "maxLength": 60},
+          {"key": "extraDrivers", "label": "Zusatzfahrer", "kind": "text", "maxLength": 200}
+        ]},
+        {"id": "abholung", "title": "Abholung", "fields": [
+          {"key": "pickupPlace", "label": "Station", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "pickupAddress", "label": "Adresse Abholung", "kind": "text", "maxLength": 300},
+          {"key": "pickupHours", "label": "Öffnungszeiten", "kind": "text", "maxLength": 100},
+          {"key": "pickupPhone", "label": "Telefon Station", "kind": "text", "maxLength": 60}
+        ]},
+        {"id": "rueckgabe", "title": "Rückgabe", "fields": [
+          {"key": "returnPlace", "label": "Station", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "returnAddress", "label": "Adresse Rückgabe", "kind": "text", "maxLength": 300},
+          {"key": "returnHours", "label": "Öffnungszeiten", "kind": "text", "maxLength": 100}
+        ]},
+        {"id": "versicherung", "title": "Versicherung und Kaution", "fields": [
+          {"key": "insurance", "label": "Versicherung", "kind": "text", "maxLength": 200},
+          {"key": "deductibleMinor", "label": "Selbstbehalt", "kind": "money"},
+          {"key": "depositMinor", "label": "Kaution", "kind": "money"},
+          {"key": "depositCard", "label": "Karte für Kaution", "kind": "text", "maxLength": 60},
+          {"key": "emergencyPhone", "label": "Notfallnummer", "kind": "text", "important": true, "maxLength": 60}
+        ]}
+      ]
+    },
+    {
+      "id": "Transfer", "label": "Transfer", "icon": "transfer", "color": "transfer",
+      "startLabel": "Abholung", "endLabel": "Ankunft", "titleHint": "Transfer Hafen nach Hotel",
+      "summary": ["transferKind", "originPlace", "destinationPlace"],
+      "sections": [
+        {"id": "transfer", "title": "Transfer", "fields": [
+          {"key": "transferKind", "label": "Art", "kind": "select", "important": true, "options": ["Taxi", "Shuttle", "Bus", "Faehre", "Privat", "Sonstiges"], "optionLabels": ["Taxi", "Shuttle", "Bus", "Fähre", "Privat", "Sonstiges"]},
+          {"key": "originPlace", "label": "Abholort", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "originAddress", "label": "Adresse Abholort", "kind": "text", "maxLength": 300},
+          {"key": "destinationPlace", "label": "Zielort", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "destinationAddress", "label": "Adresse Zielort", "kind": "text", "maxLength": 300},
+          {"key": "meetingPoint", "label": "Treffpunkt", "kind": "text", "important": true, "maxLength": 200},
+          {"key": "driverContact", "label": "Fahrer/Kontakt", "kind": "text", "maxLength": 120},
+          {"key": "vehicle", "label": "Fahrzeug", "kind": "text", "maxLength": 80},
+          {"key": "luggage", "label": "Gepäck", "kind": "text", "maxLength": 80},
+          {"key": "durationMinutes", "label": "Dauer", "kind": "number", "unit": "Min."}
+        ]}
+      ]
+    },
+    {
+      "id": "Hotel", "label": "Hotel", "icon": "bed", "color": "stay",
+      "startLabel": "Check-in", "endLabel": "Check-out", "titleHint": "Hotel Negresco Princess",
+      "summary": ["roomType", "board", "checkInFrom", "checkOutUntil"],
+      "sections": [
+        {"id": "aufenthalt", "title": "Aufenthalt", "fields": [
+          {"key": "checkInFrom", "label": "Check-in ab", "kind": "time", "important": true},
+          {"key": "checkOutUntil", "label": "Check-out bis", "kind": "time", "important": true},
+          {"key": "roomType", "label": "Zimmerart", "kind": "text", "important": true, "maxLength": 100},
+          {"key": "rooms", "label": "Zimmer", "kind": "number"},
+          {"key": "guests", "label": "Personen", "kind": "number"},
+          {"key": "board", "label": "Verpflegung", "kind": "select", "options": ["Ohne", "Fruehstueck", "Halbpension", "Vollpension", "All inclusive"], "optionLabels": ["Ohne", "Frühstück", "Halbpension", "Vollpension", "All inclusive"]}
+        ]},
+        {"id": "buchung", "title": "Buchung", "fields": [
+          {"key": "platform", "label": "Buchungsplattform", "kind": "text", "placeholder": "Booking.com", "maxLength": 80},
+          {"key": "confirmationNumber", "label": "Bestätigungsnummer", "kind": "text", "maxLength": 60},
+          {"key": "hostContact", "label": "Kontakt Gastgeber", "kind": "text", "maxLength": 120}
+        ]},
+        {"id": "vorort", "title": "Vor Ort", "fields": [
+          {"key": "accessCode", "label": "Türcode / Schlüsselübergabe", "kind": "text", "important": true, "maxLength": 200},
+          {"key": "wifi", "label": "WLAN", "kind": "text", "maxLength": 120},
+          {"key": "parking", "label": "Parkplatz", "kind": "text", "maxLength": 120},
+          {"key": "touristTaxMinor", "label": "Kurtaxe", "kind": "money"}
+        ]}
+      ]
+    },
+    {
+      "id": "Unterkunft", "label": "Ferienwohnung", "icon": "bed", "color": "stay", "extends": "Hotel",
+      "startLabel": "Check-in", "endLabel": "Check-out", "titleHint": "Private Pool Oasis"
+    },
+    {
+      "id": "Kreuzfahrt", "label": "Kreuzfahrt", "icon": "ship", "color": "ship",
+      "startLabel": "Ankunft / Beginn", "endLabel": "Abfahrt / Ende", "titleHint": "Palma de Mallorca",
+      "summary": ["entryKind", "ship", "cabin", "allAboard"],
+      "sections": [
+        {"id": "reise", "title": "Kreuzfahrt", "fields": [
+          {"key": "entryKind", "label": "Eintrag", "kind": "select", "important": true, "options": ["Reise", "Einschiffung", "Hafen", "Seetag", "Ausschiffung"]},
+          {"key": "shipLine", "label": "Reederei", "kind": "text", "maxLength": 80},
+          {"key": "ship", "label": "Schiff", "kind": "text", "important": true, "maxLength": 80},
+          {"key": "routeName", "label": "Routenname", "kind": "text", "maxLength": 200}
+        ]},
+        {"id": "kabine", "title": "Kabine", "fields": [
+          {"key": "cabin", "label": "Kabine", "kind": "text", "important": true, "maxLength": 20},
+          {"key": "cabinCategory", "label": "Kategorie", "kind": "text", "maxLength": 60},
+          {"key": "deck", "label": "Deck", "kind": "text", "maxLength": 20},
+          {"key": "diningTime", "label": "Tischzeit/Restaurant", "kind": "text", "maxLength": 100},
+          {"key": "package", "label": "Getränke-/Bordpaket", "kind": "text", "maxLength": 100}
+        ]},
+        {"id": "hafen", "title": "Hafen und Zeiten", "fields": [
+          {"key": "terminal", "label": "Terminal / Pier", "kind": "text", "important": true, "maxLength": 100},
+          {"key": "terminalAddress", "label": "Adresse Terminal / Pier", "kind": "text", "maxLength": 300},
+          {"key": "checkInWindow", "label": "Einschiffungs-Zeitfenster", "kind": "text", "maxLength": 60},
+          {"key": "allAboard", "label": "Alle an Bord", "kind": "time", "important": true},
+          {"key": "tender", "label": "Tenderhafen", "kind": "bool"},
+          {"key": "emergencyPhone", "label": "Notrufnummer", "kind": "text", "maxLength": 60},
+          {"key": "documentsRequired", "label": "Reisedokumente", "kind": "text", "maxLength": 200}
+        ]}
+      ]
+    },
+    {
+      "id": "Ausflug", "label": "Ausflug", "icon": "map", "color": "activity",
+      "startLabel": "Beginn", "endLabel": "Ende", "titleHint": "Stadtrundfahrt Lissabon",
+      "summary": ["meetingPoint", "durationMinutes", "participantsCount"],
+      "sections": [
+        {"id": "ausflug", "title": "Ausflug", "fields": [
+          {"key": "meetingPoint", "label": "Treffpunkt", "kind": "text", "important": true, "maxLength": 200},
+          {"key": "durationMinutes", "label": "Dauer", "kind": "number", "unit": "Min."},
+          {"key": "participantsCount", "label": "Personenzahl", "kind": "number"},
+          {"key": "voucher", "label": "Voucher/Ticket", "kind": "text", "maxLength": 100},
+          {"key": "language", "label": "Sprache", "kind": "text", "maxLength": 40},
+          {"key": "bring", "label": "Mitbringen", "kind": "text", "maxLength": 200}
+        ]}
+      ]
+    },
+    {
+      "id": "Restaurant", "label": "Restaurant", "icon": "fork", "color": "food",
+      "startLabel": "Reservierung", "endLabel": "Ende", "titleHint": "Abendessen",
+      "summary": ["reservationName", "partySize", "table"],
+      "sections": [
+        {"id": "reservierung", "title": "Reservierung", "fields": [
+          {"key": "reservationName", "label": "Name der Reservierung", "kind": "text", "important": true, "maxLength": 80},
+          {"key": "partySize", "label": "Personen", "kind": "number", "important": true},
+          {"key": "table", "label": "Tisch", "kind": "text", "maxLength": 40},
+          {"key": "dressCode", "label": "Dresscode", "kind": "text", "maxLength": 80},
+          {"key": "cuisine", "label": "Küche", "kind": "text", "maxLength": 80}
+        ]}
+      ]
+    },
+    {
+      "id": "Veranstaltung", "label": "Veranstaltung", "icon": "ticket", "color": "ticket",
+      "startLabel": "Beginn", "endLabel": "Ende", "titleHint": "Konzert, Museum, Show",
+      "summary": ["venue", "doorsOpen", "seat"],
+      "sections": [
+        {"id": "veranstaltung", "title": "Veranstaltung", "fields": [
+          {"key": "organizer", "label": "Veranstalter", "kind": "text", "maxLength": 100},
+          {"key": "venue", "label": "Veranstaltungsort", "kind": "place", "important": true, "maxLength": 200},
+          {"key": "venueAddress", "label": "Adresse Veranstaltungsort", "kind": "text", "maxLength": 300},
+          {"key": "doorsOpen", "label": "Einlass", "kind": "time", "important": true},
+          {"key": "seat", "label": "Sitz / Block / Reihe", "kind": "text", "important": true, "maxLength": 60},
+          {"key": "ticketNumber", "label": "Ticketnummer", "kind": "text", "maxLength": 60},
+          {"key": "ticketCount", "label": "Anzahl Tickets", "kind": "number"}
+        ]}
+      ]
+    },
+    {
+      "id": "Versicherung", "label": "Versicherung", "icon": "shield", "color": "safety",
+      "startLabel": "Gültig ab", "endLabel": "Gültig bis", "titleHint": "Reiseversicherung",
+      "summary": ["insurer", "policyNumber", "emergencyPhone"],
+      "sections": [
+        {"id": "police", "title": "Police", "fields": [
+          {"key": "insurer", "label": "Versicherer", "kind": "text", "important": true, "maxLength": 100},
+          {"key": "policyNumber", "label": "Policennummer", "kind": "text", "important": true, "maxLength": 60},
+          {"key": "coverage", "label": "Deckung", "kind": "text", "maxLength": 300},
+          {"key": "emergencyPhone", "label": "Notfallnummer", "kind": "text", "important": true, "maxLength": 60},
+          {"key": "claimInfo", "label": "Schadenmeldung", "kind": "text", "maxLength": 300}
+        ]}
+      ]
+    },
+    {
+      "id": "Visum", "label": "Visum / Einreise", "icon": "passport", "color": "doc",
+      "startLabel": "Gültig ab", "endLabel": "Gültig bis", "titleHint": "ESTA USA",
+      "summary": ["authorizationNumber", "applicationStatus", "country"],
+      "sections": [
+        {"id": "visum", "title": "Visum / Einreise", "fields": [
+          {"key": "country", "label": "Land", "kind": "text", "important": true, "maxLength": 80},
+          {"key": "documentKind", "label": "Dokument", "kind": "text", "placeholder": "ESTA, eTA, Visum", "maxLength": 80},
+          {"key": "authorizationNumber", "label": "Genehmigungsnummer", "kind": "text", "important": true, "maxLength": 60},
+          {"key": "applicationStatus", "label": "Antragsstatus", "kind": "select", "important": true, "options": ["offen", "beantragt", "genehmigt", "abgelehnt"], "optionLabels": ["Offen", "Beantragt", "Genehmigt", "Abgelehnt"]},
+          {"key": "link", "label": "Antrag/Link", "kind": "text", "maxLength": 300}
+        ]}
+      ]
+    },
+    {
+      "id": "Aufgabe", "label": "Aufgabe", "icon": "task", "color": "task",
+      "startLabel": "Fällig", "endLabel": "", "titleHint": "Online-Check-in, Pass prüfen",
+      "summary": ["done"],
+      "sections": [
+        {"id": "aufgabe", "title": "Aufgabe", "fields": [
+          {"key": "done", "label": "Erledigt", "kind": "bool", "important": true},
+          {"key": "link", "label": "Link", "kind": "text", "maxLength": 300}
+        ]}
+      ]
+    }
+  ],
+  "aliases": {
+    "Mietwagen": "Mietauto", "Aktivitaet": "Ausflug", "Aktivität": "Ausflug", "Notiz": "Aufgabe",
+    "Sonstiges": "Ausflug", "Bahn": "Zugreisen", "Zug": "Zugreisen", "Train": "Zugreisen",
+    "Parking": "Transfer", "Visa / Einreise": "Visum", "Pauschalreise / Urlaub": "Ausflug",
+    "Reiseversicherung": "Versicherung"
+  }
+}

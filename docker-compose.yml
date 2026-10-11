@@ -1,0 +1,61 @@
+# TravelBuddy-Server als eigener Container (Build-Kontext: Repo-Root).
+#
+#   cp .env.example .env            # Werte eintragen, .env nie committen
+#   mkdir -p data/apns && sudo chown -R 1000:1000 data
+#   (später: AuthKey_<KEYID>.p8 nach ./data/apns/ legen, chmod 600, Besitzer 1000; kein Neustart nötig)
+#   docker compose up -d --build
+#   docker compose exec -it travelbuddy node dist/create-user.mjs rolf "Rolf" --admin
+#
+# Daten (SQLite, documents/, media/, apns/) liegen in ./data. Standardmässig nur lokal gebunden (127.0.0.1:7780);
+# HTTPS übernimmt der Reverse-Proxy davor.
+services:
+  travelbuddy:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        GIT_SHA: ${TRAVELBUDDY_BUILD:-dev}
+    image: travelbuddy-server:local
+    container_name: travelbuddy
+    restart: unless-stopped
+    environment:
+      PORT: "7780"
+      TRAVELBUDDY_DB_PATH: /data/travelbuddy.sqlite
+      TRAVELBUDDY_TZ: ${TRAVELBUDDY_TZ:-Europe/Zurich}
+      # Alles Folgende ist optional und wird aus .env übernommen.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      TRAVELBUDDY_AI_MODEL_TEXT: ${TRAVELBUDDY_AI_MODEL_TEXT:-}
+      TRAVELBUDDY_AI_MODEL_VISION: ${TRAVELBUDDY_AI_MODEL_VISION:-}
+      # Dokumentanalyse: automatische Bestätigung, Toleranz um den Reisezeitraum, Teilgrösse je KI-Aufruf
+      TRAVELBUDDY_AUTO_CONFIRM_MIN: ${TRAVELBUDDY_AUTO_CONFIRM_MIN:-}
+      TRAVELBUDDY_TRIP_TOLERANCE_DAYS: ${TRAVELBUDDY_TRIP_TOLERANCE_DAYS:-}
+      TRAVELBUDDY_AI_CHUNK_CHARS: ${TRAVELBUDDY_AI_CHUNK_CHARS:-}
+      # Mitteilungen: Sekunden zwischen den Planer-Läufen (0 = aus)
+      TRAVELBUDDY_NOTIFY_SECONDS: ${TRAVELBUDDY_NOTIFY_SECONDS:-}
+      # Import aus HomeBuddy beim ersten Start (Pfad in /data oder off)
+      TRAVELBUDDY_BOOTSTRAP_IMPORT: ${TRAVELBUDDY_BOOTSTRAP_IMPORT:-}
+      # KI-Bilder (Reise- und Ereignisbilder): aktiv mit OPENAI_API_KEY, 0 schaltet ab
+      TRAVELBUDDY_AI_IMAGES: ${TRAVELBUDDY_AI_IMAGES:-}
+      TRAVELBUDDY_AI_IMAGES_PER_RUN: ${TRAVELBUDDY_AI_IMAGES_PER_RUN:-}
+      OPENAI_IMAGE_MODEL: ${OPENAI_IMAGE_MODEL:-}
+      OPENAI_IMAGE_BASE_URL: ${OPENAI_IMAGE_BASE_URL:-}
+      # Push (APNs). Alternativ genügt die Datei AuthKey_<KEYID>.p8 in ./data/apns.
+      APNS_KEY: ${APNS_KEY:-}
+      APNS_KEY_PATH: ${APNS_KEY_PATH:-}
+      APNS_KEY_ID: ${APNS_KEY_ID:-}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-}
+      APNS_TOPIC: ${APNS_TOPIC:-}
+      # Apple Karten (MapKit JS im Web, Geokodierung über die Maps Server API)
+      TRAVELBUDDY_MAPKIT_TEAM_ID: ${TRAVELBUDDY_MAPKIT_TEAM_ID:-}
+      TRAVELBUDDY_MAPKIT_KEY_ID: ${TRAVELBUDDY_MAPKIT_KEY_ID:-}
+      TRAVELBUDDY_MAPKIT_KEY: ${TRAVELBUDDY_MAPKIT_KEY:-}
+      TRAVELBUDDY_MAPKIT_KEY_PATH: ${TRAVELBUDDY_MAPKIT_KEY_PATH:-}
+      TRAVELBUDDY_MAPKIT_ORIGIN: ${TRAVELBUDDY_MAPKIT_ORIGIN:-}
+      # Geokodierung: auto (Apple, sonst Nominatim) | apple | nominatim | off
+      TRAVELBUDDY_GEOCODER: ${TRAVELBUDDY_GEOCODER:-}
+      TRAVELBUDDY_GEOCODER_CONTACT: ${TRAVELBUDDY_GEOCODER_CONTACT:-}
+    ports:
+      - "${TRAVELBUDDY_BIND:-127.0.0.1}:${TRAVELBUDDY_PORT:-7780}:7780"
+    volumes:
+      - ./data:/data

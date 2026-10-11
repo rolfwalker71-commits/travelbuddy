@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TravelBuddy – Designvorschläge</title><style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#0b0d10;color:#e8ebef;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:40px 24px 80px}
+.intro h1{font-size:34px;margin:0 0 8px;letter-spacing:-.02em}
+.intro p{color:#a7afba;max-width:78ch;margin:6px 0}
+.intro nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 8px}
+.intro nav a{color:#e8ebef;text-decoration:none;border:1px solid #2b323d;padding:8px 14px;border-radius:999px;font-size:14px}
+.intro nav a:hover{background:#161a21}
+.note0{border-left:3px solid #e39b5c;padding:6px 12px;color:#a7afba;font-size:13px;margin-top:14px}
+h3.sectitle{font-size:22px;margin:56px 0 4px}
+.dir{margin-top:44px;padding:30px;border-radius:24px;background:var(--bg);color:var(--ink);font-family:var(--font)}
+.dh{display:flex;gap:32px;flex-wrap:wrap;justify-content:space-between;margin-bottom:26px}
+.dh>div:first-child{flex:1 1 420px}
+.dn{font:600 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.dir h2{font-family:var(--head);font-size:34px;line-height:1.1;margin:8px 0 10px;letter-spacing:-.02em;font-weight:var(--hw)}
+.dir p{color:var(--mute);margin:0 0 8px;max-width:62ch}
+.meta2{flex:0 1 360px}
+.sw{display:flex;flex-wrap:wrap;gap:8px 14px;margin-bottom:10px}
+.sw span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mute)}
+.sw i{width:16px;height:16px;border-radius:5px;border:1px solid rgba(128,128,128,.35);display:inline-block}
+.fnt{font-size:12.5px}.pc{font-size:13px;color:var(--ink)!important}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.phones{display:flex;gap:22px;flex-wrap:wrap}
+.pf{margin:0;text-align:center}
+.pf figcaption{font-size:12px;color:var(--mute);margin-top:10px}
+.phone{width:300px;height:620px;border-radius:44px;border:9px solid #05060a;background:var(--bg);overflow:hidden;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.scr{height:100%;padding:12px 14px 0;font-size:12px;text-align:left;position:relative;overflow:hidden}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:0 6px 8px;font-size:12px}
+.sbr{display:flex;gap:2px}.sbr i{width:14px;height:8px;background:var(--ink);border-radius:2px;opacity:.85}
+.ico{width:18px;height:18px;flex:none}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kick{font:600 10.5px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.hd h4{margin:4px 0 2px;font-size:22px;line-height:1.15;letter-spacing:-.01em;font-family:var(--head);font-weight:var(--hw)}
+.sub{color:var(--mute);font-size:12px}
+.sec{font:600 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin:14px 0 7px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:var(--shadow)}
+.dots{display:flex;gap:2.5px;margin-top:10px}
+.dots i{flex:1;height:5px;border-radius:2px;background:var(--line)}
+.dots i.d{background:var(--accent);opacity:.55}.dots i.n{background:var(--accent)}
+.next{margin-top:12px;background:var(--hero);border-radius:var(--r);padding:12px;color:var(--heroink);border:1px solid var(--line)}
+.next .lbl{font:600 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.nrow{display:flex;gap:12px;align-items:center;margin-top:10px}
+.ringsvg{width:56px;height:56px;flex:none}
+.ringsvg .r0{fill:none;stroke:currentColor;opacity:.2;stroke-width:5}
+.ringsvg .r1{fill:none;stroke:var(--heroacc);stroke-width:5;stroke-linecap:round}
+.ringsvg .rt{font:700 13px var(--mono);fill:currentColor}.ringsvg .rs{font:500 8px var(--mono);fill:currentColor;opacity:.8}
+.big{font-size:18px;font-weight:700;line-height:1.15;font-family:var(--head)}
+.meta{font-size:11.5px;opacity:.85}
+.ev{display:grid;grid-template-columns:38px 30px 1fr;gap:8px;align-items:start;padding:9px 0;border-top:1px solid var(--line)}
+.ev:first-of-type{border-top:0}
+.ev.now{background:var(--nowbg);margin:0 -8px;padding:9px 8px;border-radius:var(--r2);border-top:0}
+.ev.soft{opacity:.7}
+.ev .t{font-size:11.5px;color:var(--mute);padding-top:5px}
+.ev .ic{width:30px;height:30px;border-radius:var(--r2);display:grid;place-items:center;color:var(--icfg)}
+.ev .b b{display:block;font-size:13px;line-height:1.25}.ev .b span{display:block;font-size:11.5px;color:var(--mute)}
+.chips{display:flex;gap:6px;margin-top:6px}
+.chips u{text-decoration:none;display:flex;align-items:center;gap:4px;font-size:10.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.chips .ico{width:12px;height:12px}
+.c-flight{background:var(--k-air)}.c-ship{background:var(--k-ship)}.c-stay{background:var(--k-stay)}.c-car{background:var(--k-car)}
+.tabs{position:absolute;left:10px;right:10px;bottom:10px;display:flex;justify-content:space-around;padding:8px 4px;border-radius:var(--tabr);background:var(--tabbg);border:1px solid var(--line);backdrop-filter:blur(14px)}
+.tabs span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9.5px;color:var(--mute)}
+.tabs span.on{color:var(--accent)}.tabs em{font-style:normal}
+.cover{position:relative;height:150px;border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.cvbg{position:absolute;inset:0;background:var(--cover)}
+.cvt{position:absolute;left:12px;bottom:10px;right:12px;color:var(--coverink)}
+.cvt h4{margin:2px 0;font-size:24px;font-family:var(--head);font-weight:var(--hw);letter-spacing:-.01em}.cvt small{opacity:.9;font-size:11px}.cvt span{font-size:11px;opacity:.9}
+.stats{display:flex;margin-top:10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.stats div{flex:1;padding:8px;text-align:center;border-left:1px solid var(--line)}.stats div:first-child{border-left:0}
+.stats b{display:block;font-size:17px}.stats span{font-size:10.5px;color:var(--mute)}
+.seg{display:flex;margin-top:10px;background:var(--surface2);border-radius:var(--r2);padding:3px;font-size:11px}
+.seg span{flex:1;text-align:center;padding:5px 2px;border-radius:calc(var(--r2) - 2px);color:var(--mute)}
+.seg span.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:600}
+.seg.s2{margin-top:10px}
+.mband{width:100%;height:auto;display:block}
+.mband .s-flight,.s-flight{fill:var(--k-air)}.s-ship{fill:var(--k-ship)}.s-stay{fill:var(--k-stay)}.s-car{fill:var(--k-car)}
+.today{fill:var(--accent)}
+.axis{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:4px}
+.dayrow{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--line);font-size:12.5px}
+.dayrow b{width:46px;font-size:11.5px;color:var(--mute)}.dayrow span{flex:1}.dayrow .ico{width:14px;height:14px;color:var(--mute)}
+.dayrow.now{background:var(--nowbg);margin:0 -6px;padding:9px 6px;border-radius:var(--r2)}.dayrow.now b{color:var(--accent)}
+.dayrow.soft{opacity:.65}
+.drop{margin-top:12px;display:flex;gap:10px;align-items:center;padding:12px;border:1.5px dashed var(--accent);border-radius:var(--r);color:var(--ink);background:var(--surface)}
+.drop .ico{width:24px;height:24px;color:var(--accent)}.drop b{font-size:12.5px;display:block}.drop span{font-size:11px;color:var(--mute)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);padding:9px 8px;display:flex;flex-direction:column;gap:2px}
+.tile .ico{color:var(--accent);margin-bottom:3px}.tile b{font-size:12px}.tile small{font-size:9.5px;color:var(--mute);line-height:1.25}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.fld{background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);padding:5px 8px;position:relative;min-height:40px}
+.fld label{display:block;font-size:9.5px;color:var(--mute);letter-spacing:.02em}
+.fld .val{font-size:12.5px;font-weight:600;margin-top:1px}.fld .val.empty{color:var(--mute);font-weight:400;font-style:italic}
+.src{position:absolute;right:7px;top:7px;width:8px;height:8px;border-radius:50%;font-style:normal}
+.src.doc{background:var(--accent)}.src.hand{border:1.5px solid var(--mute)}
+.lg{display:flex;gap:14px;font-size:10px;color:var(--mute);margin-top:8px}.lg span{display:flex;align-items:center;gap:5px}.lg i{width:8px;height:8px;border-radius:50%;display:inline-block}.lg i.doc{background:var(--accent)}.lg i.hand{border:1.5px solid var(--mute)}
+.pax{display:grid;grid-template-columns:1fr auto 1fr auto;gap:4px 8px;align-items:center;margin-top:7px;padding:7px 8px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface);font-size:11.5px}
+.pax b{padding:2px 7px;border-radius:5px;background:var(--surface2)}
+.cta{margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;border-radius:var(--r2);background:var(--accent);color:var(--onaccent);font-weight:700;font-size:12.5px}
+.prop{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:11px}
+.prop.warn{border-color:var(--warn)}
+.ph{display:flex;gap:10px;align-items:center}.ph>div:nth-child(2){flex:1}.ph b{font-size:13px;display:block}.ph span{font-size:11px;color:var(--mute)}
+.conf{text-decoration:none;font:700 10.5px var(--mono);padding:3px 6px;border-radius:5px}.conf.hi{background:var(--ok);color:#fff}.conf.lo{background:var(--warn);color:#fff}
+.quote{margin:10px 0;padding:8px 10px;border-left:3px solid var(--accent);background:var(--surface2);font-size:11px;color:var(--mute)}
+.kv{display:grid;grid-template-columns:70px 1fr;gap:4px 8px;font-size:11.5px}.kv span{color:var(--mute)}
+.acts{display:flex;gap:8px;margin-top:10px}
+.btn{flex:1;text-align:center;padding:8px;border-radius:var(--r2);border:1px solid var(--line);font-size:12px;font-weight:600}
+.btn.pr{background:var(--accent);color:var(--onaccent);border-color:var(--accent)}
+.note{font-size:10.5px;color:var(--mute);margin-top:12px}
+.board{flex:1 1 640px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.board h5{margin:0 0 10px;font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.board .card{padding:16px}
+.ig{width:100%;height:auto;display:block}
+.grat line,.grat1{stroke:var(--line);stroke-width:1;stroke-dasharray:2 5;opacity:.9}
+.rt-ship{fill:none;stroke:var(--k-ship);stroke-width:2.4;stroke-linecap:round}
+.rt-air{fill:none;stroke:var(--k-air);stroke-width:2;stroke-dasharray:6 5;stroke-linecap:round}
+.rt-rail{fill:none;stroke:var(--k-car);stroke-width:2.4}
+.pt circle{fill:var(--bg);stroke:var(--ink);stroke-width:1.6}
+.lb text{font:500 10.5px var(--font);fill:var(--ink)}.lb .m{fill:var(--k-ship);font-weight:600}.lb .m.a{fill:var(--k-air)}
+.leg2{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--mute);margin-top:8px;flex-wrap:wrap}
+.leg2 i{display:inline-block;width:18px;height:3px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.k-ship{background:var(--k-ship)}.k-air{background:var(--k-air)}.k-rail{background:var(--k-car)}
+.leg2 small{margin-left:auto;font-size:11px}
+.ax{font:500 10px var(--mono);fill:var(--mute)}.ln{font:500 11px var(--font);fill:var(--mute)}.sl{font:600 10px var(--font);fill:var(--onseg)}
+.kasse{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:900px){.kasse{grid-template-columns:1fr}}
+.sm{font-size:12px;color:var(--mute);margin-bottom:8px}
+.stack rect.c1{fill:var(--c1)}.stack rect.c2{fill:var(--c2)}.stack rect.c3{fill:var(--c3)}.stack rect.c4{fill:var(--c4)}.stack rect.c5{fill:var(--c5)}.stack rect.c6{fill:var(--c6)}
+.leg{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;font-size:12px}
+.leg li{display:flex;align-items:center;gap:7px}.leg li span{flex:1}.leg i{width:10px;height:10px;border-radius:3px}
+.leg i.c1{background:var(--c1)}.leg i.c2{background:var(--c2)}.leg i.c3{background:var(--c3)}.leg i.c4{background:var(--c4)}.leg i.c5{background:var(--c5)}.leg i.c6{background:var(--c6)}
+.axisl{stroke:var(--mute);stroke-width:1}.pos{fill:var(--ok)}.neg{fill:var(--warn)}.vl{font:600 11px var(--mono);fill:var(--ink)}
+.pay{list-style:none;margin:6px 0 0;padding:0;font-size:12.5px}
+.pay li{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}.pay s{text-decoration:none;color:var(--accent)}.pay span{margin-left:auto}
+.fn{display:block;margin-top:12px;color:var(--mute);font-size:11px}
+/* Richtung A · Atlas */
+.dA{--bg:#08141f;--surface:#0f2231;--surface2:#15304a;--line:#223f58;--ink:#eaf2f8;--mute:#8fa8bb;--accent:#f0c674;--onaccent:#1a1405;--ok:#2f9e6a;--warn:#e0645c;
+ --k-air:#f0c674;--k-ship:#4fc3d9;--k-stay:#7d8ff0;--k-car:#6fcf97;--onseg:#06121c;--icfg:#06121c;
+ --c1:#4fc3d9;--c2:#f0c674;--c3:#7d8ff0;--c4:#6fcf97;--c5:#f29f7a;--c6:#c3a6ff;
+ --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;--head:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;--hw:700;--mono:ui-monospace,"SF Mono",Menlo,monospace;
+ --r:18px;--r2:11px;--tabr:24px;--tabbg:rgba(15,34,49,.72);--shadow:none;--nowbg:rgba(240,198,116,.09);
+ --hero:linear-gradient(135deg,#12466b,#0d2c45 70%);--heroink:#eaf2f8;--heroacc:#f0c674;
+ --cover:radial-gradient(circle at 78% 30%,rgba(240,198,116,.9) 0 9%,transparent 10%),linear-gradient(180deg,#1d5f86 0%,#0d3350 55%,#08141f 100%);--coverink:#fff}
+.dA .cvbg::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.18) 1px,transparent 1.5px);background-size:12px 12px;opacity:.5}
+/* Richtung B · Ticket */
+.dB{--bg:#ece5d7;--surface:#fbf8f1;--surface2:#f1ebdd;--line:#d4c9b4;--ink:#1d1b18;--mute:#6f675a;--accent:#d8452b;--onaccent:#fff;--ok:#2f7d4f;--warn:#b3261e;
+ --k-air:#d8452b;--k-ship:#1f4e5f;--k-stay:#b48a2b;--k-car:#5b8c5a;--onseg:#fff;--icfg:#fff;
+ --c1:#1f4e5f;--c2:#d8452b;--c3:#e0a526;--c4:#5b8c5a;--c5:#8a6f9e;--c6:#9a8f7e;
+ --font:"Helvetica Neue",Helvetica,Arial,sans-serif;--head:"Helvetica Neue",Helvetica,Arial,sans-serif;--hw:800;--mono:ui-monospace,"SF Mono",Menlo,monospace;
+ --r:10px;--r2:6px;--tabr:14px;--tabbg:rgba(251,248,241,.92);--shadow:0 1px 0 rgba(0,0,0,.05);--nowbg:rgba(216,69,43,.08);
+ --hero:#1d1b18;--heroink:#fbf8f1;--heroacc:#ffb347;
+ --cover:repeating-linear-gradient(135deg,#d8452b 0 14px,#c93d24 14px 28px);--coverink:#fff}
+.dB .kick,.dB .sec,.dB .board h5,.dB .lbl{font-family:var(--mono)}
+.dB .next{position:relative;border:0}
+.dB .next::before,.dB .next::after{content:"";position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--bg);margin-top:-7px}
+.dB .next::before{left:-7px}.dB .next::after{right:-7px}
+.dB .card,.dB .prop,.dB .tile,.dB .fld{border-style:solid}
+.dB .cvbg::after{content:"";position:absolute;right:12px;top:12px;width:70px;height:26px;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 4px,#fff 4px 5px,transparent 5px 8px);opacity:.85}
+/* Richtung C · Journal */
+.dC{--bg:#f4f4f1;--surface:#fff;--surface2:#ececE8;--line:#d9d9d3;--ink:#0e0e0e;--mute:#68685f;--accent:#1747d6;--onaccent:#fff;--ok:#1d7a46;--warn:#b3261e;
+ --k-air:#1747d6;--k-ship:#0e0e0e;--k-stay:#9a9a92;--k-car:#1d7a46;--onseg:#fff;--icfg:#fff;
+ --c1:#1747d6;--c2:#0e0e0e;--c3:#7a8cff;--c4:#1d7a46;--c5:#c46a00;--c6:#9a9a92;
+ --font:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;--head:"New York",Georgia,"Times New Roman",serif;--hw:600;--mono:ui-monospace,"SF Mono",Menlo,monospace;
+ --r:3px;--r2:3px;--tabr:0px;--tabbg:rgba(255,255,255,.94);--shadow:none;--nowbg:rgba(23,71,214,.07);
+ --hero:#0e0e0e;--heroink:#fff;--heroacc:#7a8cff;
+ --cover:linear-gradient(160deg,#dfe3ee 0%,#c9d1e6 45%,#8da0d8 100%);--coverink:#0e0e0e}
+.dC .card,.dC .stats,.dC .fld,.dC .tile,.dC .prop{box-shadow:none}
+.dC .hd h4{font-size:26px}.dC .ev,.dC .dayrow{border-top-color:#0e0e0e}.dC .sec{border-top:1px solid #0e0e0e;padding-top:7px}
+.dC .next{border:0}.dC .tabs{border-left:0;border-right:0;border-bottom:0}.dC .dots i{height:3px;border-radius:0}
+.dC .ev .ic{border-radius:0}
+/* Weitere Abschnitte */
+.cmp{background:#10141a;border:1px solid #2b323d;border-radius:20px;padding:26px;margin-top:20px}
+.cmp h3{margin:0 0 6px;font-size:22px}.cmp p{color:#a7afba;max-width:80ch;margin:0 0 6px}
+.ipad{margin-top:18px;border:10px solid #05060a;border-radius:28px;background:#08141f;color:#eaf2f8;display:grid;grid-template-columns:200px 1.2fr 1fr;height:420px;overflow:hidden;font-size:12px}
+.ipad>div{padding:14px;border-left:1px solid #223f58}.ipad>div:first-child{border-left:0;background:#0b1b2a}
+.ipad h6{margin:0 0 10px;font:600 10.5px var(--mono,monospace);letter-spacing:.1em;text-transform:uppercase;color:#8fa8bb}
+.ipad .it{padding:8px 9px;border-radius:9px;margin-bottom:4px;color:#8fa8bb}.ipad .it.on{background:#15304a;color:#eaf2f8}
+.ipad .blk{background:#0f2231;border:1px solid #223f58;border-radius:12px;padding:10px;margin-bottom:8px}
+.ipad .map{height:150px;border-radius:12px;background:radial-gradient(circle at 30% 60%,#4fc3d9 0 3px,transparent 4px),radial-gradient(circle at 70% 30%,#f0c674 0 3px,transparent 4px),linear-gradient(180deg,#12466b,#0d2c45);position:relative}
+.ipad .map::after{content:"";position:absolute;inset:0;border-radius:12px;background-image:radial-gradient(rgba(255,255,255,.14) 1px,transparent 1.5px);background-size:12px 12px}
+.rec{margin-top:36px;border:1px solid #e39b5c;border-radius:20px;padding:26px;background:#14100c}
+.rec h3{margin:0 0 8px;font-size:22px;color:#e39b5c}.rec li{margin:6px 0;color:#d6dbe2}.rec ul{padding-left:18px}
+.tablewrap{overflow:auto}
+table.t{border-collapse:collapse;width:100%;font-size:13px;margin-top:10px}
+table.t th,table.t td{border-top:1px solid #2b323d;padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{color:#8c95a1;font-weight:600;font-size:12px}
+</style></head>
+<body><div class="wrap">
+<div class="intro">
+  <h1>TravelBuddy · Designvorschläge</h1>
+  <p>Drei Richtungen am selben Inhalt: der Tag <b>25.10.2026</b> der Reise «Ferien 2026» (Einschiffung in Barcelona),
+  die Reiseübersicht und die Infografiken. Ereignisse und Zeiten stammen aus den echten Reisedaten in HomeBuddy,
+  Beträge der Reisekasse sind Beispielwerte.</p>
+  <nav><a href="#dA">A · Atlas</a><a href="#dB">B · Ticket</a><a href="#dC">C · Journal</a><a href="#erfassen">Ereignis erfassen</a><a href="#ipad">iPad</a><a href="#empfehlung">Empfehlung</a></nav>
+  <div class="note0">Alle drei haben dieselbe Struktur: <b>Heute</b> (nur bei aktiver Reise), <b>Plan</b>, <b>Dokumente</b>, <b>Kasse</b>, <b>Team</b>.
+  Unterschiede liegen in Farbe, Typografie, Kartenform und Gewichtung der Infografiken.</div>
+</div>
+
+<section class="dir dA" id="dA">
+  <header class="dh">
+    <div><span class="dn">Richtung A · Atlas</span><h2>Karte zuerst, Nacht blau, Sand als Signal</h2><p>Die Reise ist eine Strecke auf der Karte. Dunkler Grund, ein warmer Sandton für alles, was jetzt wichtig ist. Starke Infografiken, ruhig auf dem Flug, gut lesbar im dunklen Hotelzimmer. Auf iOS trägt natives Liquid Glass die Leisten.</p></div>
+    <div class="meta2">
+      <div class="sw"><span><i style="background:#08141f"></i>Nacht</span><span><i style="background:#0f2231"></i>Fläche</span><span><i style="background:#4fc3d9"></i>Meer</span><span><i style="background:#f0c674"></i>Sand · Signal</span><span><i style="background:#7d8ff0"></i>Unterkunft</span><span><i style="background:#6fcf97"></i>Auto/Bahn</span></div>
+      <p class="fnt">SF Pro (System), SF Mono für Zeiten, Beträge und Codes. Dynamic Type voll unterstützt.</p>
+      <p class="pc"><b>Passt, wenn</b> Karte, Route und Zeitband im Mittelpunkt stehen sollen; für lange Reisen mit vielen Stationen.<br><b>Preis</b> Wenig «Papier-Gefühl»; Buchungsdaten wirken weniger wie ein Beleg.</p>
+    </div>
+  </header>
+  <div class="row">
+    <div class="phones">
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="hd">
+    <div class="kick">Ferien 2026 · Tag 3 von 29</div>
+    <h4>Sonntag, 25.10.2026</h4>
+    <div class="sub">Barcelona · 19 ° sonnig</div>
+    <div class="dots" aria-label="Tag 3 von 29"><i class="d"></i><i class="d"></i><i class="n"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div>
+  </div>
+  <div class="next">
+    <div class="lbl">Als Nächstes</div>
+    <div class="nrow">
+  <svg class="ringsvg" viewBox="0 0 56 56" aria-hidden="true">
+    <circle cx="28" cy="28" r="23" class="r0"/>
+    <circle cx="28" cy="28" r="23" class="r1" stroke-dasharray="144.5" stroke-dashoffset="52" transform="rotate(-90 28 28)"/>
+    <text x="28" y="26" text-anchor="middle" class="rt">1:40</text><text x="28" y="38" text-anchor="middle" class="rs">Std.</text>
+  </svg><div><div class="big">Check-out</div><div class="meta">Hotel Negresco Princess</div><div class="meta num">12:00 · Zimmer räumen</div></div></div>
+  </div>
+  <div class="sec">Heute</div>
+  <div class="ev now"><div class="t num">12:00</div><div class="ic c-stay"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.5"/></svg></div><div class="b"><b>Check-out Hotel</b><span>Negresco Princess 4*</span></div></div>
+  <div class="ev"><div class="t num">13:00</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg></div><div class="b"><b>Einschiffung</b><span>Terminal Port Nou · Legend of the Seas</span><div class="chips"><u><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg>Bordkarte</u><u><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg>Route</u></div></div></div>
+  <div class="ev"><div class="t num">17:00</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg></div><div class="b"><b>Abfahrt Barcelona</b><span>Alle an Bord bis 16:30</span></div></div>
+  <div class="sec">Morgen</div>
+  <div class="ev soft"><div class="t num">07:30</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg></div><div class="b"><b>Palma de Mallorca</b><span>07:30–15:30 · Hafentag</span></div></div>
+  <nav class="tabs"><span class="on"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><em>Heute</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><em>Plan</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><em>Dokumente</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg><em>Kasse</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6"/></svg><em>Team</em></span></nav>
+  </div></div><figcaption>Heute-Modus: aktive Reise, Tag 3 von 29</figcaption></figure>
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="cover"><div class="cvbg"></div>
+    <div class="cvt"><small>Kreuzfahrt Barcelona → Florida</small><h4>Ferien 2026</h4><span class="num">23.10. – 20.11.2026</span></div>
+  </div>
+  <div class="stats"><div><b class="num">29</b><span>Tage</span></div><div><b class="num">4</b><span>Personen</span></div><div><b class="num">43</b><span>Ereignisse</span></div></div>
+  <div class="seg"><span class="on">Plan</span><span>Dokumente</span><span>Kasse</span><span>Team</span></div>
+  <div class="sec">Verlauf</div>
+  <div class="card">
+  <svg viewBox="0 0 280 34" class="mband" aria-hidden="true">
+    <rect x="0" y="4" width="20" height="10" class="s-flight"/>
+    <rect x="0" y="20" width="20" height="10" class="s-stay"/>
+    <rect x="20" y="4" width="130" height="10" class="s-ship"/>
+    <rect x="150" y="20" width="10" height="10" class="s-stay"/>
+    <rect x="160" y="4" width="70" height="10" class="s-ship"/>
+    <rect x="230" y="20" width="40" height="10" class="s-car"/>
+    <rect x="270" y="4" width="10" height="10" class="s-flight"/>
+    <rect x="20" y="0" width="1.5" height="34" class="today"/>
+  </svg><div class="axis num"><span>23.10.</span><span>07.11.</span><span>20.11.</span></div></div>
+  <div class="sec">Tage</div>
+  <div class="dayrow now"><b class="num">25.10.</b><span>Barcelona · Einschiffung</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">26.10.</b><span>Palma de Mallorca</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">27.10.</b><span>Málaga</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">28.10.</b><span>Cádiz</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow soft"><b class="num">29.10.</b><span>Seetag · Atlantik (9 Tage)</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <nav class="tabs"><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><em>Heute</em></span><span class="on"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><em>Plan</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><em>Dokumente</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg><em>Kasse</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6"/></svg><em>Team</em></span></nav>
+  </div></div><figcaption>Reiseübersicht</figcaption></figure></div>
+    
+  <div class="board">
+    <section class="card"><h5>Routenbogen</h5>
+<svg viewBox="0 0 630 232" class="ig" role="img" aria-label="Routenbogen der Reise von Zürich über Barcelona und die Karibik nach Lissabon">
+  <g class="grat">
+    <line x1="60" y1="0" x2="60" y2="232"/><line x1="120" y1="0" x2="120" y2="232"/><line x1="180" y1="0" x2="180" y2="232"/><line x1="240" y1="0" x2="240" y2="232"/><line x1="300" y1="0" x2="300" y2="232"/><line x1="360" y1="0" x2="360" y2="232"/><line x1="420" y1="0" x2="420" y2="232"/><line x1="480" y1="0" x2="480" y2="232"/><line x1="540" y1="0" x2="540" y2="232"/><line x1="600" y1="0" x2="600" y2="232"/>
+    <line x1="0" y1="12" x2="630" y2="12"/><line x1="0" y1="72" x2="630" y2="72"/><line x1="0" y1="132" x2="630" y2="132"/><line x1="0" y1="192" x2="630" y2="192"/>
+  </g>
+  <path class="rt-rail" d="M591 27 L553 64"/>
+  <path class="rt-ship" d="M553 64 L556 74 L514 92 L502 93"/>
+  <path class="rt-ship" d="M502 93 Q280 30 59 157"/>
+  <path class="rt-ship" d="M59 157 L79 152 Q110 170 143 201 L150 202 Q110 188 59 157"/>
+  <path class="rt-air" d="M59 157 Q270 -10 485 80"/>
+  <path class="rt-air" d="M485 80 Q540 40 591 27"/>
+  <g class="pt">
+    <circle cx="591" cy="27" r="4.5"/><circle cx="553" cy="64" r="4.5"/><circle cx="556" cy="74" r="3"/>
+    <circle cx="514" cy="92" r="3"/><circle cx="502" cy="93" r="3"/><circle cx="485" cy="80" r="4.5"/>
+    <circle cx="59" cy="157" r="4.5"/><circle cx="79" cy="152" r="3"/><circle cx="143" cy="201" r="3"/><circle cx="150" cy="202" r="3"/>
+  </g>
+  <g class="lb">
+    <text x="585" y="18" text-anchor="end">Zürich</text>
+    <text x="545" y="68" text-anchor="end">Barcelona</text>
+    <text x="563" y="80">Palma</text>
+    <text x="508" y="108" text-anchor="middle">Málaga · Cádiz</text>
+    <text x="478" y="76" text-anchor="end">Lissabon</text>
+    <text x="52" y="172" text-anchor="end">Miami</text>
+    <text x="84" y="143">CocoCay</text>
+    <text x="160" y="206">San Juan · St. Thomas</text>
+    <text x="300" y="98" text-anchor="middle" class="m">13 Nächte Atlantik</text>
+    <text x="270" y="38" text-anchor="middle" class="m a">Rückflug 19.11.</text>
+  </g>
+</svg>
+      <div class="leg2"><span><i class="k-ship"></i>Schiff</span><span><i class="k-air"></i>Flug</span><span><i class="k-rail"></i>Bahn</span><small>Schematisch; in der App echte Karte (Apple Karten)</small></div></section>
+    <section class="card"><h5>Zeitband</h5>
+<svg viewBox="0 0 620 176" class="ig" role="img" aria-label="Zeitband der 29 Reisetage">
+  <line x1="78" y1="22" x2="78" y2="158" class="grat1"/><text x="78" y="14" class="ax" >23.10.</text><line x1="204" y1="22" x2="204" y2="158" class="grat1"/><text x="204" y="14" class="ax" >30.10.</text><line x1="330" y1="22" x2="330" y2="158" class="grat1"/><text x="330" y="14" class="ax" >06.11.</text><line x1="456" y1="22" x2="456" y2="158" class="grat1"/><text x="456" y="14" class="ax" >13.11.</text><line x1="582" y1="22" x2="582" y2="158" class="grat1"/><text x="582" y="14" class="ax" text-anchor="end" dx="18">20.11.</text>
+  <text x="2" y="46" class="ln">Unterwegs</text>
+  <text x="2" y="80" class="ln">Schiff</text>
+  <text x="2" y="114" class="ln">Unterkunft</text>
+  <text x="2" y="148" class="ln">Mietwagen</text>
+  <g><rect x="78" y="32" width="16" height="22" rx="3" class="s-flight"/><text x="85" y="47" class="sl">Zug+Flug</text></g>
+  <g><rect x="564" y="32" width="34" height="22" rx="3" class="s-flight"/><text x="571" y="47" class="sl">Heimflug</text></g>
+  <g><rect x="114" y="66" width="232" height="22" rx="3" class="s-ship"/><text x="121" y="81" class="sl">Legend of the Seas · 13 Nächte</text></g>
+  <g><rect x="366" y="66" width="124" height="22" rx="3" class="s-ship"/><text x="373" y="81" class="sl">Karibik · 7 Nächte</text></g>
+  <g><rect x="78" y="100" width="34" height="22" rx="3" class="s-stay"/><text x="85" y="115" class="sl">Barcelona</text></g>
+  <g><rect x="348" y="100" width="16" height="22" rx="3" class="s-stay"/></g>
+  <g><rect x="492" y="100" width="70" height="22" rx="3" class="s-stay"/><text x="499" y="115" class="sl">Private Pool Oasis</text></g>
+  <g><rect x="492" y="134" width="70" height="22" rx="3" class="s-car"/><text x="499" y="149" class="sl">Miami · 4 Tage</text></g>
+  <rect x="114" y="20" width="2" height="142" class="today"/>
+  <text x="120" y="172" class="ax">heute · Tag 3</text>
+</svg></section>
+    <section class="card"><h5>Reisekasse</h5>
+  <div class="kasse">
+    <div>
+      <div class="sm">Ausgaben nach Kategorie · CHF · <span class="num">27’550</span></div>
+      <svg viewBox="0 0 580 26" class="ig stack" role="img" aria-label="Ausgaben nach Kategorie"><rect x="0" y="0" width="385.8684210526316" height="26" class="c1"/><rect x="387.3684210526316" y="0" width="81.65789473684211" height="26" class="c2"/><rect x="470.52631578947376" y="0" width="64.1842105263158" height="26" class="c3"/><rect x="536.2105263157896" y="0" width="20.394736842105264" height="26" class="c4"/><rect x="558.1052631578949" y="0" width="14.921052631578949" height="26" class="c5"/><rect x="574.5263157894739" y="0" width="3.973684210526316" height="26" class="c6"/></svg>
+      <ul class="leg"><li><i class="c1"></i><span>Schiff</span><b class="num">18’400</b></li><li><i class="c2"></i><span>Flug</span><b class="num">3’950</b></li><li><i class="c3"></i><span>Hotel</span><b class="num">3’120</b></li><li><i class="c4"></i><span>Mietwagen</span><b class="num">1’040</b></li><li><i class="c5"></i><span>Aktivität</span><b class="num">780</b></li><li><i class="c6"></i><span>Transfer</span><b class="num">260</b></li></ul>
+    </div>
+    <div>
+      <div class="sm">Saldo je Person · CHF</div>
+      <svg viewBox="0 0 440 130" class="ig" role="img" aria-label="Salden je Person">
+        <line x1="220" y1="0" x2="220" y2="130" class="axisl"/><text x="0" y="22" class="ln">Rolf</text>
+        <rect x="220" y="8" width="148.79999999999998" height="20" rx="3" class="pos"/>
+        <text x="376.79999999999995" y="23" text-anchor="start" class="vl">+1’240</text><text x="0" y="52" class="ln">Valentyna</text>
+        <rect x="182.8" y="38" width="37.199999999999996" height="20" rx="3" class="neg"/>
+        <text x="174.8" y="53" text-anchor="end" class="vl">−310</text><text x="0" y="82" class="ln">Eliane</text>
+        <rect x="157.6" y="68" width="62.4" height="20" rx="3" class="neg"/>
+        <text x="149.6" y="83" text-anchor="end" class="vl">−520</text><text x="0" y="112" class="ln">Harald</text>
+        <rect x="170.8" y="98" width="49.199999999999996" height="20" rx="3" class="neg"/>
+        <text x="162.8" y="113" text-anchor="end" class="vl">−410</text>
+      </svg>
+      <div class="sm" style="margin-top:6px">Ausgleich · 3 Überweisungen</div>
+      <ul class="pay">
+        <li><b>Eliane</b><s>→</s><b>Rolf</b><span class="num">CHF 520</span></li>
+        <li><b>Harald</b><s>→</s><b>Rolf</b><span class="num">CHF 410</span></li>
+        <li><b>Valentyna</b><s>→</s><b>Rolf</b><span class="num">CHF 310</span></li>
+      </ul>
+    </div>
+  </div><small class="fn">Beispieldaten, Struktur wie die echte Kasse «Ferien 2026»</small></section>
+  </div>
+  </div>
+</section>
+<section class="dir dB" id="dB">
+  <header class="dh">
+    <div><span class="dn">Richtung B · Ticket</span><h2>Boardingpass-Karten, Papier, Zinnober</h2><p>Jede Buchung ist ein Ticket: Kopf mit Typ und Referenz, Perforation, Details darunter. Warmes Papier, ein kräftiges Zinnoberrot, Codes in Monospace. Buchungsdaten sind sofort wiederzufinden, wie am Schalter.</p></div>
+    <div class="meta2">
+      <div class="sw"><span><i style="background:#ece5d7"></i>Papier</span><span><i style="background:#fbf8f1"></i>Karte</span><span><i style="background:#1d1b18"></i>Tinte</span><span><i style="background:#d8452b"></i>Zinnober</span><span><i style="background:#1f4e5f"></i>Schiff</span><span><i style="background:#b48a2b"></i>Messing</span></div>
+      <p class="fnt">Helvetica Neue (System) fett für Titel, Monospace für Referenzen, Gate, Sitz.</p>
+      <p class="pc"><b>Passt, wenn</b> Buchungsnummern, Gate und Sitz die Hauptsache sind; für viele einzelne Flüge, Züge, Hotels.<br><b>Preis</b> Verspielter; Karte und Infografiken sind Beiwerk, nicht Held. Hell blendet nachts.</p>
+    </div>
+  </header>
+  <div class="row">
+    <div class="phones">
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="hd">
+    <div class="kick">Ferien 2026 · Tag 3 von 29</div>
+    <h4>Sonntag, 25.10.2026</h4>
+    <div class="sub">Barcelona · 19 ° sonnig</div>
+    <div class="dots" aria-label="Tag 3 von 29"><i class="d"></i><i class="d"></i><i class="n"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div>
+  </div>
+  <div class="next">
+    <div class="lbl">Als Nächstes</div>
+    <div class="nrow">
+  <svg class="ringsvg" viewBox="0 0 56 56" aria-hidden="true">
+    <circle cx="28" cy="28" r="23" class="r0"/>
+    <circle cx="28" cy="28" r="23" class="r1" stroke-dasharray="144.5" stroke-dashoffset="52" transform="rotate(-90 28 28)"/>
+    <text x="28" y="26" text-anchor="middle" class="rt">1:40</text><text x="28" y="38" text-anchor="middle" class="rs">Std.</text>
+  </svg><div><div class="big">Check-out</div><div class="meta">Hotel Negresco Princess</div><div class="meta num">12:00 · Zimmer räumen</div></div></div>
+  </div>
+  <div class="sec">Heute</div>
+  <div class="ev now"><div class="t num">12:00</div><div class="ic c-stay"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.5"/></svg></div><div class="b"><b>Check-out Hotel</b><span>Negresco Princess 4*</span></div></div>
+  <div class="ev"><div class="t num">13:00</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg></div><div class="b"><b>Einschiffung</b><span>Terminal Port Nou · Legend of the Seas</span><div class="chips"><u><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg>Bordkarte</u><u><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg>Route</u></div></div></div>
+  <div class="ev"><div class="t num">17:00</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg></div><div class="b"><b>Abfahrt Barcelona</b><span>Alle an Bord bis 16:30</span></div></div>
+  <div class="sec">Morgen</div>
+  <div class="ev soft"><div class="t num">07:30</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg></div><div class="b"><b>Palma de Mallorca</b><span>07:30–15:30 · Hafentag</span></div></div>
+  <nav class="tabs"><span class="on"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><em>Heute</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><em>Plan</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><em>Dokumente</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg><em>Kasse</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6"/></svg><em>Team</em></span></nav>
+  </div></div><figcaption>Heute-Modus: aktive Reise, Tag 3 von 29</figcaption></figure>
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="cover"><div class="cvbg"></div>
+    <div class="cvt"><small>Kreuzfahrt Barcelona → Florida</small><h4>Ferien 2026</h4><span class="num">23.10. – 20.11.2026</span></div>
+  </div>
+  <div class="stats"><div><b class="num">29</b><span>Tage</span></div><div><b class="num">4</b><span>Personen</span></div><div><b class="num">43</b><span>Ereignisse</span></div></div>
+  <div class="seg"><span class="on">Plan</span><span>Dokumente</span><span>Kasse</span><span>Team</span></div>
+  <div class="sec">Verlauf</div>
+  <div class="card">
+  <svg viewBox="0 0 280 34" class="mband" aria-hidden="true">
+    <rect x="0" y="4" width="20" height="10" class="s-flight"/>
+    <rect x="0" y="20" width="20" height="10" class="s-stay"/>
+    <rect x="20" y="4" width="130" height="10" class="s-ship"/>
+    <rect x="150" y="20" width="10" height="10" class="s-stay"/>
+    <rect x="160" y="4" width="70" height="10" class="s-ship"/>
+    <rect x="230" y="20" width="40" height="10" class="s-car"/>
+    <rect x="270" y="4" width="10" height="10" class="s-flight"/>
+    <rect x="20" y="0" width="1.5" height="34" class="today"/>
+  </svg><div class="axis num"><span>23.10.</span><span>07.11.</span><span>20.11.</span></div></div>
+  <div class="sec">Tage</div>
+  <div class="dayrow now"><b class="num">25.10.</b><span>Barcelona · Einschiffung</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">26.10.</b><span>Palma de Mallorca</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">27.10.</b><span>Málaga</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">28.10.</b><span>Cádiz</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow soft"><b class="num">29.10.</b><span>Seetag · Atlantik (9 Tage)</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <nav class="tabs"><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><em>Heute</em></span><span class="on"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><em>Plan</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><em>Dokumente</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg><em>Kasse</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6"/></svg><em>Team</em></span></nav>
+  </div></div><figcaption>Reiseübersicht</figcaption></figure></div>
+    
+  <div class="board">
+    <section class="card"><h5>Routenbogen</h5>
+<svg viewBox="0 0 630 232" class="ig" role="img" aria-label="Routenbogen der Reise von Zürich über Barcelona und die Karibik nach Lissabon">
+  <g class="grat">
+    <line x1="60" y1="0" x2="60" y2="232"/><line x1="120" y1="0" x2="120" y2="232"/><line x1="180" y1="0" x2="180" y2="232"/><line x1="240" y1="0" x2="240" y2="232"/><line x1="300" y1="0" x2="300" y2="232"/><line x1="360" y1="0" x2="360" y2="232"/><line x1="420" y1="0" x2="420" y2="232"/><line x1="480" y1="0" x2="480" y2="232"/><line x1="540" y1="0" x2="540" y2="232"/><line x1="600" y1="0" x2="600" y2="232"/>
+    <line x1="0" y1="12" x2="630" y2="12"/><line x1="0" y1="72" x2="630" y2="72"/><line x1="0" y1="132" x2="630" y2="132"/><line x1="0" y1="192" x2="630" y2="192"/>
+  </g>
+  <path class="rt-rail" d="M591 27 L553 64"/>
+  <path class="rt-ship" d="M553 64 L556 74 L514 92 L502 93"/>
+  <path class="rt-ship" d="M502 93 Q280 30 59 157"/>
+  <path class="rt-ship" d="M59 157 L79 152 Q110 170 143 201 L150 202 Q110 188 59 157"/>
+  <path class="rt-air" d="M59 157 Q270 -10 485 80"/>
+  <path class="rt-air" d="M485 80 Q540 40 591 27"/>
+  <g class="pt">
+    <circle cx="591" cy="27" r="4.5"/><circle cx="553" cy="64" r="4.5"/><circle cx="556" cy="74" r="3"/>
+    <circle cx="514" cy="92" r="3"/><circle cx="502" cy="93" r="3"/><circle cx="485" cy="80" r="4.5"/>
+    <circle cx="59" cy="157" r="4.5"/><circle cx="79" cy="152" r="3"/><circle cx="143" cy="201" r="3"/><circle cx="150" cy="202" r="3"/>
+  </g>
+  <g class="lb">
+    <text x="585" y="18" text-anchor="end">Zürich</text>
+    <text x="545" y="68" text-anchor="end">Barcelona</text>
+    <text x="563" y="80">Palma</text>
+    <text x="508" y="108" text-anchor="middle">Málaga · Cádiz</text>
+    <text x="478" y="76" text-anchor="end">Lissabon</text>
+    <text x="52" y="172" text-anchor="end">Miami</text>
+    <text x="84" y="143">CocoCay</text>
+    <text x="160" y="206">San Juan · St. Thomas</text>
+    <text x="300" y="98" text-anchor="middle" class="m">13 Nächte Atlantik</text>
+    <text x="270" y="38" text-anchor="middle" class="m a">Rückflug 19.11.</text>
+  </g>
+</svg>
+      <div class="leg2"><span><i class="k-ship"></i>Schiff</span><span><i class="k-air"></i>Flug</span><span><i class="k-rail"></i>Bahn</span><small>Schematisch; in der App echte Karte (Apple Karten)</small></div></section>
+    <section class="card"><h5>Zeitband</h5>
+<svg viewBox="0 0 620 176" class="ig" role="img" aria-label="Zeitband der 29 Reisetage">
+  <line x1="78" y1="22" x2="78" y2="158" class="grat1"/><text x="78" y="14" class="ax" >23.10.</text><line x1="204" y1="22" x2="204" y2="158" class="grat1"/><text x="204" y="14" class="ax" >30.10.</text><line x1="330" y1="22" x2="330" y2="158" class="grat1"/><text x="330" y="14" class="ax" >06.11.</text><line x1="456" y1="22" x2="456" y2="158" class="grat1"/><text x="456" y="14" class="ax" >13.11.</text><line x1="582" y1="22" x2="582" y2="158" class="grat1"/><text x="582" y="14" class="ax" text-anchor="end" dx="18">20.11.</text>
+  <text x="2" y="46" class="ln">Unterwegs</text>
+  <text x="2" y="80" class="ln">Schiff</text>
+  <text x="2" y="114" class="ln">Unterkunft</text>
+  <text x="2" y="148" class="ln">Mietwagen</text>
+  <g><rect x="78" y="32" width="16" height="22" rx="3" class="s-flight"/><text x="85" y="47" class="sl">Zug+Flug</text></g>
+  <g><rect x="564" y="32" width="34" height="22" rx="3" class="s-flight"/><text x="571" y="47" class="sl">Heimflug</text></g>
+  <g><rect x="114" y="66" width="232" height="22" rx="3" class="s-ship"/><text x="121" y="81" class="sl">Legend of the Seas · 13 Nächte</text></g>
+  <g><rect x="366" y="66" width="124" height="22" rx="3" class="s-ship"/><text x="373" y="81" class="sl">Karibik · 7 Nächte</text></g>
+  <g><rect x="78" y="100" width="34" height="22" rx="3" class="s-stay"/><text x="85" y="115" class="sl">Barcelona</text></g>
+  <g><rect x="348" y="100" width="16" height="22" rx="3" class="s-stay"/></g>
+  <g><rect x="492" y="100" width="70" height="22" rx="3" class="s-stay"/><text x="499" y="115" class="sl">Private Pool Oasis</text></g>
+  <g><rect x="492" y="134" width="70" height="22" rx="3" class="s-car"/><text x="499" y="149" class="sl">Miami · 4 Tage</text></g>
+  <rect x="114" y="20" width="2" height="142" class="today"/>
+  <text x="120" y="172" class="ax">heute · Tag 3</text>
+</svg></section>
+    <section class="card"><h5>Reisekasse</h5>
+  <div class="kasse">
+    <div>
+      <div class="sm">Ausgaben nach Kategorie · CHF · <span class="num">27’550</span></div>
+      <svg viewBox="0 0 580 26" class="ig stack" role="img" aria-label="Ausgaben nach Kategorie"><rect x="0" y="0" width="385.8684210526316" height="26" class="c1"/><rect x="387.3684210526316" y="0" width="81.65789473684211" height="26" class="c2"/><rect x="470.52631578947376" y="0" width="64.1842105263158" height="26" class="c3"/><rect x="536.2105263157896" y="0" width="20.394736842105264" height="26" class="c4"/><rect x="558.1052631578949" y="0" width="14.921052631578949" height="26" class="c5"/><rect x="574.5263157894739" y="0" width="3.973684210526316" height="26" class="c6"/></svg>
+      <ul class="leg"><li><i class="c1"></i><span>Schiff</span><b class="num">18’400</b></li><li><i class="c2"></i><span>Flug</span><b class="num">3’950</b></li><li><i class="c3"></i><span>Hotel</span><b class="num">3’120</b></li><li><i class="c4"></i><span>Mietwagen</span><b class="num">1’040</b></li><li><i class="c5"></i><span>Aktivität</span><b class="num">780</b></li><li><i class="c6"></i><span>Transfer</span><b class="num">260</b></li></ul>
+    </div>
+    <div>
+      <div class="sm">Saldo je Person · CHF</div>
+      <svg viewBox="0 0 440 130" class="ig" role="img" aria-label="Salden je Person">
+        <line x1="220" y1="0" x2="220" y2="130" class="axisl"/><text x="0" y="22" class="ln">Rolf</text>
+        <rect x="220" y="8" width="148.79999999999998" height="20" rx="3" class="pos"/>
+        <text x="376.79999999999995" y="23" text-anchor="start" class="vl">+1’240</text><text x="0" y="52" class="ln">Valentyna</text>
+        <rect x="182.8" y="38" width="37.199999999999996" height="20" rx="3" class="neg"/>
+        <text x="174.8" y="53" text-anchor="end" class="vl">−310</text><text x="0" y="82" class="ln">Eliane</text>
+        <rect x="157.6" y="68" width="62.4" height="20" rx="3" class="neg"/>
+        <text x="149.6" y="83" text-anchor="end" class="vl">−520</text><text x="0" y="112" class="ln">Harald</text>
+        <rect x="170.8" y="98" width="49.199999999999996" height="20" rx="3" class="neg"/>
+        <text x="162.8" y="113" text-anchor="end" class="vl">−410</text>
+      </svg>
+      <div class="sm" style="margin-top:6px">Ausgleich · 3 Überweisungen</div>
+      <ul class="pay">
+        <li><b>Eliane</b><s>→</s><b>Rolf</b><span class="num">CHF 520</span></li>
+        <li><b>Harald</b><s>→</s><b>Rolf</b><span class="num">CHF 410</span></li>
+        <li><b>Valentyna</b><s>→</s><b>Rolf</b><span class="num">CHF 310</span></li>
+      </ul>
+    </div>
+  </div><small class="fn">Beispieldaten, Struktur wie die echte Kasse «Ferien 2026»</small></section>
+  </div>
+  </div>
+</section>
+<section class="dir dC" id="dC">
+  <header class="dh">
+    <div><span class="dn">Richtung C · Journal</span><h2>Redaktionell, Schweizer Typografie, ein Blau</h2><p>Reiseführer-Charakter: grosse Serifenüberschriften, feine Linien, viel Weissraum, ein einziges Kobaltblau. Zahlen und Zeiten in Tabellenziffern. Wirkt am ruhigsten und professionellsten, wie ein gesetztes Dokument.</p></div>
+    <div class="meta2">
+      <div class="sw"><span><i style="background:#f4f4f1"></i>Papier</span><span><i style="background:#ffffff"></i>Fläche</span><span><i style="background:#0e0e0e"></i>Schwarz</span><span><i style="background:#1747d6"></i>Kobalt</span><span><i style="background:#1d7a46"></i>Positiv</span><span><i style="background:#9a9a92"></i>Grau</span></div>
+      <p class="fnt">New York (Serif, System) für Titel, SF Pro für Text, SF Mono für Zahlen. Linien 1 pt.</p>
+      <p class="pc"><b>Passt, wenn</b> Ruhe und Lesbarkeit wichtiger sind als Atmosphäre; für Ausdrucke (PDF-Reiseplan) und iPad.<br><b>Preis</b> Am nüchternsten; Bilder und Cover müssen die Stimmung tragen.</p>
+    </div>
+  </header>
+  <div class="row">
+    <div class="phones">
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="hd">
+    <div class="kick">Ferien 2026 · Tag 3 von 29</div>
+    <h4>Sonntag, 25.10.2026</h4>
+    <div class="sub">Barcelona · 19 ° sonnig</div>
+    <div class="dots" aria-label="Tag 3 von 29"><i class="d"></i><i class="d"></i><i class="n"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div>
+  </div>
+  <div class="next">
+    <div class="lbl">Als Nächstes</div>
+    <div class="nrow">
+  <svg class="ringsvg" viewBox="0 0 56 56" aria-hidden="true">
+    <circle cx="28" cy="28" r="23" class="r0"/>
+    <circle cx="28" cy="28" r="23" class="r1" stroke-dasharray="144.5" stroke-dashoffset="52" transform="rotate(-90 28 28)"/>
+    <text x="28" y="26" text-anchor="middle" class="rt">1:40</text><text x="28" y="38" text-anchor="middle" class="rs">Std.</text>
+  </svg><div><div class="big">Check-out</div><div class="meta">Hotel Negresco Princess</div><div class="meta num">12:00 · Zimmer räumen</div></div></div>
+  </div>
+  <div class="sec">Heute</div>
+  <div class="ev now"><div class="t num">12:00</div><div class="ic c-stay"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.5"/></svg></div><div class="b"><b>Check-out Hotel</b><span>Negresco Princess 4*</span></div></div>
+  <div class="ev"><div class="t num">13:00</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg></div><div class="b"><b>Einschiffung</b><span>Terminal Port Nou · Legend of the Seas</span><div class="chips"><u><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg>Bordkarte</u><u><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg>Route</u></div></div></div>
+  <div class="ev"><div class="t num">17:00</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg></div><div class="b"><b>Abfahrt Barcelona</b><span>Alle an Bord bis 16:30</span></div></div>
+  <div class="sec">Morgen</div>
+  <div class="ev soft"><div class="t num">07:30</div><div class="ic c-ship"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg></div><div class="b"><b>Palma de Mallorca</b><span>07:30–15:30 · Hafentag</span></div></div>
+  <nav class="tabs"><span class="on"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><em>Heute</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><em>Plan</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><em>Dokumente</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg><em>Kasse</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6"/></svg><em>Team</em></span></nav>
+  </div></div><figcaption>Heute-Modus: aktive Reise, Tag 3 von 29</figcaption></figure>
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="cover"><div class="cvbg"></div>
+    <div class="cvt"><small>Kreuzfahrt Barcelona → Florida</small><h4>Ferien 2026</h4><span class="num">23.10. – 20.11.2026</span></div>
+  </div>
+  <div class="stats"><div><b class="num">29</b><span>Tage</span></div><div><b class="num">4</b><span>Personen</span></div><div><b class="num">43</b><span>Ereignisse</span></div></div>
+  <div class="seg"><span class="on">Plan</span><span>Dokumente</span><span>Kasse</span><span>Team</span></div>
+  <div class="sec">Verlauf</div>
+  <div class="card">
+  <svg viewBox="0 0 280 34" class="mband" aria-hidden="true">
+    <rect x="0" y="4" width="20" height="10" class="s-flight"/>
+    <rect x="0" y="20" width="20" height="10" class="s-stay"/>
+    <rect x="20" y="4" width="130" height="10" class="s-ship"/>
+    <rect x="150" y="20" width="10" height="10" class="s-stay"/>
+    <rect x="160" y="4" width="70" height="10" class="s-ship"/>
+    <rect x="230" y="20" width="40" height="10" class="s-car"/>
+    <rect x="270" y="4" width="10" height="10" class="s-flight"/>
+    <rect x="20" y="0" width="1.5" height="34" class="today"/>
+  </svg><div class="axis num"><span>23.10.</span><span>07.11.</span><span>20.11.</span></div></div>
+  <div class="sec">Tage</div>
+  <div class="dayrow now"><b class="num">25.10.</b><span>Barcelona · Einschiffung</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">26.10.</b><span>Palma de Mallorca</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">27.10.</b><span>Málaga</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow"><b class="num">28.10.</b><span>Cádiz</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="dayrow soft"><b class="num">29.10.</b><span>Seetag · Atlantik (9 Tage)</span><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></div>
+  <nav class="tabs"><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><em>Heute</em></span><span class="on"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><em>Plan</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><em>Dokumente</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg><em>Kasse</em></span><span class=""><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6"/></svg><em>Team</em></span></nav>
+  </div></div><figcaption>Reiseübersicht</figcaption></figure></div>
+    
+  <div class="board">
+    <section class="card"><h5>Routenbogen</h5>
+<svg viewBox="0 0 630 232" class="ig" role="img" aria-label="Routenbogen der Reise von Zürich über Barcelona und die Karibik nach Lissabon">
+  <g class="grat">
+    <line x1="60" y1="0" x2="60" y2="232"/><line x1="120" y1="0" x2="120" y2="232"/><line x1="180" y1="0" x2="180" y2="232"/><line x1="240" y1="0" x2="240" y2="232"/><line x1="300" y1="0" x2="300" y2="232"/><line x1="360" y1="0" x2="360" y2="232"/><line x1="420" y1="0" x2="420" y2="232"/><line x1="480" y1="0" x2="480" y2="232"/><line x1="540" y1="0" x2="540" y2="232"/><line x1="600" y1="0" x2="600" y2="232"/>
+    <line x1="0" y1="12" x2="630" y2="12"/><line x1="0" y1="72" x2="630" y2="72"/><line x1="0" y1="132" x2="630" y2="132"/><line x1="0" y1="192" x2="630" y2="192"/>
+  </g>
+  <path class="rt-rail" d="M591 27 L553 64"/>
+  <path class="rt-ship" d="M553 64 L556 74 L514 92 L502 93"/>
+  <path class="rt-ship" d="M502 93 Q280 30 59 157"/>
+  <path class="rt-ship" d="M59 157 L79 152 Q110 170 143 201 L150 202 Q110 188 59 157"/>
+  <path class="rt-air" d="M59 157 Q270 -10 485 80"/>
+  <path class="rt-air" d="M485 80 Q540 40 591 27"/>
+  <g class="pt">
+    <circle cx="591" cy="27" r="4.5"/><circle cx="553" cy="64" r="4.5"/><circle cx="556" cy="74" r="3"/>
+    <circle cx="514" cy="92" r="3"/><circle cx="502" cy="93" r="3"/><circle cx="485" cy="80" r="4.5"/>
+    <circle cx="59" cy="157" r="4.5"/><circle cx="79" cy="152" r="3"/><circle cx="143" cy="201" r="3"/><circle cx="150" cy="202" r="3"/>
+  </g>
+  <g class="lb">
+    <text x="585" y="18" text-anchor="end">Zürich</text>
+    <text x="545" y="68" text-anchor="end">Barcelona</text>
+    <text x="563" y="80">Palma</text>
+    <text x="508" y="108" text-anchor="middle">Málaga · Cádiz</text>
+    <text x="478" y="76" text-anchor="end">Lissabon</text>
+    <text x="52" y="172" text-anchor="end">Miami</text>
+    <text x="84" y="143">CocoCay</text>
+    <text x="160" y="206">San Juan · St. Thomas</text>
+    <text x="300" y="98" text-anchor="middle" class="m">13 Nächte Atlantik</text>
+    <text x="270" y="38" text-anchor="middle" class="m a">Rückflug 19.11.</text>
+  </g>
+</svg>
+      <div class="leg2"><span><i class="k-ship"></i>Schiff</span><span><i class="k-air"></i>Flug</span><span><i class="k-rail"></i>Bahn</span><small>Schematisch; in der App echte Karte (Apple Karten)</small></div></section>
+    <section class="card"><h5>Zeitband</h5>
+<svg viewBox="0 0 620 176" class="ig" role="img" aria-label="Zeitband der 29 Reisetage">
+  <line x1="78" y1="22" x2="78" y2="158" class="grat1"/><text x="78" y="14" class="ax" >23.10.</text><line x1="204" y1="22" x2="204" y2="158" class="grat1"/><text x="204" y="14" class="ax" >30.10.</text><line x1="330" y1="22" x2="330" y2="158" class="grat1"/><text x="330" y="14" class="ax" >06.11.</text><line x1="456" y1="22" x2="456" y2="158" class="grat1"/><text x="456" y="14" class="ax" >13.11.</text><line x1="582" y1="22" x2="582" y2="158" class="grat1"/><text x="582" y="14" class="ax" text-anchor="end" dx="18">20.11.</text>
+  <text x="2" y="46" class="ln">Unterwegs</text>
+  <text x="2" y="80" class="ln">Schiff</text>
+  <text x="2" y="114" class="ln">Unterkunft</text>
+  <text x="2" y="148" class="ln">Mietwagen</text>
+  <g><rect x="78" y="32" width="16" height="22" rx="3" class="s-flight"/><text x="85" y="47" class="sl">Zug+Flug</text></g>
+  <g><rect x="564" y="32" width="34" height="22" rx="3" class="s-flight"/><text x="571" y="47" class="sl">Heimflug</text></g>
+  <g><rect x="114" y="66" width="232" height="22" rx="3" class="s-ship"/><text x="121" y="81" class="sl">Legend of the Seas · 13 Nächte</text></g>
+  <g><rect x="366" y="66" width="124" height="22" rx="3" class="s-ship"/><text x="373" y="81" class="sl">Karibik · 7 Nächte</text></g>
+  <g><rect x="78" y="100" width="34" height="22" rx="3" class="s-stay"/><text x="85" y="115" class="sl">Barcelona</text></g>
+  <g><rect x="348" y="100" width="16" height="22" rx="3" class="s-stay"/></g>
+  <g><rect x="492" y="100" width="70" height="22" rx="3" class="s-stay"/><text x="499" y="115" class="sl">Private Pool Oasis</text></g>
+  <g><rect x="492" y="134" width="70" height="22" rx="3" class="s-car"/><text x="499" y="149" class="sl">Miami · 4 Tage</text></g>
+  <rect x="114" y="20" width="2" height="142" class="today"/>
+  <text x="120" y="172" class="ax">heute · Tag 3</text>
+</svg></section>
+    <section class="card"><h5>Reisekasse</h5>
+  <div class="kasse">
+    <div>
+      <div class="sm">Ausgaben nach Kategorie · CHF · <span class="num">27’550</span></div>
+      <svg viewBox="0 0 580 26" class="ig stack" role="img" aria-label="Ausgaben nach Kategorie"><rect x="0" y="0" width="385.8684210526316" height="26" class="c1"/><rect x="387.3684210526316" y="0" width="81.65789473684211" height="26" class="c2"/><rect x="470.52631578947376" y="0" width="64.1842105263158" height="26" class="c3"/><rect x="536.2105263157896" y="0" width="20.394736842105264" height="26" class="c4"/><rect x="558.1052631578949" y="0" width="14.921052631578949" height="26" class="c5"/><rect x="574.5263157894739" y="0" width="3.973684210526316" height="26" class="c6"/></svg>
+      <ul class="leg"><li><i class="c1"></i><span>Schiff</span><b class="num">18’400</b></li><li><i class="c2"></i><span>Flug</span><b class="num">3’950</b></li><li><i class="c3"></i><span>Hotel</span><b class="num">3’120</b></li><li><i class="c4"></i><span>Mietwagen</span><b class="num">1’040</b></li><li><i class="c5"></i><span>Aktivität</span><b class="num">780</b></li><li><i class="c6"></i><span>Transfer</span><b class="num">260</b></li></ul>
+    </div>
+    <div>
+      <div class="sm">Saldo je Person · CHF</div>
+      <svg viewBox="0 0 440 130" class="ig" role="img" aria-label="Salden je Person">
+        <line x1="220" y1="0" x2="220" y2="130" class="axisl"/><text x="0" y="22" class="ln">Rolf</text>
+        <rect x="220" y="8" width="148.79999999999998" height="20" rx="3" class="pos"/>
+        <text x="376.79999999999995" y="23" text-anchor="start" class="vl">+1’240</text><text x="0" y="52" class="ln">Valentyna</text>
+        <rect x="182.8" y="38" width="37.199999999999996" height="20" rx="3" class="neg"/>
+        <text x="174.8" y="53" text-anchor="end" class="vl">−310</text><text x="0" y="82" class="ln">Eliane</text>
+        <rect x="157.6" y="68" width="62.4" height="20" rx="3" class="neg"/>
+        <text x="149.6" y="83" text-anchor="end" class="vl">−520</text><text x="0" y="112" class="ln">Harald</text>
+        <rect x="170.8" y="98" width="49.199999999999996" height="20" rx="3" class="neg"/>
+        <text x="162.8" y="113" text-anchor="end" class="vl">−410</text>
+      </svg>
+      <div class="sm" style="margin-top:6px">Ausgleich · 3 Überweisungen</div>
+      <ul class="pay">
+        <li><b>Eliane</b><s>→</s><b>Rolf</b><span class="num">CHF 520</span></li>
+        <li><b>Harald</b><s>→</s><b>Rolf</b><span class="num">CHF 410</span></li>
+        <li><b>Valentyna</b><s>→</s><b>Rolf</b><span class="num">CHF 310</span></li>
+      </ul>
+    </div>
+  </div><small class="fn">Beispieldaten, Struktur wie die echte Kasse «Ferien 2026»</small></section>
+  </div>
+  </div>
+</section>
+
+<section class="cmp" id="erfassen">
+  <h3>Ereignis erfassen: alle wichtigen Angaben je Typ</h3>
+  <p>Gezeigt in Richtung A, gilt für jede Richtung. Das Formular entsteht aus einem Typ-Katalog: jedes Feld kann erkannt
+  <i>oder</i> von Hand eingetragen werden. Felder zeigen ihre Herkunft; von Hand Geändertes wird nie durch eine erneute
+  PDF-Analyse überschrieben.</p>
+  <div class="dir dA" style="margin-top:18px;padding:24px"><div class="phones">
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="hd"><div class="kick">Ferien 2026</div><h4>Neues Ereignis</h4></div>
+  <div class="drop"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9 12h6M9 16h6"/></svg><div><b>PDF hier ablegen oder teilen</b><span>Wird erkannt und als Vorschlag angelegt</span></div></div>
+  <div class="sec">Oder von Hand erfassen</div>
+  <div class="tiles">
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><b>Flug</b><small>Airline, Sitz, Gate</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="14" rx="3"/><path d="M6 11h12M9 21l2-4M15 21l-2-4"/><circle cx="9.5" cy="14" r=".7"/><circle cx="14.5" cy="14" r=".7"/></svg><b>Zug</b><small>Gleis, Wagen, Sitz</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.5"/></svg><b>Hotel</b><small>Check-in, Türcode</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v-4l2-5h12l2 5v4zM4 16v2M20 16v2"/><circle cx="8" cy="14" r=".8"/><circle cx="16" cy="14" r=".8"/></svg><b>Mietauto</b><small>Abholung, Kaution</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg><b>Transfer</b><small>Treffpunkt, Fahrer</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h14l2-4zM12 4v8M12 5l6 5h-6M6 12h12"/></svg><b>Kreuzfahrt</b><small>Kabine, Hafen</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><b>Ausflug</b><small>Voucher, Treffpunkt</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 6 0 8v10"/></svg><b>Restaurant</b><small>Zeit, Personen</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 1 0-4V6H3zM14 6v12" /></svg><b>Veranstaltung</b><small>Einlass, Sitz</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><b>Versicherung</b><small>Police, Notruf</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M9 17h6"/></svg><b>Visum</b><small>Gültig bis, Nr.</small></div>
+    <div class="tile"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg><b>Aufgabe</b><small>Fällig, erledigt</small></div>
+  </div>
+  </div></div><figcaption>1 · Typ wählen</figcaption></figure>
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="hd"><div class="kick">Neues Ereignis</div><h4>Flug</h4>
+    <div class="seg s2"><span class="on">Wichtiges</span><span>Alle Felder</span></div>
+    <div class="lg"><span><i class="doc"></i>aus Dokument</span><span><i class="hand"></i>von Hand</span><span>Leer = offen</span></div></div>
+  <div class="sec">Flug</div>
+  <div class="grid2"><div class="fld"><label>Airline</label><div class="val  ">Swiss</div><em class="src doc" title="aus Dokument"></em></div><div class="fld"><label>Flugnummer</label><div class="val num ">LX 1952</div><em class="src doc" title="aus Dokument"></em></div></div>
+  <div class="sec">Abflug</div>
+  <div class="grid2"><div class="fld"><label>Flughafen</label><div class="val  ">ZRH · Zürich</div><em class="src doc" title="aus Dokument"></em></div><div class="fld"><label>Zeit (Zürich)</label><div class="val num ">23.10. 12:20</div><em class="src doc" title="aus Dokument"></em></div></div>
+  <div class="grid2"><div class="fld"><label>Terminal</label><div class="val  empty">Leer</div></div><div class="fld"><label>Gate</label><div class="val  empty">Leer</div></div></div>
+  <div class="sec">Ankunft</div>
+  <div class="grid2"><div class="fld"><label>Flughafen</label><div class="val  ">BCN · Barcelona</div><em class="src doc" title="aus Dokument"></em></div><div class="fld"><label>Zeit (Barcelona)</label><div class="val num ">23.10. 14:05</div><em class="src doc" title="aus Dokument"></em></div></div>
+  <div class="sec">Buchung · wer sitzt wo</div>
+  <div class="grid2"><div class="fld"><label>Buchungscode</label><div class="val num ">K7M2QX</div><em class="src doc" title="aus Dokument"></em></div><div class="fld"><label>Klasse</label><div class="val  ">Economy</div><em class="src hand" title="von Hand"></em></div></div>
+  <div class="pax"><span>Rolf</span><b class="num">12C</b><span>Valentyna</span><b class="num">12D</b></div>
+  <div class="sec">Kosten</div>
+  <div class="grid2"><div class="fld"><label>Preis</label><div class="val num ">CHF 612.00</div><em class="src hand" title="von Hand"></em></div><div class="fld"><label>Zahler</label><div class="val  ">Rolf</div><em class="src hand" title="von Hand"></em></div></div>
+  <div class="cta"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3v3M17 14h2"/></svg>In Reisekasse übernehmen</div>
+  </div></div><figcaption>2 · Flug erfassen, in Abschnitten</figcaption></figure>
+  <figure class="pf"><div class="phone"><div class="scr">
+    <div class="sb"><b>9:41</b><span class="sbr"><i></i><i></i><i></i></span></div>
+    
+  <div class="hd"><div class="kick">Zu prüfen · 2 Vorschläge</div><h4>Booking-Bestätigung.pdf</h4></div>
+  <div class="prop">
+    <div class="ph"><div class="ic c-stay"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.5"/></svg></div><div><b>Hotel Negresco Princess</b><span class="num">23.10. – 25.10.2026 · 2 Nächte</span></div><u class="conf hi">98 %</u></div>
+    <div class="quote">«Check-in ab 15:00 · Check-out bis 12:00 · Frühstück inklusive · Bestätigung 884-221-905»</div>
+    <div class="kv"><span>Adresse</span><b>Carrer de Pere IV, Barcelona</b><span>Buchung</span><b class="num">884-221-905</b><span>Zimmer</span><b>Doppel, 2 Personen</b></div>
+    <div class="acts"><span class="btn pr">Übernehmen</span><span class="btn">Bearbeiten</span></div>
+  </div>
+  <div class="prop warn">
+    <div class="ph"><div class="ic c-flight"><svg class="ico " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg></div><div><b>Flug ZRH → BCN</b><span class="num">23.10.2026 · 12:20</span></div><u class="conf lo">71 %</u></div>
+    <div class="quote">Ankunftszeit nicht eindeutig. Vorschlag: 14:05 (Seite 2).</div>
+    <div class="acts"><span class="btn pr">Prüfen</span><span class="btn">Verwerfen</span></div>
+  </div>
+  <div class="note">Vorhandene Ereignisse werden ergänzt, nicht überschrieben. Von Hand geänderte Felder bleiben gesperrt.</div>
+  </div></div><figcaption>3 · PDF wurde erkannt: Vorschlag prüfen</figcaption></figure></div></div>
+</section>
+
+<section class="cmp" id="ipad">
+  <h3>iPad: drei Spalten statt gestrecktem iPhone</h3>
+  <p>Reisen links, Plan mit Tagen in der Mitte, rechts Detail oder Karte. Im Heute-Modus belegt der aktuelle Tag die Mitte,
+  die Karte bleibt sichtbar. Gezeigt als Skizze in Richtung A.</p>
+  <div class="ipad">
+    <div><h6>Reisen</h6><div class="it on">Ferien 2026</div><div class="it">Besuch Mishenka</div><div class="it">Lissabon (Entwurf)</div></div>
+    <div><h6>Plan · 25.10.2026</h6>
+      <div class="blk"><b>12:00 Check-out Hotel</b><br><span style="color:#8fa8bb">Negresco Princess</span></div>
+      <div class="blk"><b>13:00 Einschiffung</b><br><span style="color:#8fa8bb">Terminal Port Nou</span></div>
+      <div class="blk"><b>17:00 Abfahrt Barcelona</b><br><span style="color:#8fa8bb">Alle an Bord 16:30</span></div></div>
+    <div><h6>Detail</h6><div class="map"></div>
+      <div class="blk" style="margin-top:10px"><b>Legend of the Seas</b><br><span style="color:#8fa8bb">Royal Caribbean · Buchung ••••</span></div></div>
+  </div>
+</section>
+
+<section class="rec" id="empfehlung">
+  <h3>Empfehlung</h3>
+  <p style="color:#d6dbe2">Eine Mischung aus <b>A und B</b>:</p>
+  <ul>
+    <li><b>Atlas</b> als Grundlage: Karte, Route und Zeitband tragen die Reise, dunkel ist im Flugzeug und auf dem Schiff angenehm. Das passt zum Anspruch «jeder Schritt nachvollziehbar».</li>
+    <li><b>Ticket-Karten aus B</b> für Buchungen im Heute-Modus: Referenz, Gate, Sitz, Check-in-Zeit gross und monospaced, mit Perforation.</li>
+    <li><b>Journal (C)</b> für den PDF-Reiseplan zum Ausdrucken und optional als helles Thema.</li>
+    <li>Auf iOS Liquid Glass nur für Tab-Leiste und Werkzeugleisten (System), Inhalt bleibt flach und lesbar.</li>
+    <li>Infografiken aus den Daten gezeichnet (immer korrekt). KI (OpenAI) nur für Cover und Stimmungsbilder.</li>
+  </ul>
+</section>
+</div></body></html>

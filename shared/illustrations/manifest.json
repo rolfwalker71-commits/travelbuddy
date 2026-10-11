@@ -1,0 +1,743 @@
+{
+  "version": 1,
+  "doc": "Illustrationen für TravelBuddy (isometrisch, hell «Papier» und dunkel «Nachtpapier»). Dateipfade relativ zu diesem Verzeichnis. Quelle: design/illustrations (node build.js).",
+  "kinds": {
+    "type": "Ereignistypen",
+    "empty": "Leere Zustände",
+    "help": "Hilfekarten",
+    "cover": "Reise-Cover",
+    "notification": "Mitteilungsbilder"
+  },
+  "items": [
+    {
+      "id": "type-Flug",
+      "kind": "type",
+      "title": "Flug",
+      "alt": "Isometrische Darstellung eines Verkehrsflugzeugs am Gate: Fluggastbrücke, Terminalgebäude mit Kontrollturm, Gepäckwagen und wartende Reisende.",
+      "files": {
+        "lightSvg": "light/type-Flug.svg",
+        "darkSvg": "dark/type-Flug.svg",
+        "lightPng": "png/light/type-Flug.png",
+        "darkPng": "png/dark/type-Flug.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Flug",
+      "bytes": {
+        "lightSvg": 87682,
+        "darkSvg": 88769
+      }
+    },
+    {
+      "id": "type-Zugreisen",
+      "kind": "type",
+      "title": "Zug",
+      "alt": "Isometrische Darstellung eines Bahnhofs: Zug mit drei Wagen am Bahnsteig, Fahrleitung, Bahnhofsgebäude mit Uhrturm und Reisende mit Gepäck.",
+      "files": {
+        "lightSvg": "light/type-Zugreisen.svg",
+        "darkSvg": "dark/type-Zugreisen.svg",
+        "lightPng": "png/light/type-Zugreisen.png",
+        "darkPng": "png/dark/type-Zugreisen.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Zugreisen",
+      "bytes": {
+        "lightSvg": 71349,
+        "darkSvg": 71926
+      }
+    },
+    {
+      "id": "type-Mietauto",
+      "kind": "type",
+      "title": "Mietauto",
+      "alt": "Isometrische Darstellung einer Mietwagenstation: Parkfeld mit Fahrzeugen, Stationsgebäude mit Schlüssel-Wahrzeichen, Palmen und Kundinnen mit Gepäck.",
+      "files": {
+        "lightSvg": "light/type-Mietauto.svg",
+        "darkSvg": "dark/type-Mietauto.svg",
+        "lightPng": "png/light/type-Mietauto.png",
+        "darkPng": "png/dark/type-Mietauto.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Mietauto",
+      "bytes": {
+        "lightSvg": 81671,
+        "darkSvg": 81976
+      }
+    },
+    {
+      "id": "type-Transfer",
+      "kind": "type",
+      "title": "Transfer",
+      "alt": "Isometrische Darstellung eines Transfers: Shuttlebus an der Haltestelle am Kai, daneben eine Fähre am Anleger mit Gangway und Reisende mit Gepäck.",
+      "files": {
+        "lightSvg": "light/type-Transfer.svg",
+        "darkSvg": "dark/type-Transfer.svg",
+        "lightPng": "png/light/type-Transfer.png",
+        "darkPng": "png/dark/type-Transfer.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Transfer",
+      "bytes": {
+        "lightSvg": 81336,
+        "darkSvg": 81760
+      }
+    },
+    {
+      "id": "type-Hotel",
+      "kind": "type",
+      "title": "Hotel",
+      "alt": "Isometrische Explosionszeichnung eines Hotels in drei Ebenen: Lobby mit Rezeption und Sofa, Zimmer mit Betten und Schränken, Dachterrasse mit Pool; davor Eingang, Auto und Gepäck.",
+      "files": {
+        "lightSvg": "light/type-Hotel.svg",
+        "darkSvg": "dark/type-Hotel.svg",
+        "lightPng": "png/light/type-Hotel.png",
+        "darkPng": "png/dark/type-Hotel.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Hotel",
+      "bytes": {
+        "lightSvg": 71319,
+        "darkSvg": 71828
+      }
+    },
+    {
+      "id": "type-Unterkunft",
+      "kind": "type",
+      "title": "Ferienwohnung",
+      "alt": "Isometrische Darstellung eines Ferienhauses mit Satteldach, Terrasse und Pool, Liegen mit Sonnenschirm, Palmen und Auto auf dem Grundstück.",
+      "files": {
+        "lightSvg": "light/type-Unterkunft.svg",
+        "darkSvg": "dark/type-Unterkunft.svg",
+        "lightPng": "png/light/type-Unterkunft.png",
+        "darkPng": "png/dark/type-Unterkunft.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Unterkunft",
+      "bytes": {
+        "lightSvg": 39089,
+        "darkSvg": 39190
+      }
+    },
+    {
+      "id": "type-Kreuzfahrt",
+      "kind": "type",
+      "title": "Kreuzfahrt",
+      "alt": "Isometrische Darstellung eines Kreuzfahrtschiffs mit fünf Decks, Schornstein und Rettungsbooten am Pier, mit Gangway, Hafenkran, Containern und einsteigenden Reisenden.",
+      "files": {
+        "lightSvg": "light/type-Kreuzfahrt.svg",
+        "darkSvg": "dark/type-Kreuzfahrt.svg",
+        "lightPng": "png/light/type-Kreuzfahrt.png",
+        "darkPng": "png/dark/type-Kreuzfahrt.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Kreuzfahrt",
+      "bytes": {
+        "lightSvg": 73436,
+        "darkSvg": 75135
+      }
+    },
+    {
+      "id": "type-Ausflug",
+      "kind": "type",
+      "title": "Ausflug",
+      "alt": "Isometrische Darstellung eines Aussichtspunkts: terrassierter Berghang mit Wanderweg, Holzdeck mit Fernglas und Fahne, Wegweiser, Nadelbäume und Wandernde vor einem Bergmassiv.",
+      "files": {
+        "lightSvg": "light/type-Ausflug.svg",
+        "darkSvg": "dark/type-Ausflug.svg",
+        "lightPng": "png/light/type-Ausflug.png",
+        "darkPng": "png/dark/type-Ausflug.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Ausflug",
+      "bytes": {
+        "lightSvg": 46725,
+        "darkSvg": 46724
+      }
+    },
+    {
+      "id": "type-Restaurant",
+      "kind": "type",
+      "title": "Restaurant",
+      "alt": "Isometrische Darstellung eines Restaurants mit gestreiftem Sonnensegel, Terrasse mit gedeckten Tischen und Sonnenschirmen, Gästen, Servicekraft, Menütafel und Lichterkette.",
+      "files": {
+        "lightSvg": "light/type-Restaurant.svg",
+        "darkSvg": "dark/type-Restaurant.svg",
+        "lightPng": "png/light/type-Restaurant.png",
+        "darkPng": "png/dark/type-Restaurant.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Restaurant",
+      "bytes": {
+        "lightSvg": 63680,
+        "darkSvg": 63679
+      }
+    },
+    {
+      "id": "type-Veranstaltung",
+      "kind": "type",
+      "title": "Veranstaltung",
+      "alt": "Isometrische Darstellung einer Konzertbühne mit Lichtkegeln, Lautsprechern und Publikum hinter einer Absperrung; im Vordergrund ein grosses Eintrittsticket auf einem Ständer.",
+      "files": {
+        "lightSvg": "light/type-Veranstaltung.svg",
+        "darkSvg": "dark/type-Veranstaltung.svg",
+        "lightPng": "png/light/type-Veranstaltung.png",
+        "darkPng": "png/dark/type-Veranstaltung.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Veranstaltung",
+      "bytes": {
+        "lightSvg": 40527,
+        "darkSvg": 40651
+      }
+    },
+    {
+      "id": "type-Versicherung",
+      "kind": "type",
+      "title": "Versicherung",
+      "alt": "Isometrische Darstellung eines grossen Schirms über einem Sockel mit Haus, Auto, Koffern und Familie, davor ein Schutzschild mit Haken.",
+      "files": {
+        "lightSvg": "light/type-Versicherung.svg",
+        "darkSvg": "dark/type-Versicherung.svg",
+        "lightPng": "png/light/type-Versicherung.png",
+        "darkPng": "png/dark/type-Versicherung.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Versicherung",
+      "bytes": {
+        "lightSvg": 25746,
+        "darkSvg": 25796
+      }
+    },
+    {
+      "id": "type-Visum",
+      "kind": "type",
+      "title": "Visum / Einreise",
+      "alt": "Isometrische Darstellung einer Passkontrolle: Schalter mit Glasscheibe, Pass und Stempel auf dem Tresen, Warteschlange mit Absperrbändern und Reisenden, Stempelabdruck mit Datum an der Wand, grosser Pass als Hinweis.",
+      "files": {
+        "lightSvg": "light/type-Visum.svg",
+        "darkSvg": "dark/type-Visum.svg",
+        "lightPng": "png/light/type-Visum.png",
+        "darkPng": "png/dark/type-Visum.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Visum",
+      "bytes": {
+        "lightSvg": 84769,
+        "darkSvg": 84785
+      }
+    },
+    {
+      "id": "type-Aufgabe",
+      "kind": "type",
+      "title": "Aufgabe",
+      "alt": "Isometrische Darstellung eines Schreibtischs mit grossem Klemmbrett und Checkliste, Notebook, Pinnwand mit farbigen Notizzetteln, Pflanze, Lampe und Bürostuhl.",
+      "files": {
+        "lightSvg": "light/type-Aufgabe.svg",
+        "darkSvg": "dark/type-Aufgabe.svg",
+        "lightPng": "png/light/type-Aufgabe.png",
+        "darkPng": "png/dark/type-Aufgabe.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "Aufgabe",
+      "bytes": {
+        "lightSvg": 40503,
+        "darkSvg": 40893
+      }
+    },
+    {
+      "id": "empty-trips",
+      "kind": "empty",
+      "title": "Noch keine Reisen",
+      "alt": "Offener, leerer Koffer mit gestrichelten Platzhaltern für Kleidung, daneben ein Globus, ein Reisepass, ein leeres Ticket und eine Kartenmarkierung am Ende eines gestrichelten Wegs.",
+      "files": {
+        "lightSvg": "light/empty-trips.svg",
+        "darkSvg": "dark/empty-trips.svg",
+        "lightPng": "png/light/empty-trips.png",
+        "darkPng": "png/dark/empty-trips.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "empty-state:trips",
+      "bytes": {
+        "lightSvg": 21859,
+        "darkSvg": 21994
+      }
+    },
+    {
+      "id": "empty-day",
+      "kind": "empty",
+      "title": "Nichts geplant",
+      "alt": "Tageskalenderblatt mit leerem Stundenraster neben Liegestuhl, Sonnenschirm und einem Getränk auf einem Tisch unter einer Palme: ein freier Tag.",
+      "files": {
+        "lightSvg": "light/empty-day.svg",
+        "darkSvg": "dark/empty-day.svg",
+        "lightPng": "png/light/empty-day.png",
+        "darkPng": "png/dark/empty-day.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "empty-state:day",
+      "bytes": {
+        "lightSvg": 23049,
+        "darkSvg": 23014
+      }
+    },
+    {
+      "id": "empty-documents",
+      "kind": "empty",
+      "title": "Keine Dokumente",
+      "alt": "Zweistöckiger Eingangskorb mit gestrichelten Ablagefeldern; ein PDF-Blatt schwebt über dem Korb, daneben Ordner und ein Stempel.",
+      "files": {
+        "lightSvg": "light/empty-documents.svg",
+        "darkSvg": "dark/empty-documents.svg",
+        "lightPng": "png/light/empty-documents.png",
+        "darkPng": "png/dark/empty-documents.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "empty-state:documents",
+      "bytes": {
+        "lightSvg": 29010,
+        "darkSvg": 29298
+      }
+    },
+    {
+      "id": "empty-ledger",
+      "kind": "empty",
+      "title": "Keine Ausgaben",
+      "alt": "Leere offene Geldkassette mit gestrichelten Fächern, daneben einzelne Münzen, ein Taschenrechner und ein Kassenzettel.",
+      "files": {
+        "lightSvg": "light/empty-ledger.svg",
+        "darkSvg": "dark/empty-ledger.svg",
+        "lightPng": "png/light/empty-ledger.png",
+        "darkPng": "png/dark/empty-ledger.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "empty-state:ledger",
+      "bytes": {
+        "lightSvg": 30849,
+        "darkSvg": 30848
+      }
+    },
+    {
+      "id": "offline",
+      "kind": "empty",
+      "title": "Offline",
+      "alt": "Router auf einem Tisch, dahinter eine Tafel mit durchgestrichenem WLAN-Symbol; das Netzkabel liegt abgezogen neben der Steckdose.",
+      "files": {
+        "lightSvg": "light/offline.svg",
+        "darkSvg": "dark/offline.svg",
+        "lightPng": "png/light/offline.png",
+        "darkPng": "png/dark/offline.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "state:offline",
+      "bytes": {
+        "lightSvg": 22486,
+        "darkSvg": 22536
+      }
+    },
+    {
+      "id": "error",
+      "kind": "empty",
+      "title": "Fehler",
+      "alt": "Strassensperre mit rot-weissem Balken, Warndreieck mit Ausrufezeichen, Pylonen, Werkzeugkasten mit Schraubenschlüssel und ein defektes Zahnrad.",
+      "files": {
+        "lightSvg": "light/error.svg",
+        "darkSvg": "dark/error.svg",
+        "lightPng": "png/light/error.png",
+        "darkPng": "png/dark/error.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "state:error",
+      "bytes": {
+        "lightSvg": 26311,
+        "darkSvg": 26344
+      }
+    },
+    {
+      "id": "help-share",
+      "kind": "help",
+      "title": "So kommt ein PDF in die Reise",
+      "alt": "Förderband-Ring mit vier Stationen: 1 Telefon mit Teilen-Schaltfläche und schwebendem PDF, 2 Server und Lesegerät mit Lupe über dem Dokument, 3 Tisch mit gestrichelten Vorschlagskarten und Haken, 4 Reisemappe mit bestätigten Tickets und Zeitleiste.",
+      "files": {
+        "lightSvg": "light/help-share.svg",
+        "darkSvg": "dark/help-share.svg",
+        "lightPng": "png/light/help-share.png",
+        "darkPng": "png/dark/help-share.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "help:share",
+      "bytes": {
+        "lightSvg": 51494,
+        "darkSvg": 52122
+      }
+    },
+    {
+      "id": "help-settle",
+      "kind": "help",
+      "title": "So wird in der Reisekasse ausgeglichen",
+      "alt": "Förderband-Ring mit vier Stationen: 1 Personen mit Münzstapeln und Belegen, 2 Waage aus dem Gleichgewicht und Balken mit Vorzeichen, 3 zwei Personen mit minimalem Überweisungspfeil, 4 Waage im Gleichgewicht mit Haken und Saldo null.",
+      "files": {
+        "lightSvg": "light/help-settle.svg",
+        "darkSvg": "dark/help-settle.svg",
+        "lightPng": "png/light/help-settle.png",
+        "darkPng": "png/dark/help-settle.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "help:settle",
+      "bytes": {
+        "lightSvg": 90849,
+        "darkSvg": 90848
+      }
+    },
+    {
+      "id": "help-today",
+      "kind": "help",
+      "title": "So funktioniert Heute",
+      "alt": "Zeitleiste als Förderband mit Stundenstrichen und vier Stationen: 1 dunkle Karte mit Countdown, 2 Tagesband mit farbigen Ereignissen und Jetzt-Marke, 3 Checkliste und Fristenkalender, 4 Vorschlagskarten mit Zähler.",
+      "files": {
+        "lightSvg": "light/help-today.svg",
+        "darkSvg": "dark/help-today.svg",
+        "lightPng": "png/light/help-today.png",
+        "darkPng": "png/dark/help-today.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "help:today",
+      "bytes": {
+        "lightSvg": 38973,
+        "darkSvg": 39533
+      }
+    },
+    {
+      "id": "help-timezones",
+      "kind": "help",
+      "title": "Zeiten und Zeitzonen",
+      "alt": "Förderband-Ring mit vier Stationen: 1 Uhrenturm mit Abflugzeit 14:05, 2 Weltkugel mit Zonenband und Versatz -6 h, 3 Uhrenturm mit Ankunftszeit 17:35 in Ortszeit, 4 Ticket mit Kennzeichnung Ortszeit.",
+      "files": {
+        "lightSvg": "light/help-timezones.svg",
+        "darkSvg": "dark/help-timezones.svg",
+        "lightPng": "png/light/help-timezones.png",
+        "darkPng": "png/dark/help-timezones.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "help:timezones",
+      "bytes": {
+        "lightSvg": 39993,
+        "darkSvg": 40723
+      }
+    },
+    {
+      "id": "help-invite",
+      "kind": "help",
+      "title": "Mitreisende einladen",
+      "alt": "Förderband-Ring mit vier Stationen: 1 Wegweiser mit den Wegen Link oder Konto und Telefon, 2 QR-Karte, Kettenglied und Brief, 3 Profilkarte mit Schlüssel und Schloss, 4 Gruppe von Mitreisenden um die Reisekarte.",
+      "files": {
+        "lightSvg": "light/help-invite.svg",
+        "darkSvg": "dark/help-invite.svg",
+        "lightPng": "png/light/help-invite.png",
+        "darkPng": "png/dark/help-invite.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "help:invite",
+      "bytes": {
+        "lightSvg": 50791,
+        "darkSvg": 50875
+      }
+    },
+    {
+      "id": "help-review",
+      "kind": "help",
+      "title": "Vorschläge prüfen",
+      "alt": "Förderband-Ring mit vier Stationen: 1 Dokument mit markierten Fundstellen und Lupe, 2 Feldzeilen mit gefülltem Punkt und Ring für die Herkunft, 3 gesperrte Felder mit Schlössern und ein offenes Feld, 4 Stempel, Ticket und Haken.",
+      "files": {
+        "lightSvg": "light/help-review.svg",
+        "darkSvg": "dark/help-review.svg",
+        "lightPng": "png/light/help-review.png",
+        "darkPng": "png/dark/help-review.png"
+      },
+      "width": 1200,
+      "height": 800,
+      "pngScale": 2,
+      "usage": "help:review",
+      "bytes": {
+        "lightSvg": 35564,
+        "darkSvg": 35648
+      }
+    },
+    {
+      "id": "cover-sea",
+      "kind": "cover",
+      "title": "Meer und Hafen",
+      "alt": "Reise-Cover: isometrischer Hafen mit grossem Kreuzfahrtschiff, Leuchtturm auf der Mole, Segelboot und Bojen unter einer grossen Sonne.",
+      "files": {
+        "lightSvg": "light/cover-sea.svg",
+        "darkSvg": "dark/cover-sea.svg",
+        "lightPng": "png/light/cover-sea.png",
+        "darkPng": "png/dark/cover-sea.png"
+      },
+      "width": 1600,
+      "height": 900,
+      "pngScale": 2,
+      "usage": "cover:sea",
+      "bytes": {
+        "lightSvg": 32914,
+        "darkSvg": 34364
+      }
+    },
+    {
+      "id": "cover-city",
+      "kind": "cover",
+      "title": "Stadt",
+      "alt": "Reise-Cover: isometrische Stadt mit Hochhäusern, Uhrturm, Strassen, Brücke über einen Fluss, Fähre, Bäumen und Fussgängern.",
+      "files": {
+        "lightSvg": "light/cover-city.svg",
+        "darkSvg": "dark/cover-city.svg",
+        "lightPng": "png/light/cover-city.png",
+        "darkPng": "png/dark/cover-city.png"
+      },
+      "width": 1600,
+      "height": 900,
+      "pngScale": 2,
+      "usage": "cover:city",
+      "bytes": {
+        "lightSvg": 88952,
+        "darkSvg": 96165
+      }
+    },
+    {
+      "id": "cover-mountain",
+      "kind": "cover",
+      "title": "Berge",
+      "alt": "Reise-Cover: isometrische Berglandschaft mit schneebedeckten Gipfeln, See mit Steg, Chalet, Seilbahn und Nadelwald.",
+      "files": {
+        "lightSvg": "light/cover-mountain.svg",
+        "darkSvg": "dark/cover-mountain.svg",
+        "lightPng": "png/light/cover-mountain.png",
+        "darkPng": "png/dark/cover-mountain.png"
+      },
+      "width": 1600,
+      "height": 900,
+      "pngScale": 2,
+      "usage": "cover:mountain",
+      "bytes": {
+        "lightSvg": 52683,
+        "darkSvg": 52701
+      }
+    },
+    {
+      "id": "cover-island",
+      "kind": "cover",
+      "title": "Insel",
+      "alt": "Reise-Cover: isometrische Tropeninsel mit Palmen, Hütte, Sonnenschirm, Steg, Segelboot und heller Lagune im Meer.",
+      "files": {
+        "lightSvg": "light/cover-island.svg",
+        "darkSvg": "dark/cover-island.svg",
+        "lightPng": "png/light/cover-island.png",
+        "darkPng": "png/dark/cover-island.png"
+      },
+      "width": 1600,
+      "height": 900,
+      "pngScale": 2,
+      "usage": "cover:island",
+      "bytes": {
+        "lightSvg": 16566,
+        "darkSvg": 16519
+      }
+    },
+    {
+      "id": "notif-today",
+      "kind": "notification",
+      "title": "Heute",
+      "alt": "Aufgehende Sonne hinter einem grossen Tageskalenderblatt mit Datum und Uhrzeit 07:30 und einer Kaffeetasse: Morgenbriefing für den heutigen Tag.",
+      "files": {
+        "lightSvg": "notifications/light/notif-today.svg",
+        "darkSvg": "notifications/dark/notif-today.svg",
+        "lightPng": "notifications/png/light/notif-today.png",
+        "darkPng": "notifications/png/dark/notif-today.png"
+      },
+      "width": 1200,
+      "height": 600,
+      "pngScale": 1,
+      "usage": "notification:trip.today",
+      "bytes": {
+        "lightSvg": 5227,
+        "darkSvg": 5327
+      },
+      "imageKey": "notif-today",
+      "serverFiles": {
+        "png": "notifications/png/notif-today.png",
+        "pngDark": "notifications/png/notif-today-dark.png"
+      }
+    },
+    {
+      "id": "notif-depart",
+      "kind": "notification",
+      "title": "Abflug",
+      "alt": "Grosse Bordkarte mit Vermerk Abflug und Uhrzeit, darüber ein Flugzeug und daneben ein Koffer: Erinnerung an den Abflug.",
+      "files": {
+        "lightSvg": "notifications/light/notif-depart.svg",
+        "darkSvg": "notifications/dark/notif-depart.svg",
+        "lightPng": "notifications/png/light/notif-depart.png",
+        "darkPng": "notifications/png/dark/notif-depart.png"
+      },
+      "width": 1200,
+      "height": 600,
+      "pngScale": 1,
+      "usage": "notification:trip.depart",
+      "bytes": {
+        "lightSvg": 8832,
+        "darkSvg": 9039
+      },
+      "imageKey": "notif-depart",
+      "serverFiles": {
+        "png": "notifications/png/notif-depart.png",
+        "pngDark": "notifications/png/notif-depart-dark.png"
+      }
+    },
+    {
+      "id": "notif-stay",
+      "kind": "notification",
+      "title": "Unterkunft",
+      "alt": "Grosse Schlüsselkarte mit Vermerk Check-in und Uhrzeit, davor ein Hotelbett mit Nachttisch: Check-in oder Check-out.",
+      "files": {
+        "lightSvg": "notifications/light/notif-stay.svg",
+        "darkSvg": "notifications/dark/notif-stay.svg",
+        "lightPng": "notifications/png/light/notif-stay.png",
+        "darkPng": "notifications/png/dark/notif-stay.png"
+      },
+      "width": 1200,
+      "height": 600,
+      "pngScale": 1,
+      "usage": "notification:trip.stay",
+      "bytes": {
+        "lightSvg": 7165,
+        "darkSvg": 7283
+      },
+      "imageKey": "notif-stay",
+      "serverFiles": {
+        "png": "notifications/png/notif-stay.png",
+        "pngDark": "notifications/png/notif-stay-dark.png"
+      }
+    },
+    {
+      "id": "notif-pickup",
+      "kind": "notification",
+      "title": "Mietwagen",
+      "alt": "Roter Mietwagen mit Dachreling und ein grosser liegender Schlüssel: Abholung des Mietwagens.",
+      "files": {
+        "lightSvg": "notifications/light/notif-pickup.svg",
+        "darkSvg": "notifications/dark/notif-pickup.svg",
+        "lightPng": "notifications/png/light/notif-pickup.png",
+        "darkPng": "notifications/png/dark/notif-pickup.png"
+      },
+      "width": 1200,
+      "height": 600,
+      "pngScale": 1,
+      "usage": "notification:trip.pickup",
+      "bytes": {
+        "lightSvg": 8113,
+        "darkSvg": 8112
+      },
+      "imageKey": "notif-pickup",
+      "serverFiles": {
+        "png": "notifications/png/notif-pickup.png",
+        "pngDark": "notifications/png/notif-pickup-dark.png"
+      }
+    },
+    {
+      "id": "notif-deadline",
+      "kind": "notification",
+      "title": "Frist",
+      "alt": "Grosse Standuhr kurz vor zwölf, eine Sanduhr und ein Kalenderblatt mit rotem Kopfband: Storno- oder Zahlungsfrist läuft ab.",
+      "files": {
+        "lightSvg": "notifications/light/notif-deadline.svg",
+        "darkSvg": "notifications/dark/notif-deadline.svg",
+        "lightPng": "notifications/png/light/notif-deadline.png",
+        "darkPng": "notifications/png/dark/notif-deadline.png"
+      },
+      "width": 1200,
+      "height": 600,
+      "pngScale": 1,
+      "usage": "notification:trip.deadline",
+      "bytes": {
+        "lightSvg": 8586,
+        "darkSvg": 8823
+      },
+      "imageKey": "notif-deadline",
+      "serverFiles": {
+        "png": "notifications/png/notif-deadline.png",
+        "pngDark": "notifications/png/notif-deadline-dark.png"
+      }
+    },
+    {
+      "id": "notif-review",
+      "kind": "notification",
+      "title": "Vorschläge prüfen",
+      "alt": "Drei gestrichelte Vorschlagskarten übereinander mit einer grossen Lupe und einem grünen Haken: neue Vorschläge zum Prüfen.",
+      "files": {
+        "lightSvg": "notifications/light/notif-review.svg",
+        "darkSvg": "notifications/dark/notif-review.svg",
+        "lightPng": "notifications/png/light/notif-review.png",
+        "darkPng": "notifications/png/dark/notif-review.png"
+      },
+      "width": 1200,
+      "height": 600,
+      "pngScale": 1,
+      "usage": "notification:trip.review",
+      "bytes": {
+        "lightSvg": 7546,
+        "darkSvg": 7733
+      },
+      "imageKey": "notif-review",
+      "serverFiles": {
+        "png": "notifications/png/notif-review.png",
+        "pngDark": "notifications/png/notif-review-dark.png"
+      }
+    }
+  ]
+}

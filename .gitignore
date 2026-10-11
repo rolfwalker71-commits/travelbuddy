@@ -1,0 +1,45 @@
+# Allgemein
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Schluessel und Zugangsdaten gehoeren nie ins Repo
+*.p8
+AuthKey_*
+*.pem
+*.key
+secrets/
+
+# Echte Daten (Reisen, Belege, PDFs, Bilder) gehoeren nie ins Repo
+data/
+server/data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3
+import-in/
+import-out/
+
+# Server / Web
+node_modules/
+server/dist/
+web/dist/
+coverage/
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+.swiftpm/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Screenshots mit echten Daten
+docs/screenshots/
+
+# Erzeugte Vorschau-PNG der Illustrationen (SVG ist die Quelle; Mitteilungs-PNG bleiben eingecheckt)
+shared/illustrations/png/
+shared/illustrations/light/*.png
+shared/illustrations/dark/*.png
