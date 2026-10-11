@@ -119,7 +119,7 @@ export type EventInput = {
   /** Nur Lesezugriff über die API; interne Aufrufer (Analyse) setzen es beim Anlegen. */
   sourceDocumentId?: number | null;
   /** Koordinaten weiterer Orte je Rolle von Hand setzen (null entfernt). */
-  placeCoords?: Partial<Record<PlaceRole, { lat: number; lon: number } | null>>;
+  placeCoords?: Partial<Record<PlaceRole, { lat: number; lon: number; source?: "manual" | "geocoded" } | null>>;
   /** Sperren auf einzelnen Feldern setzen/aufheben (`null` entfernt den Eintrag). */
   fieldsMeta?: Record<string, { locked?: boolean } | null>;
 };
@@ -665,6 +665,16 @@ function applyFieldsMetaPatch(meta: FieldsMeta, patch: EventInput["fieldsMeta"])
   }
 }
 
+/** Suchtext je Ort (Adresse, sonst Name) und ob der erste Ort ein Flughafen ist, aus einem Ereignisstand. */
+function placeKeys(s: EventState): { byRole: Record<string, string>; first: { role: string; key: string; airport: boolean } | null } {
+  const places = derivePlaces({ type: s.type, title: s.title, location: s.location, address: s.address, lat: null, lon: null, details: s.details, placeCoords: {}, latSource: null });
+  const norm = (v: string | null) => (v ?? "").normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
+  const byRole: Record<string, string> = {};
+  for (const p of places) byRole[p.role] = norm(p.address ?? p.label);
+  const f = places[0];
+  return { byRole, first: f ? { role: f.role, key: norm(f.address ?? f.label), airport: f.isAirport } : null };
+}
+
 function mergePlaceCoords(cur: PlaceCoords, patch: EventInput["placeCoords"]): PlaceCoords {
   if (!patch) return cur;
   const next: PlaceCoords = { ...cur };
@@ -675,7 +685,8 @@ function mergePlaceCoords(cur: PlaceCoords, patch: EventInput["placeCoords"]): P
     if (v === null) delete next[role as PlaceRole];
     else if (v) {
       if (!(Math.abs(v.lat) <= 90 && Math.abs(v.lon) <= 180)) throw badRequest("placeCoords: ungültige Koordinaten");
-      next[role as PlaceRole] = { lat: v.lat, lon: v.lon, source: "manual" };
+      // Automatisch aufgelöste Koordinaten bleiben überschreibbar (Herkunft «geocoded»), von Hand gesetzte nicht.
+      next[role as PlaceRole] = { lat: v.lat, lon: v.lon, source: v.source === "geocoded" ? "geocoded" : "manual" };
     }
   }
   return next;
@@ -734,6 +745,23 @@ export function updateEvent(db: Db, tripId: number, eventId: number, patch: Even
   applyManualMeta(meta, before, after, patch);
   prefillFromAirports(after, meta, new Set());
   after.placeCoords = mergePlaceCoords(before.placeCoords, patch.placeCoords);
+  // Ändert sich die Adresse (oder der Name) eines Ortes, gelten seine alten Koordinaten nicht mehr: sie werden
+  // verworfen und neu aufgelöst. Ausgenommen sind Koordinaten, die im selben Aufruf mitgeschickt werden.
+  {
+    const kb = placeKeys(before);
+    const ka = placeKeys(after);
+    for (const role of Object.keys(after.placeCoords)) {
+      const touched = patch.placeCoords && Object.prototype.hasOwnProperty.call(patch.placeCoords, role);
+      if (!touched && kb.byRole[role] !== ka.byRole[role]) delete after.placeCoords[role as PlaceRole];
+    }
+    const sentLatLon = patch.lat !== undefined || patch.lon !== undefined;
+    if (!sentLatLon && ka.first && !ka.first.airport && !meta.lat?.locked && (kb.first?.key !== ka.first.key || kb.first?.role !== ka.first.role)) {
+      after.lat = null;
+      after.lon = null;
+      delete meta.lat;
+      delete meta.lon;
+    }
+  }
   applyFieldsMetaPatch(meta, patch.fieldsMeta);
   writeEvent(db, cur.id, after, meta);
   persistParticipants(db, eventId, after.participantIds);

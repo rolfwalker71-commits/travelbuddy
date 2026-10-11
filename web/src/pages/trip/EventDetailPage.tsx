@@ -171,9 +171,19 @@ export function EventDetailPage() {
             onSaveCoords={
               isAdmin
                 ? async (role, index, lat, lon) => {
-                    ctx.apply(
-                      await api.updateEvent(trip.id, e.id, index === 0 ? { lat, lon } : { placeCoords: { [role]: { lat, lon } } })
-                    );
+                    // Im Browser aufgelöst: als «geocoded» speichern, damit eine spätere Adressänderung sie ersetzt
+                    void index;
+                    ctx.apply(await api.updateEvent(trip.id, e.id, { placeCoords: { [role]: { lat, lon, source: "geocoded" } } }));
+                  }
+                : undefined
+            }
+            onResetCoords={
+              isAdmin
+                ? async (role, index) => {
+                    const patch = index === 0 ? { lat: null, lon: null, placeCoords: { [role]: null } } : { placeCoords: { [role]: null } };
+                    ctx.apply(await api.updateEvent(trip.id, e.id, patch));
+                    // Server geokodiert nach dem Speichern im Hintergrund; danach neu laden
+                    window.setTimeout(() => ctx.reload(), 2500);
                   }
                 : undefined
             }

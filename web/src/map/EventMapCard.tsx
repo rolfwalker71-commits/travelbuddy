@@ -19,6 +19,7 @@ export function EventMapCard({
   color,
   onSaveCoords,
   onServerGeocode,
+  onResetCoords,
 }: {
   event: TripEvent;
   color: string;
@@ -29,6 +30,8 @@ export function EventMapCard({
   onSaveCoords?: (role: string, index: number, lat: number, lon: number) => Promise<void>;
   /** Server-Geokodierung (`POST …/geocode`); sie läuft, wenn Apple Karten im Browser nicht zur Verfügung steht. */
   onServerGeocode?: () => Promise<void>;
+  /** Koordinaten eines Ortes verwerfen; der Server löst die Adresse danach neu auf (nur Admin). */
+  onResetCoords?: (role: string, index: number) => Promise<void>;
 }) {
   const toast = useToast();
   const maps = useMapsEnabled();
@@ -125,6 +128,20 @@ export function EventMapCard({
                   <Icon name="copy" size={16} />
                   <span>Adresse kopieren</span>
                 </button>
+                {onResetCoords && p.lat != null ? (
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--s"
+                    onClick={() => {
+                      // Aus dem Zwischenspeicher der Sitzung nehmen, sonst kommt dieselbe falsche Position zurück
+                      savedRoles.current.delete(p.id);
+                      onResetCoords(p.role, points.findIndex((x) => x.id === p.id)).catch(() => toast("Koordinaten konnten nicht zurückgesetzt werden", "error"));
+                    }}
+                  >
+                    <Icon name="refresh" size={16} />
+                    <span>Position neu suchen</span>
+                  </button>
+                ) : null}
               </span>
             </li>
           );

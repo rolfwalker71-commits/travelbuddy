@@ -20,6 +20,8 @@ const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "erwartet YYYY-MM-DD");
 const clock = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "erwartet HH:mm");
 const text = (max: number) => z.string().max(max);
 const coord = z.object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) });
+/** Koordinate eines Ortes; `source: "geocoded"` für automatisch (z. B. im Browser) aufgelöste, sonst «manual». */
+const placeCoord = coord.extend({ source: z.enum(["manual", "geocoded"]).optional() });
 
 const eventFields = {
   type: z.string().trim().min(1).max(60),
@@ -48,7 +50,7 @@ const eventFields = {
   paidByParticipantId: id.nullable(),
   cancelUntil: isoDate.nullable(),
   participantIds: z.array(id).max(60),
-  placeCoords: z.record(z.string(), coord.nullable()),
+  placeCoords: z.record(z.string(), placeCoord.nullable()),
   fieldsMeta: z.record(z.string(), z.object({ locked: z.boolean().optional() }).nullable()),
 };
 const eventCreate = z.object({ ...eventFields }).partial().required({ title: true });

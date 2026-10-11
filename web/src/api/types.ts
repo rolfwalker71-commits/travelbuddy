@@ -329,7 +329,7 @@ export type EventInput = Partial<{
   cancelUntil: string | null;
   status: EventStatus;
   /** Koordinaten weiterer Orte je Rolle (der erste Ort nutzt `lat`/`lon`). */
-  placeCoords: Record<string, { lat: number; lon: number } | null>;
+  placeCoords: Record<string, { lat: number; lon: number; source?: "manual" | "geocoded" } | null>;
   /** Sperre setzen/aufheben; `null` entfernt den Eintrag. */
   fieldsMeta: Record<string, { locked: boolean } | null>;
 }>;

@@ -1,10 +1,14 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { trips as api } from "../../api/endpoints";
 import type { TripEvent } from "../../api/types";
 import { errorMessage } from "../../api/client";
 import { daysBetween, formatDayHeading, relativeDays, todayIso } from "../../lib/dates";
 import { canSwap, groupEventsByDay, moveEvent, tripSpan } from "../../lib/plan";
-import { EventTicket } from "../../trip/EventTicket";
+import { useMapsEnabled } from "../../hooks/useMapsEnabled";
+import { eventMapPoints } from "../../lib/maps";
+import { MapView } from "../../map/MapView";
+import { EventTicket, typeInfo } from "../../trip/EventTicket";
 import { Button, IconButton } from "../../ui/Button";
 import { Icon } from "../../ui/Icon";
 import { HelpCard, IllustrationCard } from "../../ui/IllustrationCard";
@@ -26,6 +30,11 @@ export function PlanTab() {
   const span = tripSpan(trip, events);
   const proposals = events.filter((e) => e.status && e.status !== "confirmed");
   const nextId = nextEventId(events, today);
+  const maps = useMapsEnabled();
+  const routePoints = useMemo(
+    () => eventMapPoints(events, (e) => `var(--k-${typeInfo(catalog, e).color})`),
+    [events, catalog]
+  );
 
   const move = async (e: TripEvent, dir: -1 | 1) => {
     const ids = moveEvent(events, e.id, dir);
@@ -171,7 +180,11 @@ export function PlanTab() {
           <TripNumbersCard events={events} span={span} />
           <section className="card viz-card" aria-label="Routenbogen">
             <h3 className="label">Route</h3>
-            <RouteArc events={events} />
+            {maps === true && routePoints.length > 0 ? (
+              <MapView points={routePoints} route numbered compact height={280} label={`Karte der Reise ${trip.title}`} />
+            ) : (
+              <RouteArc events={events} />
+            )}
           </section>
           <HelpCard id="help-timezones" defaultOpen={false} />
         </aside>

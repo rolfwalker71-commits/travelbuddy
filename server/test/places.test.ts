@@ -151,3 +151,43 @@ test("orte: Abholung und Rückgabe an derselben Adresse teilen die Koordinaten (
   });
   assert.equal(oneWay[1]!.lat, null);
 });
+
+test("orte: Adressänderung verwirft die alten Koordinaten des Ortes, auch von Hand gesetzte", async () => {
+  const { call, tokens } = await setup();
+  const anna = await tokens.anna();
+  const t = await call("POST", "/v1/trips", { token: anna, json: { title: "Miami" } });
+  const id = t.body.trip.id as number;
+  const car = await call("POST", `/v1/trips/${id}/events`, {
+    token: anna,
+    json: {
+      type: "Mietauto", title: "Mietwagen", lat: 25.79, lon: -80.28,
+      details: { pickupPlace: "Miami", pickupAddress: "3900 NW 25th St, Miami", returnPlace: "Miami", returnAddress: "3900 NW 25th St, Miami" },
+    },
+  });
+  const evId = car.body.eventId as number;
+  const get = async () => (await call("GET", `/v1/trips/${id}`, { token: anna })).body.events.find((e: any) => e.id === evId);
+  // Falscher Punkt wie damals: im Browser aufgelöst und als Rückgabe gespeichert
+  await call("PATCH", `/v1/trips/${id}/events/${evId}`, { token: anna, json: { placeCoords: { return: { lat: -26.2, lon: 28.0 } } } });
+  let e = await get();
+  assert.equal(e.places.find((p: any) => p.role === "return").lat, -26.2);
+
+  // Gleiche Adresse bestätigt: Koordinaten bleiben
+  await call("PATCH", `/v1/trips/${id}/events/${evId}`, { token: anna, json: { notes: "x" } });
+  e = await get();
+  assert.equal(e.places.find((p: any) => p.role === "return").lat, -26.2);
+
+  // Adresse geändert: die alten Koordinaten der Rückgabe fallen weg, der erste Ort bleibt
+  await call("PATCH", `/v1/trips/${id}/events/${evId}`, {
+    token: anna,
+    json: { details: { pickupPlace: "Miami", pickupAddress: "3900 NW 25th St, Miami", returnPlace: "Miami Airport", returnAddress: "2100 NW 42nd Ave, Miami" } },
+  });
+  e = await get();
+  const ret = e.places.find((p: any) => p.role === "return");
+  assert.equal(ret.lat, null);
+  assert.equal(e.places.find((p: any) => p.role === "pickup").lat, 25.79);
+
+  // Im Browser aufgelöste Position wird als «geocoded» gespeichert und bleibt überschreibbar
+  await call("PATCH", `/v1/trips/${id}/events/${evId}`, { token: anna, json: { placeCoords: { return: { lat: 25.8, lon: -80.3, source: "geocoded" } } } });
+  e = await get();
+  assert.equal(e.places.find((p: any) => p.role === "return").source, "geocoded");
+});
