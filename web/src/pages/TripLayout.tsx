@@ -151,7 +151,8 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
       toast("Kalenderdatei erstellt");
     });
 
-  const menu = [
+  const printItem = { label: "Drucken / Als PDF", icon: "file" as const, onSelect: () => nav(`/trips/${trip.id}/print`) };
+  const adminMenu = [
     { label: "Reise bearbeiten", icon: "edit" as const, onSelect: () => setEditOpen(true) },
     { label: "Kalender exportieren (ICS)", icon: "download" as const, onSelect: () => void downloadIcs() },
     {
@@ -186,6 +187,7 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
       },
     },
   ];
+  const menu = isAdmin ? [printItem, ...adminMenu] : [printItem];
 
   const span = tripSpan(trip, events);
   const reviewCount = trip.needsReviewCount ?? events.filter((e) => e.status && e.status !== "confirmed").length;
@@ -217,14 +219,17 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
         back="/trips"
         backLabel="Zu den Reisen"
         actions={
-          isAdmin ? (
-            <>
+          <>
+            <LinkButton to={`/trips/${trip.id}/print`} icon="file" className="hide-sm">
+              Drucken
+            </LinkButton>
+            {isAdmin ? (
               <Button variant="primary" icon="plus" className="hide-sm" onClick={() => setForm({ open: true, event: null })}>
                 Ereignis
               </Button>
-              <Menu items={menu} />
-            </>
-          ) : undefined
+            ) : null}
+            <Menu items={menu} />
+          </>
         }
       />
 

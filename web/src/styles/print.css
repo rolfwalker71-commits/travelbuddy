@@ -1,0 +1,75 @@
+/* Druckansicht einer Reise (A4). Hell, Typfarben über die Katalog-Tokens. */
+.print-root { background: #8a8478; min-height: 100vh; padding: 12px 12px 40px; color: #1d1b18; font-family: Barlow, "Helvetica Neue", Arial, sans-serif; }
+.print-loading { padding: 40px; display: flex; justify-content: center; }
+.print-toolbar { max-width: 210mm; margin: 0 auto 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface, #fbf8f1); border: 1px solid var(--line, #d4c9b4); border-radius: 10px; padding: 8px 12px; }
+.print-toolbar__variants { display: inline-flex; border: 1px solid var(--line, #d4c9b4); border-radius: 8px; overflow: hidden; margin-left: auto; }
+.print-toolbar__opt { padding: 7px 14px; background: transparent; border: 0; font: inherit; cursor: pointer; color: inherit; }
+.print-toolbar__opt.is-on { background: #1d1b18; color: #fff; }
+.print-toolbar__hint { flex-basis: 100%; margin: 0; font-size: 12px; color: #6f675a; }
+
+.sheet { width: 210mm; max-width: 100%; min-height: 297mm; margin: 0 auto; background: #fff; padding: 14mm 14mm 20mm; box-shadow: 0 2px 12px #0004; position: relative; font-size: 10pt; line-height: 1.4; }
+.sheet .muted { color: #6f675a; }
+.sheet .mono { font-family: "IBM Plex Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+.sheet__cover { border-bottom: 2px solid #1d1b18; padding-bottom: 5mm; margin-bottom: 5mm; }
+.sheet .eyebrow { font: 600 8.5pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #d8452b; }
+.sheet h1 { font: 700 28pt/1.05 "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; margin: 1mm 0 2mm; }
+.sheet__meta { display: flex; flex-wrap: wrap; gap: 4px 7mm; color: #6f675a; font-size: 10pt; }
+.sheet__meta span { display: inline-flex; gap: 5px; align-items: center; }
+.sheet__sum { display: flex; flex-wrap: wrap; border: 1px solid #d4c9b4; border-radius: 6px; margin-bottom: 6mm; }
+.sheet__sum > div { padding: 5px 12px; border-right: 1px solid #d4c9b4; }
+.sheet__sum > div:last-child { border-right: 0; }
+.sheet__sum .k { display: block; font: 600 7.5pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #6f675a; }
+.sheet__sum .v { font: 700 14pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; }
+.sheet__sum-total { margin-left: auto; }
+.sheet__map { margin-bottom: 6mm; border: 1px solid #d4c9b4; border-radius: 6px; overflow: hidden; break-inside: avoid; }
+.sheet__map .map-card { border: 0; border-radius: 0; }
+
+.day { margin-bottom: 5mm; }
+.day h2 { display: flex; justify-content: space-between; align-items: baseline; font: 700 13pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; border-bottom: 1px solid #1d1b18; padding-bottom: 1.5mm; margin: 0 0 3mm; break-after: avoid; }
+.day h2 > span:first-child { display: inline-flex; gap: 6px; align-items: center; }
+.day__n { font: 600 8.5pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #6f675a; }
+
+.ev { border: 1px solid #d4c9b4; border-left: 4px solid var(--c, #6f675a); border-radius: 6px; margin-bottom: 3.5mm; break-inside: avoid; background: #fff; }
+.ev header { display: flex; align-items: center; gap: 8px; padding: 4px 10px; background: #f6f1e5; border-bottom: 1px dashed #d4c9b4; }
+.ev__ico { color: var(--c); display: inline-flex; }
+.ev__typ { font: 700 8.5pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--c); }
+.ev__ref { margin-left: auto; font: 500 9pt "IBM Plex Mono", Menlo, monospace; }
+.ev__main { display: flex; gap: 10px; padding: 7px 10px 4px; align-items: baseline; }
+.ev__time { min-width: 28mm; font: 500 12pt "IBM Plex Mono", Menlo, monospace; white-space: nowrap; }
+.ev__ttl { flex: 1; }
+.ev__ttl h3 { margin: 0; font: 700 13pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; }
+.ev__ttl p { margin: 0; color: #6f675a; font-size: 9.5pt; }
+.ev__price { font: 500 10pt "IBM Plex Mono", Menlo, monospace; white-space: nowrap; }
+.ev__facts { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px; padding: 3px 10px 7px; margin: 0 0 0 calc(28mm + 10px); }
+.ev__facts > div { min-width: 0; }
+.ev__facts .wide { grid-column: 1 / -1; }
+.ev__facts dt { font: 600 7pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #6f675a; }
+.ev__facts dd { margin: 0; font-size: 9.5pt; white-space: pre-line; overflow-wrap: anywhere; }
+
+.cmp { width: 100%; border-collapse: collapse; }
+.cmp tr { break-inside: avoid; border-left: 3px solid var(--c); border-bottom: 1px solid #d4c9b4; }
+.cmp td { padding: 4px 6px; vertical-align: top; }
+.cmp__time { width: 24mm; font: 500 10pt "IBM Plex Mono", Menlo, monospace; white-space: nowrap; }
+.cmp__ico { width: 7mm; color: var(--c); }
+.cmp__facts { font-size: 9pt; color: #6f675a; }
+.cmp__ref { width: 34mm; font-size: 9pt; text-align: right; }
+.cmp__price { width: 28mm; font-size: 9pt; text-align: right; white-space: nowrap; }
+
+.refs table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+.refs th { text-align: left; font: 600 7.5pt "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #6f675a; border-bottom: 1px solid #1d1b18; padding: 3px 6px; }
+.refs td { padding: 4px 6px; border-bottom: 1px solid #d4c9b4; }
+.sheet__foot { margin-top: 8mm; display: flex; justify-content: space-between; color: #6f675a; font-size: 8pt; border-top: 1px solid #d4c9b4; padding-top: 2mm; }
+
+@page { size: A4; margin: 10mm; }
+@media print {
+  html, body { background: #fff !important; }
+  .print-root { background: #fff; padding: 0; min-height: 0; }
+  .print-toolbar { display: none; }
+  .sheet { box-shadow: none; width: auto; padding: 0; min-height: 0; }
+  .sheet__foot { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; background: #fff; }
+  .ev header, .sheet__cover, .sheet__sum, .day h2 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (max-width: 800px) {
+  .sheet { padding: 8mm; }
+  .ev__facts { margin-left: 10px; grid-template-columns: 1fr; }
+}

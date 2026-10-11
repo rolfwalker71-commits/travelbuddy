@@ -11,6 +11,7 @@ import { TodayPage } from "./pages/Today";
 
 // Jede Route ist ein eigener Chunk; Heute und Anmeldung bleiben im Hauptbündel.
 const TripsPage = lazy(() => import("./pages/Trips").then((m) => ({ default: m.TripsPage })));
+const TripPrintPage = lazy(() => import("./pages/TripPrint").then((m) => ({ default: m.TripPrintPage })));
 const TripLayout = lazy(() => import("./pages/TripLayout").then((m) => ({ default: m.TripLayout })));
 const PlanTab = lazy(() => import("./pages/trip/PlanTab").then((m) => ({ default: m.PlanTab })));
 const DocumentsTab = lazy(() => import("./pages/trip/DocumentsTab").then((m) => ({ default: m.DocumentsTab })));
@@ -68,6 +69,14 @@ export function App() {
                 <Route path="/t/:token" element={<GuestTripPage />} />
 
                 <Route path="/login" element={<LoginPage />} />
+                <Route
+                  path="/trips/:id/print"
+                  element={
+                    <RequireAuth>
+                      <TripPrintPage />
+                    </RequireAuth>
+                  }
+                />
 
                 <Route
                   element={
