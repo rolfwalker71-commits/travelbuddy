@@ -227,9 +227,9 @@
     text-transform: uppercase;
     min-width: 0;
   }
-  .tab span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tab > span:not(.tab__icon) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tab.active { color: var(--accent); }
-  .tab__icon { position: relative; display: inline-flex; }
+  .tab__icon { position: relative; display: inline-flex; overflow: visible; max-width: none; }
   .tab__icon .navcount { position: absolute; top: -8px; left: 12px; }
 
   .fab {

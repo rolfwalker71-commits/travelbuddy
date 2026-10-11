@@ -13,7 +13,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "sync:catalog": "node scripts/sync-catalog.mjs",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "layout:check": "node scripts/layout-check.mjs"
   },
   "dependencies": {
     "@fontsource/barlow": "5.2.8",

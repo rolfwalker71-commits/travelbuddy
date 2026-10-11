@@ -232,6 +232,7 @@
 .media--button { padding: 0; cursor: zoom-in; font: inherit; }
 .media--full { display: block; width: 100%; border-radius: var(--r-m); min-height: 120px; }
 .media--full img { height: auto; max-height: 70dvh; object-fit: contain; }
+.versionline p { white-space: normal; overflow-wrap: anywhere; }
 .versionline { margin-top: 12px; padding-top: 16px; border-top: 1px dashed var(--line-strong); display: flex; flex-direction: column; gap: 10px; }
 .pw-row { display: flex; flex-direction: column; gap: 4px; }
 .pw-row__tools { display: flex; gap: 6px; align-items: center; }
@@ -271,3 +272,4 @@
 .ongoing { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
 .day__view { margin-left: auto; padding: 0; }
 .day__view + .day__add { margin-left: 8px; }
+.hero { overflow-x: clip; }

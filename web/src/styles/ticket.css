@@ -12,6 +12,8 @@ dialog.sheet { --notch: var(--surface); }
   border-radius: var(--r-l);
   box-shadow: var(--shadow-1);
   color: var(--ink);
+  /* Kerben der Perforation ragen halb nach aussen; nur ihre innere Hälfte ist sichtbar */
+  overflow-x: clip;
 }
 .ticket.is-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .ticket.is-soft { opacity: 0.72; }
@@ -130,23 +132,26 @@ button.prov__dot:focus-visible { outline: 3px solid var(--focus); outline-offset
 .help__title { flex: 1; font-family: var(--font-title); font-weight: 600; font-size: 1rem; letter-spacing: 0.02em; }
 .help__chev { transition: transform 0.15s ease; color: var(--mute); }
 .help__chev.is-open { transform: rotate(180deg); }
-.help__body { display: grid; grid-template-columns: minmax(260px, 46%) minmax(0, 1fr); gap: 20px; align-items: start; padding: 6px 14px 18px; }
+.help { container-type: inline-size; container-name: help; }
+.help__body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; padding: 6px 14px 18px; }
+/* Ab ca. 640 px Behälterbreite zweispaltig; keine Spalte schmaler als 240 px */
+@container help (min-width: 640px) {
+  .help__body { grid-template-columns: minmax(240px, 42%) minmax(240px, 1fr); gap: 22px; }
+}
+.help__body > * { min-width: 0; }
+.help__illu { width: 100%; max-width: 560px; }
 .help__body:not(:has(.illu)) { grid-template-columns: minmax(0, 1fr); }
 .help__text { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .help__steps { display: flex; flex-direction: column; gap: 8px; }
 .help__steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 0.9375rem; }
 .help__no { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
-@media (max-width: 639px) {
-  .help__body { grid-template-columns: minmax(0, 1fr); }
-  .illu--compact .illu__frame { max-width: none; }
-}
+.help__text { min-width: 0; }
+.help__steps li > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 
 /* ───────────── Leerer Zustand mit Illustration ───────────── */
-.empty--illu { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 22px; align-items: center; text-align: left; padding: 22px; }
-.empty--illu .empty__text { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-@media (max-width: 639px) {
-  .empty--illu { grid-template-columns: minmax(0, 1fr); text-align: left; }
-}
+.empty--illu { display: flex; flex-wrap: wrap; gap: 18px 24px; align-items: center; text-align: left; padding: 22px; }
+.empty--illu > .illu { flex: 0 1 280px; min-width: min(100%, 200px); }
+.empty--illu .empty__text { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; flex: 1 1 240px; min-width: min(100%, 240px); }
 
 /* Schmale Bildschirme: Kennzahlen mit langen Marken (Saldo) über die ganze Breite */
 @media (max-width: 639px) {

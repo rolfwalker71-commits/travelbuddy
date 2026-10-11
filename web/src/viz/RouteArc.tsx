@@ -1,5 +1,7 @@
 import { useId } from "react";
 import type { TripEvent } from "../api/types";
+import { useContainerWidth } from "../hooks/useContainerWidth";
+import { shortStopLabel, textWidth } from "../lib/vizLayout";
 import { buildRoute, projectRoute } from "../lib/viz";
 
 const KIND_LABEL = { air: "Flug", ship: "Schiff", rail: "Bahn", road: "Strasse", other: "Weg" } as const;
@@ -7,12 +9,28 @@ const KIND_LABEL = { air: "Flug", ship: "Schiff", rail: "Bahn", road: "Strasse",
 /**
  * Routenbogen: die Reise als Linie, aus den Koordinaten der Ereignisse gezeichnet (kein Kartenmaterial).
  * Ersatz für Apple Karten, wenn kein MapKit-Schlüssel eingerichtet ist, und Infografik für sich.
+ * Die Zeichenfläche folgt der Breite des Behälters (1 Einheit = 1 px), Beschriftungen werden gekürzt und überdecken
+ * sich nicht; die vollständigen Namen stehen in der Stationenliste darunter (`list`).
  */
-export function RouteArc({ events, title = "Routenbogen der Reise", height = 232 }: { events: TripEvent[]; title?: string; height?: number }) {
+export function RouteArc({
+  events,
+  title = "Routenbogen der Reise",
+  height,
+  list = true,
+}: {
+  events: TripEvent[];
+  title?: string;
+  /** Feste Höhe in px; sonst nach Breite (180 bis 280). */
+  height?: number;
+  /** Stationenliste mit vollen Namen unter der Grafik. */
+  list?: boolean;
+}) {
   const uid = useId();
-  const width = 630;
+  const [ref, w] = useContainerWidth<HTMLElement>(630);
+  const width = Math.min(Math.max(w, 260), 960);
+  const h = height ?? Math.round(Math.min(280, Math.max(180, width * 0.38)));
   const route = buildRoute(events);
-  const p = projectRoute(route, width, height);
+  const p = projectRoute(route, width, h, 34);
   if (p.stops.length < 2) {
     return (
       <p className="muted small viz__empty">
@@ -21,36 +39,44 @@ export function RouteArc({ events, title = "Routenbogen der Reise", height = 232
     );
   }
   const kinds = [...new Set(p.legs.map((l) => l.kind))];
-  // Beschriftungen ohne Überdeckung: kollidierende entfallen, ihre Nummer bleibt am Punkt (Liste steht auf der Karte-Seite)
-  const placed: { x0: number; x1: number; y0: number; y1: number }[] = [];
-  const labels: { id: string; x: number; y: number; anchor: "start" | "end"; text: string }[] = [];
-  p.stops.forEach((s, i) => {
-    const right = s.x < width * 0.7;
-    const text = s.label.length > 22 ? `${s.label.slice(0, 21)}…` : s.label;
-    const w = text.length * 5.8 + 4;
-    const y = s.y + (i % 2 === 0 ? -9 : 17);
-    const x = s.x + (right ? 10 : -10);
-    const box = { x0: right ? x : x - w, x1: right ? x + w : x, y0: y - 11, y1: y + 3 };
-    const clash = placed.some((o) => box.x0 < o.x1 && box.x1 > o.x0 && box.y0 < o.y1 && box.y1 > o.y0);
-    const outside = box.x0 < 0 || box.x1 > width;
-    if (clash || outside) return;
-    placed.push(box);
-    labels.push({ id: s.id, x, y, anchor: right ? "start" : "end", text });
-  });
   const desc = `Stationen in Reihenfolge: ${p.stops.map((s) => s.label).join(", ")}.`;
-  const grid: number[] = [];
-  for (let x = 60; x < width; x += 60) grid.push(x);
+
+  // Beschriftung rechts oder links vom Punkt, in zwei Reihen (oberhalb/unterhalb), ohne Überdeckung
+  const shorts = p.stops.map((s) => shortStopLabel(s.label, width < 420 ? 12 : 18));
+  const taken: { x0: number; x1: number; y0: number; y1: number }[] = [];
+  const labels = p.stops.flatMap((s, i) => {
+    const text = shorts[i]!;
+    const tw = textWidth(text, 5.9, 2);
+    const spots = [
+      { x: s.x + 11, y: s.y - 9, anchor: "start" as const },
+      { x: s.x - 11, y: s.y - 9, anchor: "end" as const },
+      { x: s.x + 11, y: s.y + 16, anchor: "start" as const },
+      { x: s.x - 11, y: s.y + 16, anchor: "end" as const },
+    ];
+    for (const sp of spots) {
+      const x0 = sp.anchor === "start" ? sp.x : sp.x - tw;
+      const box = { x0, x1: x0 + tw, y0: sp.y - 11, y1: sp.y + 3 };
+      if (box.x0 < 2 || box.x1 > width - 2 || box.y0 < 0 || box.y1 > h) continue;
+      if (taken.some((o) => box.x0 < o.x1 + 3 && box.x1 + 3 > o.x0 && box.y0 < o.y1 && box.y1 > o.y0)) continue;
+      // Punkte nicht überdecken
+      if (p.stops.some((o) => o !== s && o.x + 8 > box.x0 && o.x - 8 < box.x1 && o.y + 8 > box.y0 && o.y - 8 < box.y1)) continue;
+      taken.push(box);
+      return [{ id: s.id, text, x: sp.x, y: sp.y, anchor: sp.anchor }];
+    }
+    return [];
+  });
+
   return (
-    <figure className="viz viz--scroll">
-      <svg viewBox={`0 0 ${width} ${height}`} className="viz__svg" role="img" aria-labelledby={`${uid}-t ${uid}-d`}>
+    <figure className="viz viz--route" ref={ref}>
+      <svg viewBox={`0 0 ${width} ${h}`} width={width} height={h} className="viz__svg viz__svg--px" role="img" aria-labelledby={`${uid}-t ${uid}-d`}>
         <title id={`${uid}-t`}>{title}</title>
         <desc id={`${uid}-d`}>{desc}</desc>
         <g className="viz__grid">
-          {grid.map((x) => (
-            <line key={x} x1={x} y1={0} x2={x} y2={height} />
+          {Array.from({ length: Math.floor(width / 70) }, (_, i) => (i + 1) * 70).map((x) => (
+            <line key={x} x1={x} y1={0} x2={x} y2={h} />
           ))}
-          {[Math.round(height / 4), Math.round(height / 2), Math.round((height * 3) / 4)].map((y) => (
-            <line key={y} x1={0} y1={y} x2={width} y2={y} />
+          {[0.25, 0.5, 0.75].map((f) => (
+            <line key={f} x1={0} y1={Math.round(h * f)} x2={width} y2={Math.round(h * f)} />
           ))}
         </g>
         {p.legs.map((l, i) => (
@@ -58,8 +84,8 @@ export function RouteArc({ events, title = "Routenbogen der Reise", height = 232
         ))}
         {p.stops.map((s) => (
           <g key={s.id}>
-            <circle cx={s.x} cy={s.y} r={5.5} className="viz__stop" style={{ stroke: `var(--k-${s.color})` }} />
-            <text x={s.x} y={s.y + 3.5} textAnchor="middle" className="viz__stopno num">
+            <circle cx={s.x} cy={s.y} r={8} className="viz__stop" style={{ stroke: `var(--k-${s.color})` }} />
+            <text x={s.x} y={s.y + 3.2} textAnchor="middle" className="viz__stopno num">
               {s.order}
             </text>
             <title>{`${s.order}. ${s.label}`}</title>
@@ -73,6 +99,18 @@ export function RouteArc({ events, title = "Routenbogen der Reise", height = 232
           ))}
         </g>
       </svg>
+      {list ? (
+        <ol className="viz__stations" aria-label="Stationen">
+          {p.stops.map((s) => (
+            <li key={s.id}>
+              <span className="viz__no num" style={{ borderColor: `var(--k-${s.color})` }}>
+                {s.order}
+              </span>
+              <span>{s.label}</span>
+            </li>
+          ))}
+        </ol>
+      ) : null}
       <figcaption className="viz__legend">
         {kinds.map((k) => (
           <span key={k}>
