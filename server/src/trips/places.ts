@@ -152,6 +152,20 @@ export function derivePlaces(ev: PlaceSource, context: { destination?: string | 
       p.source = normalizeSource(ev.latSource);
     }
   });
+
+  // Derselbe Ort unter zwei Rollen (Abholung = Rückgabe an derselben Adresse): Koordinaten übernehmen, damit die
+  // Karte den zweiten nicht separat sucht und dabei beim falschen gleichnamigen Ort landet.
+  for (const p of out) {
+    if (p.lat != null && p.lon != null) continue;
+    const key = fold(p.address ?? p.label ?? "");
+    if (!key) continue;
+    const twin = out.find((q) => q !== p && q.lat != null && q.lon != null && fold(q.address ?? q.label ?? "") === key);
+    if (twin) {
+      p.lat = twin.lat;
+      p.lon = twin.lon;
+      p.source = twin.source;
+    }
+  }
   return out;
 }
 

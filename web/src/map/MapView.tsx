@@ -86,11 +86,15 @@ export function MapView({ points, label, height = 360, route = false, compact = 
         if (p.lat != null && p.lon != null) {
           c = new mapkit.Coordinate(p.lat, p.lon);
         } else if (p.query && lookups < MAX_LOOKUPS) {
-          let hit = geocoded.get(p.query);
+          // Schon platzierter Ort desselben Ereignisses als Anhaltspunkt (Abholung → Rückgabe).
+          const ref = placed.find((x) => x.p.eventId === p.eventId);
+          const near = ref ? { lat: ref.c.latitude, lon: ref.c.longitude } : null;
+          const cacheKey = near ? `${p.query}|${near.lat.toFixed(2)},${near.lon.toFixed(2)}` : p.query;
+          let hit = geocoded.get(cacheKey);
           if (hit === undefined) {
             lookups += 1;
-            hit = await lookupPlace(mapkit, p.query);
-            geocoded.set(p.query, hit);
+            hit = await lookupPlace(mapkit, p.query, near);
+            geocoded.set(cacheKey, hit);
             if (cancelled) return;
             if (hit) cb.current.onResolve?.({ point: p, lat: hit.lat, lon: hit.lon, label: hit.label });
           }

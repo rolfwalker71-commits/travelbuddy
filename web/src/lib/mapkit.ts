@@ -117,25 +117,63 @@ export function mapsEnabled(): Promise<boolean> {
   return enabledP;
 }
 
-/** Adresse oder Ort suchen; `null`, wenn nichts gefunden wurde. Nutzt `mapkit.Search`, sonst den Geocoder. */
-export async function lookupPlace(mapkit: Mapkit, query: string): Promise<{ lat: number; lon: number; label: string | null } | null> {
-  const fromResult = (r: MkPlaceResult | undefined) =>
-    r ? { lat: r.coordinate.latitude, lon: r.coordinate.longitude, label: r.formattedAddress ?? r.name ?? null } : null;
+/** Entfernung in km (Haversine). */
+export function distanceKm(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+  const rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad;
+  const dLon = (b.lon - a.lon) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+}
+
+/** Treffer weiter als dies vom bekannten Ort desselben Ereignisses gelten als falsches gleichnamiges Ziel. */
+export const MAX_NEAR_KM = 300;
+
+/**
+ * Adresse oder Ort suchen; `null`, wenn nichts gefunden wurde. Nutzt `mapkit.Search`, sonst den Geocoder.
+ * Mit `near` (bekannter Ort desselben Ereignisses) wird die Suche dorthin gewichtet und ein Treffer weit davon
+ * verworfen, sonst landet «Northwest 25th Street, Miami» bei einem gleichnamigen Ort auf einem anderen Kontinent.
+ */
+export async function lookupPlace(
+  mapkit: Mapkit,
+  query: string,
+  near?: { lat: number; lon: number } | null
+): Promise<{ lat: number; lon: number; label: string | null } | null> {
+  const fromResult = (r: MkPlaceResult | undefined) => {
+    if (!r) return null;
+    const hit = { lat: r.coordinate.latitude, lon: r.coordinate.longitude, label: r.formattedAddress ?? r.name ?? null };
+    return near && distanceKm(near, hit) > MAX_NEAR_KM ? null : hit;
+  };
+  const opts: Record<string, unknown> = { language: "de" };
+  if (near) {
+    opts.coordinate = new mapkit.Coordinate(near.lat, near.lon);
+    opts.region = new mapkit.CoordinateRegion(new mapkit.Coordinate(near.lat, near.lon), new mapkit.CoordinateSpan(1, 1));
+  }
   try {
-    const hit = await new Promise<MkPlaceResult | undefined>((resolve) => {
+    const hit = await new Promise<MkPlaceResult[]>((resolve) => {
       try {
-        new mapkit.Search({ language: "de" }).search(query, (err, data) => resolve(err ? undefined : data.places?.[0]));
+        new mapkit.Search(opts).search(query, (err, data) => resolve(err ? [] : data.places ?? []));
       } catch {
-        resolve(undefined);
+        resolve([]);
       }
     });
-    if (hit) return fromResult(hit);
+    for (const h of hit) {
+      const r = fromResult(h);
+      if (r) return r;
+    }
   } catch {
     /* weiter mit dem Geocoder */
   }
   return new Promise((resolve) => {
     try {
-      new mapkit.Geocoder({ language: "de" }).lookup(query, (err, data) => resolve(err ? null : fromResult(data.results?.[0])));
+      new mapkit.Geocoder({ language: "de" }).lookup(query, (err, data) => {
+        if (err) return resolve(null);
+        for (const h of data.results ?? []) {
+          const r = fromResult(h);
+          if (r) return resolve(r);
+        }
+        resolve(null);
+      });
     } catch {
       resolve(null);
     }

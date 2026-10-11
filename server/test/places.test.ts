@@ -129,3 +129,25 @@ test("bereinigung (Migration 022): geocodierte Ergebnisse verworfen, Handarbeit 
   db.exec(fs.readFileSync(path.resolve(import.meta.dirname, "../src/db/migrations/022_geocode_reset.sql"), "utf8"));
   assert.equal(row(car).lat, 25.8);
 });
+
+test("orte: Abholung und Rückgabe an derselben Adresse teilen die Koordinaten (Karte sucht nicht erneut)", () => {
+  const car = derivePlaces({
+    ...base,
+    type: "Mietauto",
+    address: "3900 NW 25th St, Miami, FL",
+    lat: 25.79,
+    lon: -80.28,
+    details: { pickupPlace: "Miami Airport", returnPlace: "Miami Airport", pickupAddress: "3900 NW 25th St, Miami, FL", returnAddress: "3900 NW 25th St, Miami, FL" },
+  });
+  assert.deepEqual(car.map((p) => [p.role, p.lat, p.lon]), [["pickup", 25.79, -80.28], ["return", 25.79, -80.28]]);
+
+  // Verschiedene Adressen: Rückgabe bleibt ohne Koordinaten
+  const oneWay = derivePlaces({
+    ...base,
+    type: "Mietauto",
+    lat: 25.79,
+    lon: -80.28,
+    details: { pickupPlace: "Miami", returnPlace: "Orlando", pickupAddress: "3900 NW 25th St, Miami", returnAddress: "1 Airport Blvd, Orlando" },
+  });
+  assert.equal(oneWay[1]!.lat, null);
+});
