@@ -1,16 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { trips as tripsApi } from "../api/endpoints";
 import type { Traveler, TripDetail, TripEvent } from "../api/types";
 import { QueryView, useQuery } from "../hooks/useQuery";
-import { useMapsEnabled } from "../hooks/useMapsEnabled";
 import { useCatalog } from "../state/catalog";
 import { daysBetween, formatDate, formatDateRange, formatDayHeading, formatTimestamp } from "../lib/dates";
 import { detailSections, keyFacts, referenceOf, summaryLine, type DetailRow } from "../lib/eventUi";
-import { eventMapPoints } from "../lib/maps";
-import { formatMoney, formatTotals } from "../lib/money";
+import { findField } from "../lib/catalog";
+import type { IconName } from "../ui/Icon";
 import { groupEventsByDay, tripSpan } from "../lib/plan";
-import { MapView } from "../map/MapView";
+import { MediaImage } from "../ui/MediaImage";
+import { CoverIllustration } from "../ui/IllustrationCard";
+import { coverIdFor } from "../lib/illustrations";
 import { typeInfo } from "../trip/EventTicket";
 import { Button } from "../ui/Button";
 import { ErrorState, Spinner } from "../ui/Feedback";
@@ -54,31 +55,18 @@ export function PrintView({ data }: { data: TripDetail }) {
   const catalog = useCatalog();
   const [params, setParams] = useSearchParams();
   const variant: Variant = params.get("v") === "compact" ? "compact" : "full";
-  const maps = useMapsEnabled();
-  const [mapState, setMapState] = useState<"loading" | "ready" | "off" | "error">("loading");
   const events = useMemo(() => data.events.filter(isPrintable), [data.events]);
   const groups = useMemo(() => groupEventsByDay(events), [events]);
   const span = tripSpan(trip, events);
-  const points = useMemo(
-    () => eventMapPoints(events, (e) => `var(--k-${typeInfo(catalog, e).color})`),
-    [events, catalog]
-  );
-  const showMap = maps === true && points.length > 0;
-  const mapPending = showMap && mapState === "loading";
 
   const counts = useMemo(() => {
-    const m = new Map<string, number>();
+    const m = new Map<string, [number, IconName]>();
     for (const e of events) {
-      const label = typeInfo(catalog, e).label;
-      m.set(label, (m.get(label) ?? 0) + 1);
+      const i = typeInfo(catalog, e);
+      m.set(i.label, [(m.get(i.label)?.[0] ?? 0) + 1, i.icon]);
     }
-    return [...m.entries()];
+    return [...m.entries()].map(([label, [n, icon]]) => [label, n, icon] as const);
   }, [events, catalog]);
-  const totals = useMemo(() => {
-    const t: Record<string, number> = {};
-    for (const e of events) if (e.priceMinor != null) t[e.currency || trip.homeCurrency || "CHF"] = (t[e.currency || trip.homeCurrency || "CHF"] ?? 0) + e.priceMinor;
-    return t;
-  }, [events, trip.homeCurrency]);
   const stand = formatTimestamp(new Date().toISOString());
   const refs = events.filter((e) => e.bookingReference || e.details?.confirmationNumber);
 
@@ -96,37 +84,33 @@ export function PrintView({ data }: { data: TripDetail }) {
             </button>
           ))}
         </div>
-        <Button variant="primary" icon="download" disabled={mapPending} onClick={() => window.print()}>
-          {mapPending ? "Karte wird geladen …" : "Drucken / Als PDF"}
+        <Button variant="primary" icon="download" onClick={() => window.print()}>
+          Drucken / Als PDF
         </Button>
         <p className="print-toolbar__hint">Im Druckdialog «Kopf- und Fusszeilen» ausschalten und «Hintergrundgrafiken» einschalten.</p>
       </div>
 
       <main className="sheet">
         <header className="sheet__cover">
-          <div className="eyebrow">Reiseplan</div>
+          {trip.coverUrl ? (
+            <MediaImage src={trip.coverUrl} variant="cover" lazy={false} className="sheet__hero" />
+          ) : (
+            <div className="sheet__hero"><CoverIllustration id={coverIdFor(trip, events)} /></div>
+          )}
+          <div className="eyebrow"><Icon name="compass" size={15} /> Reiseplan</div>
           <h1>{trip.title}</h1>
           <div className="sheet__meta">
-            {trip.destination ? <span><Icon name="pin" size={15} /> {trip.destination}</span> : null}
-            {span ? <span><Icon name="calendar" size={15} /> {formatDateRange(span.start, span.end)} · {span.days} {span.days === 1 ? "Tag" : "Tage"}</span> : null}
-            {travelers.length > 0 ? <span><Icon name="users" size={15} /> {travelers.map((t) => t.displayName).join(", ")}</span> : null}
+            {trip.destination ? <span><Icon name="pin" size={16} /> {trip.destination}</span> : null}
+            {span ? <span><Icon name="calendar" size={16} /> {formatDateRange(span.start, span.end)} · {span.days} {span.days === 1 ? "Tag" : "Tage"}</span> : null}
+            {travelers.length > 0 ? <span><Icon name="users" size={16} /> {travelers.map((t) => t.displayName).join(", ")}</span> : null}
           </div>
         </header>
 
         <section className="sheet__sum" aria-label="Übersicht">
-          {counts.map(([label, n]) => (
-            <div key={label}><span className="k">{label}</span><span className="v">{n}</span></div>
+          {counts.map(([label, n, icon]) => (
+            <div key={label}><span className="k"><Icon name={icon} size={16} /> {label}</span><span className="v">{n}</span></div>
           ))}
-          {Object.keys(totals).length > 0 ? (
-            <div className="sheet__sum-total"><span className="k">Gesamtpreis</span><span className="v">{formatTotals(totals)}</span></div>
-          ) : null}
         </section>
-
-        {showMap ? (
-          <section className="sheet__map" aria-label="Karte">
-            <MapView points={points} route numbered compact height={320} label={`Karte der Reise ${trip.title}`} onStatus={setMapState} />
-          </section>
-        ) : null}
 
         {groups.length === 0 ? <p className="muted">Keine bestätigten Ereignisse.</p> : null}
         {groups.map((g) => (
@@ -175,15 +159,35 @@ const timeOf = (e: TripEvent): string => {
   return a && b ? `${a} → ${b}` : a;
 };
 
+/** Symbol je Angabe nach Feldschlüssel, sonst nach Bezeichnung. */
+function rowIcon(key: string, label: string): IconName {
+  const k = `${key} ${label}`.toLowerCase();
+  if (/phone|telefon|contact|kontakt/.test(k)) return "phone";
+  if (/website|url/.test(k)) return "globe";
+  if (/wifi|wlan|code|zugang|schlüssel|pin\b/.test(k)) return "lock";
+  if (/passenger|passagier|guests|gäste|participant|wer ist dabei|personen/.test(k)) return "users";
+  if (/notes|notiz|hinweis/.test(k)) return "message";
+  if (/address|adresse|place|ort\b|location|venue|station|terminal|airport|flughafen|hafen|meeting|treffpunkt/.test(k)) return "pin";
+  if (/gate|platform|gleis|check-?in|check-?out|boarding/.test(k)) return "flag";
+  if (/seat|sitz|kabine|cabin|zimmer|room|deck/.test(k)) return "ticket";
+  if (/reference|referenz|booking|buchung|reservierung|reservation|confirmation|bestätigung|voucher|policy|police|number|nummer/.test(k)) return "receipt";
+  if (/date|datum|start|ende|end|beginn|ankunft|abflug|dauer|duration|time|zeit|from|until|bis|ab\b/.test(k)) return "clock";
+  if (/airline|operator|provider|anbieter|gesellschaft|reederei|vermieter|company/.test(k)) return "tag";
+  if (/insurance|versicherung|visa|visum|pass/.test(k)) return "shield";
+  if (/meal|verpflegung|board|frühstück|restaurant/.test(k)) return "fork";
+  return "info";
+}
+
 function rowsOf(catalog: Catalog, e: TripEvent, travelers: Traveler[]): DetailRow[] {
-  const money = (m: number, c: string) => formatMoney(m, c);
-  const secs = detailSections(catalog, e, travelers, money, formatDate);
+  const secs = detailSections(catalog, e, travelers, () => "", formatDate);
   const out: DetailRow[] = [];
   for (const s of secs) {
+    if (s.id === "kosten") continue; // Preise und Zahlungsstatus gehören nicht auf den Ausdruck
     for (const r of s.rows) {
+      if (r.scope === "details" && findField(catalog, e.type, r.key)?.kind === "money") continue;
       if (r.key === "startDate") continue; // steht in der Kopfzeile
       if (r.key === "participantIds") continue;
-      if (r.key === "priceMinor" || r.key === "bookingReference") continue; // stehen im Kopf des Tickets
+      if (r.key === "bookingReference") continue; // steht im Kopf des Tickets
       out.push(r);
     }
   }
@@ -195,11 +199,10 @@ function FullEvent({ e, catalog, travelers }: { e: TripEvent; catalog: Catalog; 
   const ref = referenceOf(e);
   const sum = summaryLine(catalog, e);
   const rows = rowsOf(catalog, e, travelers);
-  const price = e.priceMinor != null ? formatMoney(e.priceMinor, e.currency || "CHF") : null;
   return (
     <article className="ev" style={{ ["--c" as string]: `var(--k-${info.color})` }}>
       <header>
-        <span className="ev__ico"><Icon name={info.icon} size={18} /></span>
+        <span className="ev__ico"><Icon name={info.icon} size={21} /></span>
         <span className="ev__typ">{info.label}</span>
         {ref ? <span className="ev__ref">{ref}</span> : null}
       </header>
@@ -209,13 +212,12 @@ function FullEvent({ e, catalog, travelers }: { e: TripEvent; catalog: Catalog; 
           <h3>{e.title}</h3>
           {sum ? <p>{sum}</p> : null}
         </div>
-        {price ? <div className="ev__price">{price}</div> : null}
       </div>
       {rows.length > 0 ? (
         <dl className="ev__facts">
           {rows.map((r) => (
             <div key={`${r.scope}-${r.key}`} className={r.value.includes("\n") || r.value.length > 60 || r.key === "notes" ? "wide" : ""}>
-              <dt>{r.label}</dt>
+              <dt><Icon name={rowIcon(r.key, r.label)} size={15} /> {r.label}</dt>
               <dd className={r.mono ? "mono" : ""}>{r.value}</dd>
             </div>
           ))}
@@ -232,22 +234,27 @@ function CompactDay({ events, catalog, travelers }: { events: TripEvent[]; catal
         {events.map((e) => {
           const info = typeInfo(catalog, e);
           const sum = summaryLine(catalog, e);
-          const factList = keyFacts(catalog, e, { travelers, max: 4 });
-          const facts = factList.map((f) => `${f.label} ${f.value}`);
-          const addrShown = e.address ? factList.some((f) => f.value.includes(e.address!)) : true;
+          const factList = keyFacts(catalog, e, { travelers, max: 5 });
+          const items: { icon: IconName; text: string }[] = factList.map((f) => ({ icon: rowIcon(f.label, f.label), text: `${f.label} ${f.value}` }));
+          if (e.address && !factList.some((f) => f.value.includes(e.address!))) items.unshift({ icon: "pin", text: e.address });
+          if (e.phone && !factList.some((f) => f.value.includes(e.phone!))) items.push({ icon: "phone", text: e.phone });
           const ref = referenceOf(e);
           return (
             <tr key={e.id} style={{ ["--c" as string]: `var(--k-${info.color})` }}>
               <td className="cmp__time">{timeOf(e) || "–"}</td>
-              <td className="cmp__ico"><Icon name={info.icon} size={16} /></td>
+              <td className="cmp__ico"><Icon name={info.icon} size={19} /></td>
               <td className="cmp__main">
                 <strong>{e.title}</strong>
                 {sum ? <span className="muted"> · {sum}</span> : null}
-                {facts.length > 0 ? <div className="cmp__facts">{facts.join(" · ")}</div> : null}
-                {e.address && !addrShown ? <div className="cmp__facts">{e.address}</div> : null}
+                {items.length > 0 ? (
+                  <div className="cmp__facts">
+                    {items.map((it, i) => (
+                      <span key={i} className="cmp__fact"><Icon name={it.icon} size={14} /> {it.text}</span>
+                    ))}
+                  </div>
+                ) : null}
               </td>
               <td className="cmp__ref mono">{ref}</td>
-              <td className="cmp__price mono">{e.priceMinor != null ? formatMoney(e.priceMinor, e.currency || "CHF") : ""}</td>
             </tr>
           );
         })}

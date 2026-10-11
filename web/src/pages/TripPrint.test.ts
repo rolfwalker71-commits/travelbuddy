@@ -2,7 +2,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { TripDetail } from "../api/types";
 import { ev } from "../lib/fixtures.test-helpers";
 import { PrintView, isPrintable } from "./TripPrint";
@@ -18,6 +18,9 @@ const data: TripDetail = {
   ],
 };
 
+// Serverseitiges Rendern ohne DOM: die Illustration liest nur das Thema des Dokuments.
+vi.stubGlobal("document", { documentElement: { dataset: {} } });
+
 const render = (v: string) =>
   renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [`/trips/1/print${v}`] }, createElement(PrintView, { data })));
 
@@ -27,10 +30,11 @@ describe("Druckansicht", () => {
     expect(isPrintable(data.events[2]!)).toBe(false);
     expect(isPrintable(data.events[3]!)).toBe(false);
   });
-  it("ausführlich: Preis, Codes, Referenz, ohne Vorschläge", () => {
+  it("ausführlich: Codes und Referenz, ohne Preise und Vorschläge", () => {
     const html = render("");
     expect(html).toContain("Zürich → Miami");
-    expect(html).toMatch(/CHF\s1\D234\.56/);
+    expect(html).not.toMatch(/CHF/);
+    expect(html).not.toContain("Zahlung");
     expect(html).toContain("4711");
     expect(html).toContain("Buchungsreferenzen auf einen Blick");
     expect(html).not.toContain("Nur Vorschlag");
