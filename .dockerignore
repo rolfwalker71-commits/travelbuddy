@@ -23,3 +23,8 @@ design
 docs
 **/coverage
 web/.vite
+
+# Erzeugte Vorschau-PNG der Illustrationen (nicht Teil des Images)
+shared/illustrations/png
+shared/illustrations/light/*.png
+shared/illustrations/dark/*.png

@@ -8,6 +8,8 @@ WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY VERSION /VERSION
+# Web importiert Katalog und Illustrationen relativ zu ../../../shared (Layout wie im Repo: /web und /shared)
+COPY shared/ /shared/
 COPY web/ ./
 RUN npm run build
 
