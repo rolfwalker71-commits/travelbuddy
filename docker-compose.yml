@@ -7,8 +7,7 @@
 #   docker compose up -d --build                         # alternativ lokal bauen
 #   docker compose exec -it travelbuddy node dist/create-user.mjs rolf "Rolf" --admin
 #
-# Daten (SQLite, documents/, media/, apns/) liegen in ./data. Standardmässig nur lokal gebunden (127.0.0.1:7780);
-# HTTPS übernimmt der Reverse-Proxy davor.
+# Daten (SQLite, documents/, media/, apns/) liegen in ./data. Port 7780; HTTPS übernimmt der Reverse-Proxy davor.
 services:
   travelbuddy:
     build:
@@ -62,6 +61,8 @@ services:
       # Eigener Schlüssel nur für KI-Bilder (sonst OPENAI_API_KEY)
       OPENAI_IMAGE_API_KEY: ${OPENAI_IMAGE_API_KEY:-}
     ports:
-      - "${TRAVELBUDDY_BIND:-127.0.0.1}:${TRAVELBUDDY_PORT:-7780}:7780"
+      # Host-Port:Container-Port. Von aussen im Netz erreichbar (Reverse-Proxy auf <Host>:7780).
+      # Nur lokal binden (Proxy auf demselben Host): "127.0.0.1:7780:7780"
+      - "7780:7780"
     volumes:
       - ./data:/data

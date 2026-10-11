@@ -41,7 +41,7 @@ Alle optional. Vollständige Liste mit Beispielwerten: `.env.example` im Repo-Ro
 
 | Variable | Standard | Bedeutung |
 |---|---|---|
-| `PORT` | `7780` | Port des Servers (im Container ebenfalls 7780; `TRAVELBUDDY_PORT` in `.env`/Compose ist nur der Host-Port der Veröffentlichung) |
+| `PORT` | `7780` | Port des Servers (im Container ebenfalls 7780; die Veröffentlichung steht in `docker-compose.yml` unter `ports`) |
 | `HOST` | `127.0.0.1` (Container `0.0.0.0`) | Bindeadresse |
 | `TRAVELBUDDY_DB_PATH` | `./data/travelbuddy.sqlite` | SQLite-Datei |
 | `TRAVELBUDDY_DATA_DIR` | Ordner der Datenbank | Datenordner (`documents/`, `media/`, `apns/`) |
