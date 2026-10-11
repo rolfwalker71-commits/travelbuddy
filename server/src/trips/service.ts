@@ -921,6 +921,8 @@ export function linkDocument(db: Db, tripId: number, eventId: number, documentId
 export function unlinkDocument(db: Db, tripId: number, eventId: number, documentId: number): void {
   getEventRow(db, tripId, eventId);
   db.prepare("DELETE FROM trip_event_documents WHERE trip_event_id = ? AND document_id = ?").run(eventId, documentId);
+  // Ereignisse, die aus dem Dokument entstanden sind, verweisen zusätzlich über die Quelle darauf.
+  db.prepare("UPDATE trip_events SET source_document_id = NULL WHERE id = ? AND source_document_id = ?").run(eventId, documentId);
 }
 
 export function addComment(
