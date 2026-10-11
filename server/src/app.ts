@@ -37,6 +37,7 @@ import { MediaService, type ImageGenerator } from "./media/generate";
 import type { ModuleDeps } from "./lib/module-deps";
 import { spaStatic } from "./web/static";
 import { mapsRoutes } from "./maps/routes";
+import type { GeocodeBackfill } from "./maps/backfill";
 import type { MapkitConfig } from "./maps/mapkit";
 import { CURRENCIES } from "./lib/currencies";
 import { nonAdminMayCall, participantAccess } from "./auth/roles";
@@ -80,6 +81,8 @@ export type AppDeps = {
   documentsDir?: string;
   /** Dokumentanalyse; Standard: `NoopAnalyzer` (setzt «übersprungen»). Eine spätere Welle ersetzt ihn. */
   analyzer?: DocumentAnalyzer;
+  /** Geokodierungs-Nachtrag im Hintergrund (Diagnose `GET /v1/maps/backfill`); in Tests nicht gesetzt. */
+  backfill?: GeocodeBackfill | null;
   /** Geokodierung (Apple Maps Server API / Nominatim); null/weggelassen = nicht aktiv, in Tests ein Fake. */
   geocoder?: Geocoder | null;
   /** Mitteilungs-Scheduler (Mitteilungen, Live Activities); Standard: eigener, nicht gestarteter (Diagnose, Simulation). */
@@ -688,7 +691,7 @@ export function createApp(deps: AppDeps) {
   app.route("/", trips.authed);
   app.route("/", docs);
   app.route("/", authedMetaRoutes());
-  app.route("/", mapsRoutes({ now: clock, config: deps.mapkit ?? null }));
+  app.route("/", mapsRoutes({ now: clock, config: deps.mapkit ?? null, db, backfill: deps.backfill ?? null }));
 
   // Fachmodule mit gemeinsamem Kontext.
   const moduleDeps: ModuleDeps = {

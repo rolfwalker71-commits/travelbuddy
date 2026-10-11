@@ -117,7 +117,7 @@ Ohne aktive Reise: `trip: null` und `upcoming: { id, title, startDate, daysUntil
 |---|---|---|
 | `dayRole` | `single` \| `start` \| `middle` \| `end` | Rolle am betrachteten Tag: eintägig `single`; mehrtägig (Hotel, Ferienwohnung, Mietauto, Visum, Flug über Mitternacht) am ersten Tag `start`, am letzten `end`, dazwischen `middle` |
 | `displayTime` | `HH:mm`? | `single`/`start`: `startTime`; `end`: `endTime` (Ortszeit des Endes, nicht `startTime`); `middle`: `null` |
-| `displayLabel` | string? | `start`: `startLabel` des Katalogs (z. B. «Check-in», «Abholung»), `end`: `endLabel` («Check-out», «Rückgabe»), `middle`: «Aufenthalt» (Unterkünfte) bzw. «Unterwegs», sonst `null` |
+| `displayLabel` | string? | `start`: `startLabel` des Katalogs (z. B. «Check-in», «Abholung»), `end`: `endLabel` («Check-out», «Rückgabe»), `middle`: «Aufenthalt» (Unterkünfte), «Gültig» (Visum), «Versichert» (Versicherung), sonst «Unterwegs» |
 
 Kreuzfahrt: Der Eintrag «Reise» (`entryKind`, Gesamtreise ohne Zeit) bleibt an allen Tagen `middle`/«Unterwegs»;
 Hafentage, Ein-/Ausschiffung und «Abfahrt …» sind `single`. Die Tagesliste ist nach dem angezeigten Zeitpunkt

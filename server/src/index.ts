@@ -11,7 +11,8 @@ import { findWebDir } from "./web/static";
 import { imageGeneratorFromEnv, MediaService } from "./media/generate";
 import { mapkitConfigFromEnv } from "./maps/mapkit";
 import { geocoderFromEnv } from "./geo/geocode";
-import { runPendingAnalyses } from "./ingest/analyzer";
+import { runPendingAnalyses, type DocumentAnalyzer } from "./ingest/analyzer";
+import { GeocodeBackfill, backfillModeFromEnv } from "./maps/backfill";
 import { IngestAnalyzer } from "./ingest/pipeline";
 import { OpenAiLlm } from "./ingest/openai";
 import { versionInfo } from "./lib/version";
@@ -71,6 +72,19 @@ const analyzer = new IngestAnalyzer({
   log: console.log,
 });
 
+// Geokodierungs-Nachtrag: holt fehlende Koordinaten langsam im Hintergrund nach (TRAVELBUDDY_GEOCODE_BACKFILL).
+const backfill = new GeocodeBackfill({ db, geocoder, mode: backfillModeFromEnv(env), log: console.log });
+// Nach jeder Dokumentanalyse (Upload, Wiederholung, erneutes Starten) auch den Nachtrag anstossen.
+const analyzeThenBackfill: DocumentAnalyzer = {
+  async analyze(documentId) {
+    try {
+      await analyzer.analyze(documentId);
+    } finally {
+      backfill.trigger();
+    }
+  },
+};
+
 const app = createApp({
   db,
   push,
@@ -79,7 +93,8 @@ const app = createApp({
   webDir,
   mapkit,
   geocoder,
-  analyzer,
+  analyzer: analyzeThenBackfill,
+  backfill,
   mediaDir,
   documentsDir: cfg.documentsDir,
   images,
@@ -99,9 +114,12 @@ const server = serve({ fetch: app.fetch, port: cfg.port, hostname: cfg.host }, (
   console.log(
     `Katalog: ${catalog.typeIds.length} Typen · Flughäfen: ${airports} · KI: ${cfg.ai.apiKey ? `${cfg.ai.modelText} / ${cfg.ai.modelVision}` : "nicht konfiguriert"} · ` +
       `KI-Bilder: ${images ? `${images.model}, ${cfg.imagesPerRun} je Lauf` : "aus"} · Push: ${pushLabel()} · ` +
-      `Karten: ${mapkit ? `Apple Karten (Key ${mapkit.keyId})` : "aus"} · Geokodierung: ${geocoder ? geocoder.name : "aus"} · Web: ${webDir ?? "aus"}`
+      `Karten: ${mapkit ? `Apple Karten (Key ${mapkit.keyId})` : "aus"} · Geokodierung: ${geocoder ? geocoder.name : "aus"}${backfill.enabled ? " (Nachtrag an)" : ""} · Web: ${webDir ?? "aus"}`
   );
 });
+
+// Geokodierungs-Nachtrag beim Start (mit etwas Abstand).
+setTimeout(() => backfill.trigger(), 10_000).unref();
 
 // Hintergrundlauf: Dokumentanalyse (Haken), fehlende Bilder. Läuft nie parallel zu sich selbst.
 if (cfg.maintenanceMinutes > 0) {
@@ -110,8 +128,9 @@ if (cfg.maintenanceMinutes > 0) {
     if (running) return;
     running = true;
     try {
-      await runPendingAnalyses(db, analyzer);
+      await runPendingAnalyses(db, analyzeThenBackfill);
       await media.runBatch();
+      backfill.trigger(); // fängt auch Daten ab, die ein Import-Skript geschrieben hat
     } catch (e) {
       console.error("[maintenance]", e instanceof Error ? e.message : e);
     } finally {

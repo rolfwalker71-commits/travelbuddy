@@ -90,7 +90,9 @@ export function dayInfo(v: EventView, date: string): DayInfo {
   if (role === "single") return { dayRole: role, displayTime: v.startTime ?? null, displayLabel: null };
   if (role === "start") return { dayRole: role, displayTime: v.startTime ?? null, displayLabel: type?.startLabel || null };
   if (role === "end") return { dayRole: role, displayTime: v.endTime ?? null, displayLabel: type?.endLabel || null };
-  return { dayRole: role, displayTime: null, displayLabel: type?.color === "stay" ? "Aufenthalt" : "Unterwegs" };
+  const middle =
+    v.type === "Visum" ? "Gültig" : v.type === "Versicherung" ? "Versichert" : type?.color === "stay" ? "Aufenthalt" : "Unterwegs";
+  return { dayRole: role, displayTime: null, displayLabel: middle };
 }
 
 const withDay = (v: EventView, date: string) => ({ ...v, ...dayInfo(v, date) });

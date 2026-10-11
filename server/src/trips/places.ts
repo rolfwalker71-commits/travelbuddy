@@ -31,6 +31,8 @@ export type PlaceWithQuery = EventPlace & { query: string | null; isAirport: boo
 
 export type PlaceSource = {
   type: string;
+  /** Titel des Ereignisses (Hafentage: Name des Hafens als Suchbegriff). */
+  title?: string | null;
   location: string | null;
   address: string | null;
   lat: number | null;
@@ -97,6 +99,14 @@ export function derivePlaces(ev: PlaceSource, context: { destination?: string | 
     if (dest || destAddr) out.push(fromText("end", dest, destAddr));
   } else if (venue || venueAddr) {
     out.push(fromText("venue", venue, venueAddr ?? ev.address));
+  } else if (ev.type === "Kreuzfahrt" && (str(d.entryKind) === "Seetag" || str(d.entryKind) === "Reise")) {
+    // Seetage und die Gesamtreise haben keinen Ort: nie geokodieren (vorhandene Koordinaten bleiben sichtbar).
+    if (ev.lat != null && ev.lon != null) out.push({ ...fromText("stop", ev.location, ev.address), query: null });
+  } else if (ev.type === "Kreuzfahrt" && str(d.entryKind) === "Hafen" && !ev.address && !ev.location && !terminalAddr && str(ev.title)) {
+    // Hafentag: Suchbegriff aus Titel (ohne «Abfahrt/Ankunft …») und Ziel der Reise, z. B. «Palma de Mallorca, Spain».
+    const title = str(ev.title)!;
+    const name = title.replace(/^(Abfahrt|Ankunft|Ausschiffung|Einschiffung)(\s+(in|von|aus|nach))?\s+/i, "").trim() || title;
+    out.push(fromText("stop", name, null));
   } else if (ev.address || ev.location || terminalAddr || (ev.lat != null && ev.lon != null)) {
     out.push(
       fromText(ev.type === "Kreuzfahrt" ? "stop" : "venue", ev.location, (ev.type === "Kreuzfahrt" ? terminalAddr : null) ?? ev.address)

@@ -1024,7 +1024,7 @@ export function eventViews(db: Db, trip: TripRow, opts: EventViewOpts = {}, only
     const meta = parseJson<FieldsMeta>(e.fields_meta, {});
     const coords = parseJson<PlaceCoords>(e.place_coords, {});
     const places = derivePlaces(
-      { type: e.event_type, location: e.location, address: e.address, lat: e.lat, lon: e.lon, details, placeCoords: coords, latSource: meta.lat?.source ?? null },
+      { type: e.event_type, title: e.title, location: e.location, address: e.address, lat: e.lat, lon: e.lon, details, placeCoords: coords, latSource: meta.lat?.source ?? null },
       { destination: trip.destination }
     );
     const eventDocs = docs.filter((d) => d.trip_event_id === e.id);
@@ -1079,7 +1079,7 @@ export function eventPlacesWithQuery(row: EventRow, trip: TripRow): PlaceWithQue
   const meta = parseJson<FieldsMeta>(row.fields_meta, {});
   return derivePlaces(
     {
-      type: row.event_type, location: row.location, address: row.address, lat: row.lat, lon: row.lon,
+      type: row.event_type, title: row.title, location: row.location, address: row.address, lat: row.lat, lon: row.lon,
       details: parseJson(row.details, {}), placeCoords: parseJson(row.place_coords, {}), latSource: meta.lat?.source ?? null,
     },
     { destination: trip.destination }

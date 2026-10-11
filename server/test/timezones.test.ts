@@ -280,6 +280,7 @@ test("tagesrolle: Kreuzfahrt – Reise bleibt «Unterwegs», Hafentage und Abfah
   assert.deepEqual([find(ev, port).dayRole, find(ev, port).displayTime, find(ev, port).displayLabel], ["single", "08:00", null]);
   assert.deepEqual([find(ev, night).dayRole, find(ev, night).displayTime, find(ev, night).displayLabel], ["start", "16:50", "Abflug"]);
   assert.equal(find(ev, visa).dayRole, "middle");
+  assert.equal(find(ev, visa).displayLabel, "Gültig", "Visum an Zwischentagen: «Gültig»");
   assert.equal(ev.at(-1).dayRole, "middle", "middle-Einträge ganz unten");
 
   ev = await day("2026-10-26");

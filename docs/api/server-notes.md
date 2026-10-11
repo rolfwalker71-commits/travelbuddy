@@ -159,3 +159,28 @@ Zone des Ereignisses.
 - Der Katalog prüft `select`-Werte streng gegen `options` (z. B. `Fruehstueck`); Alt- und Importdaten müssen vorher
   normalisiert werden.
 - Zeitzonen-Rechnung nutzt `Intl`; Ereignisse ohne Uhrzeit gelten ab 00:00 Ortszeit.
+
+## 5. Geokodierungs-Nachtrag (Hintergrund)
+
+`src/maps/backfill.ts`. Holt Koordinaten für Ereignisse nach, die Ort oder Adresse, aber kein `lat`/`lon` haben
+(typisch nach dem Import).
+
+- **Auslöser:** 10 s nach dem Start, nach jedem Wartungslauf (fängt Daten aus Import-Skripten ab) und nach jeder
+  Dokumentanalyse; entprellt, einzelner Lauf (nie parallel). Bei grossen Rückständen läuft er sofort weiter
+  (höchstens 25 Orte je Lauf, der Geokodierer begrenzt auf 1 Anfrage/s).
+- **Steuerung:** `TRAVELBUDDY_GEOCODE_BACKFILL=auto|on|off`. `auto` (Standard) = an, wenn ein Geokodierer konfiguriert
+  ist (Apple mit MapKit-Schlüssel, sonst Nominatim); `off` schaltet ab. In Tests (`createApp` ohne `backfill`) gibt es
+  ihn nicht.
+- **Suchbegriffe:** je Ort getrennt (Transfer/Zug: Start und Ziel, Mietwagen: Abholung und Rückgabe). Hafentag
+  (`entryKind: "Hafen"` ohne Ort/Adresse): Titel (ohne «Abfahrt/Ankunft …») plus Ziel der Reise, z. B.
+  «Palma de Mallorca, Spain». `Seetag` und `Reise` werden nie geokodiert. Flughäfen kommen aus der IATA-Tabelle.
+- **Gedächtnis:** Tabelle `geocode_backfill` (Migration `021_geocode_backfill.sql`). «Nicht gefunden» wird nicht
+  wiederholt, solange der Suchbegriff gleich bleibt. Dienstfehler: Wartezeit 15 min, 30 min … höchstens 6 h, nach
+  5 Versuchen aufgegeben; nach drei Fehlern in Folge pausiert der Lauf. Ohne Netz kein Absturz, nur eine Logzeile.
+  Zusätzlich greift der Zwischenspeicher `geocode_cache`.
+- **Schutz:** Von Hand gesetzte Koordinaten (auch ohne Herkunft) und gesperrte Felder werden nie überschrieben;
+  Ergebnis in `fieldsMeta.lat/lon = { source: "geocoded", confidence, quote }`.
+- **Diagnose:** `GET /v1/maps/backfill` (Admin) → `{ enabled, geocoder, running, lastRunAt, lastRun: { attempted,
+  resolved, notFound, failed } | null, open, due, resolved, notFound, failed }`.
+- **Tagesrolle:** `displayLabel` an `middle`-Tagen: «Gültig» (Visum), «Versichert» (Versicherung), «Aufenthalt»
+  (Unterkünfte), sonst «Unterwegs».

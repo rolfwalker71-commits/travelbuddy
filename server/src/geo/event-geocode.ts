@@ -33,7 +33,7 @@ export async function geocodeEvent(
   geocoder: Geocoder | null,
   tripId: number,
   eventId: number,
-  opts: { force?: boolean } = {}
+  opts: { force?: boolean; /** nur diese Rollen bearbeiten (Hintergrund-Nachtrag) */ only?: string[] } = {}
 ): Promise<GeocodeResult[]> {
   if (!geocoder) {
     throw new HttpError(409, "geocoder_not_configured", "Die Geokodierung ist nicht aktiv; Koordinaten bitte im Client auflösen");
@@ -50,6 +50,7 @@ export async function geocodeEvent(
 
   for (let i = 0; i < places.length; i++) {
     const p = places[i]!;
+    if (opts.only && !opts.only.includes(p.role)) continue;
     const base = { role: p.role };
     if (p.isAirport && p.lat != null && p.source === "airport") {
       results.push({ ...base, status: "airport", lat: p.lat, lon: p.lon ?? undefined, label: p.label ?? undefined });

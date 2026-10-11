@@ -65,6 +65,7 @@ Alle optional. Vollständige Liste mit Beispielwerten: `.env.example` im Repo-Ro
 | `APNS_KEY`, `APNS_KEY_PATH`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_TOPIC`, `TRAVELBUDDY_APNS_DIR` | Team `9XZWUZ7Z26`, Topic `ch.rolfwalker.travelbuddy` | Push; die Datei `AuthKey_<KEYID>.p8` in `<Datenordner>/apns` genügt |
 | `TRAVELBUDDY_MAPKIT_TEAM_ID`, `…_KEY_ID`, `…_KEY` oder `…_KEY_PATH`, `…_ORIGIN` | – | MapKit-JS-Token (`GET /v1/maps/token`) und Apple-Geokodierung |
 | `TRAVELBUDDY_GEOCODER`, `…_GEOCODER_CONTACT`, `…_NOMINATIM_URL` | `auto` | `auto` (Apple mit Schlüssel, sonst Nominatim), `apple`, `nominatim`, `off` |
+| `TRAVELBUDDY_GEOCODE_BACKFILL` | `auto` | Hintergrund-Nachtrag fehlender Koordinaten: `auto` (an mit Geokodierer), `on`, `off` |
 | `TRAVELBUDDY_BUILD`, `TRAVELBUDDY_BUILT_AT`, `TRAVELBUDDY_VERSION_FILE` | Git-Kurzhash bzw. «dev», Startzeit, `VERSION` | Angaben für `GET /v1/version` (setzt der Docker-Build) |
 | `TRAVELBUDDY_PASSWORD` | – | nur für `user:create`/`user:password` ohne Rückfrage (mindestens 12 Zeichen) |
 
