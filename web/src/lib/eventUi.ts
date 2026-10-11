@@ -5,7 +5,7 @@
 import type { PassengerRow, Traveler, TripEvent } from "../api/types";
 import { getType, optionLabel, resolveTypeId, findField, type Catalog } from "./catalog";
 import { formatDate } from "./dates";
-import { cityOf, effectiveZone } from "./timezones";
+import { cityOf, effectiveZone, offsetMinutes, zonedToUtc } from "./timezones";
 
 export type Fact = {
   label: string;
@@ -215,9 +215,19 @@ export function timeLine(e: TripEvent, tripTz: string): { start: string; end: st
   return {
     start: e.startTime ?? "",
     end: e.endTime ?? "",
-    startZone: e.startTime && sz !== tripTz ? cityOf(sz) : null,
-    endZone: e.endTime && ez !== tripTz ? cityOf(ez) : null,
+    startZone: e.startTime && zoneDiffers(sz, tripTz, e.startDate, e.startTime) ? cityOf(sz) : null,
+    endZone: e.endTime && zoneDiffers(ez, tripTz, e.endDate ?? e.startDate, e.endTime) ? cityOf(ez) : null,
   };
+}
+
+/**
+ * Weicht die Zone von der Reisezone ab? Zonen mit gleichem Versatz zum Zeitpunkt (Zürich und Madrid) gelten als gleich,
+ * damit «Ortszeit Madrid» nur erscheint, wenn die Uhr tatsächlich anders geht.
+ */
+export function zoneDiffers(tz: string, tripTz: string, date: string | null, time: string | null): boolean {
+  if (tz === tripTz) return false;
+  const at = (date && time && zonedToUtc(date, time, tripTz)) || new Date();
+  return offsetMinutes(tz, at) !== offsetMinutes(tripTz, at);
 }
 
 /** Namen der Beteiligten; leer = alle. */

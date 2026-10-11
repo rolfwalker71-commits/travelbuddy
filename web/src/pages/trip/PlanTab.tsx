@@ -115,6 +115,11 @@ export function PlanTab() {
                       <h3>{formatDayHeading(day.date)}</h3>
                       {day.date ? <span className="day__rel">{relativeDays(day.date, today)}</span> : null}
                       {idx != null && idx >= 1 && span && idx <= span.days ? <span className="day__no num">Tag {idx}</span> : null}
+                      {day.date ? (
+                        <Link className="link-btn day__view" to={`/trips/${trip.id}/day/${day.date}`}>
+                          <Icon name="compass" size={14} /> Tag ansehen
+                        </Link>
+                      ) : null}
                       {isAdmin && day.date ? (
                         <button type="button" className="link-btn day__add" onClick={() => ctx.openEventForm(null, { defaultDate: day.date })}>
                           <Icon name="plus" size={14} /> Ereignis

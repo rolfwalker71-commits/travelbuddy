@@ -165,4 +165,9 @@ button.prov__dot:focus-visible { outline: 3px solid var(--focus); outline-offset
 .help__steps li { grid-template-columns: 28px minmax(0, 1fr); align-items: start; padding-top: 2px; }
 .coverill { position: relative; width: 100%; height: clamp(120px, 20vw, 190px); border-radius: var(--r-l); overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); }
 .coverill img { width: 100%; height: 100%; object-fit: cover; object-position: center 60%; display: block; }
-.coverill--thumb { height: 96px; border-radius: var(--r-m); margin-top: 4px; }
+.coverill--thumb { height: 110px; border-radius: var(--r-m); margin-top: 4px; }
+
+.ticket__rolelabel { font-family: var(--font-title) !important; font-size: 0.8125rem !important; font-weight: 700 !important; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent) !important; }
+.ticket__state { font-family: var(--font-title) !important; font-size: 0.875rem !important; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute) !important; }
+.coverill img { object-position: center 45%; }
+.coverill--thumb img { object-position: center 30%; }

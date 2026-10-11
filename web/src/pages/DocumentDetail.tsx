@@ -91,7 +91,6 @@ function DocumentView({ doc, reload }: { doc: DocumentItem; reload: () => void }
     return out;
   }, [doc, trip.data, catalog]);
 
-  const eventsById = new Map((trip.data?.events ?? []).map((e) => [e.id, e] as const));
   const linkedEvents = (trip.data?.events ?? []).filter((e) => e.sourceDocumentId === doc.id || doc.eventIds.includes(e.id) || e.documentIds.includes(doc.id));
 
   return (
@@ -153,6 +152,17 @@ function DocumentView({ doc, reload }: { doc: DocumentItem; reload: () => void }
           </Section>
 
           <Section title="Ereignisse" id="sec-events">
+            {isAdmin && tripId != null ? (
+              <LinkToEvent
+                tripId={tripId}
+                docId={doc.id}
+                events={(trip.data?.events ?? []).filter((e) => !linkedEvents.some((l) => l.id === e.id))}
+                onLinked={() => {
+                  trip.reload();
+                  reload();
+                }}
+              />
+            ) : null}
             {linkedEvents.length === 0 ? (
               <div className="card">
                 <p className="muted small">Noch keine Ereignisse aus diesem Dokument.</p>
@@ -190,11 +200,50 @@ function DocumentView({ doc, reload }: { doc: DocumentItem; reload: () => void }
         ) : (
           <ul className="addrlist">
             {addresses.map((a) => (
-              <AddressCard key={a.key} a={a} maps={maps} events={trip.data?.events ?? []} tripId={tripId} isAdmin={isAdmin} owner={a.eventId != null ? eventsById.get(a.eventId) : undefined} onAssigned={() => { trip.reload(); }} />
+              <AddressCard key={a.key} a={a} maps={maps} events={trip.data?.events ?? []} tripId={tripId} docId={doc.id} isAdmin={isAdmin} onAssigned={() => { trip.reload(); reload(); }} />
             ))}
           </ul>
         )}
       </Section>
+    </div>
+  );
+}
+
+/** Dokument einem Ereignis zuordnen: `POST /v1/trips/:id/events/:eventId/documents { documentId }` (nur Admin). */
+function LinkToEvent({ tripId, docId, events, onLinked }: { tripId: number; docId: number; events: TripEvent[]; onLinked: () => void }) {
+  const toast = useToast();
+  const [target, setTarget] = useState("");
+  const [busy, setBusy] = useState(false);
+  if (events.length === 0) return null;
+  return (
+    <div className="addr__assign card">
+      <SelectField
+        label="Dem Ereignis zuordnen"
+        value={target}
+        onChange={setTarget}
+        options={[{ value: "", label: "Ereignis wählen …" }, ...events.map((e) => ({ value: String(e.id), label: e.title }))]}
+      />
+      <Button
+        size="s"
+        icon="link"
+        busy={busy}
+        disabled={!target}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await tripsApi.linkDocument(tripId, Number(target), docId);
+            toast("Dokument dem Ereignis zugeordnet");
+            setTarget("");
+            onLinked();
+          } catch (e) {
+            toast(errorMessage(e), "error");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        Zuordnen
+      </Button>
     </div>
   );
 }
@@ -204,16 +253,16 @@ function AddressCard({
   maps,
   events,
   tripId,
+  docId,
   isAdmin,
-  owner,
   onAssigned,
 }: {
   a: Addr;
   maps: boolean | null;
   events: TripEvent[];
   tripId: number | null;
+  docId: number;
   isAdmin: boolean;
-  owner?: TripEvent;
   onAssigned: () => void;
 }) {
   const toast = useToast();
@@ -254,15 +303,12 @@ function AddressCard({
               size="s"
               icon="check"
               busy={busy}
-              disabled={!target || (owner != null && String(owner.id) === target)}
+              disabled={!target || events.find((e) => e.id === Number(target))?.documentIds.includes(docId) === true}
               onClick={async () => {
                 setBusy(true);
                 try {
-                  await tripsApi.updateEvent(tripId, Number(target), {
-                    address: a.point.address ?? a.point.query,
-                    ...(a.point.lat != null && a.point.lon != null ? { lat: a.point.lat, lon: a.point.lon } : {}),
-                  });
-                  toast("Adresse zugeordnet");
+                  await tripsApi.linkDocument(tripId, Number(target), docId);
+                  toast("Dokument dem Ereignis zugeordnet");
                   onAssigned();
                 } catch (e) {
                   toast(errorMessage(e), "error");

@@ -84,3 +84,41 @@ describe("Tagesband", () => {
     expect(p.label).toBe("Alle an Bord");
   });
 });
+
+import { shownLabel, shownTime, splitOngoing } from "./today";
+
+describe("Tagesrolle mehrtägiger Ereignisse", () => {
+  const hotel = (role: "start" | "middle" | "end", displayTime: string | null, displayLabel: string | null) =>
+    ev({ id: 7, type: "Hotel", title: "Negresco", startDate: "2026-10-23", endDate: "2026-10-25", startTime: "15:00", endTime: "12:00", dayRole: role, displayTime, displayLabel });
+
+  it("zeigt am Endtag «Check-out 12:00» statt der Startzeit", () => {
+    const e = hotel("end", "12:00", "Check-out");
+    expect(shownTime(e)).toBe("12:00");
+    expect(shownLabel(e)).toBe("Check-out");
+    expect(shownTime(hotel("start", "15:00", "Check-in"))).toBe("15:00");
+  });
+  it("middle hat keine Zeit und heisst «Aufenthalt» bzw. «Unterwegs»", () => {
+    const m = hotel("middle", null, "Aufenthalt");
+    expect(shownTime(m)).toBeNull();
+    expect(shownLabel(m)).toBe("Aufenthalt");
+    expect(shownLabel(ev({ id: 8, type: "Mietauto", dayRole: "middle", displayLabel: null }))).toBe("Unterwegs");
+    expect(splitOngoing([m, hotel("end", "12:00", "Check-out")])).toMatchObject({ ongoing: [{ id: 7 }], timed: [{ id: 7 }] });
+  });
+  it("ohne Rolle (ältere Server) gilt startTime", () => {
+    const e = ev({ id: 9, type: "Flug", startTime: "12:20" });
+    expect(shownTime(e)).toBe("12:20");
+    expect(shownLabel(e)).toBeNull();
+  });
+  it("Tagesband: Check-out als Punkt zur displayTime, middle entfällt, vergangen nach displayTime", () => {
+    const day = "2026-10-25";
+    const band = buildDayBand([hotel("end", "12:00", "Check-out")], day, "Europe/Zurich", () => "x")!;
+    const p = band.items.find((i) => i.kind === "point")!;
+    expect(p.from).toBe(12 * 60);
+    expect(p.label).toBe("Check-out Negresco");
+    expect(buildDayBand([hotel("middle", null, "Aufenthalt")], day, "Europe/Zurich", () => "x")).toBeNull();
+    const end = hotel("end", "12:00", "Check-out");
+    expect(splitByNow([end], 14 * 60).past).toHaveLength(1);
+    expect(splitByNow([end], 9 * 60).past).toHaveLength(0);
+    expect(splitByNow([hotel("middle", null, "Aufenthalt")], 23 * 60).past).toHaveLength(0);
+  });
+});

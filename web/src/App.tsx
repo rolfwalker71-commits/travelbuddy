@@ -19,6 +19,7 @@ const TeamTab = lazy(() => import("./pages/trip/TeamTab").then((m) => ({ default
 const MapTab = lazy(() => import("./pages/trip/MapTab").then((m) => ({ default: m.MapTab })));
 const EventDetailPage = lazy(() => import("./pages/trip/EventDetailPage").then((m) => ({ default: m.EventDetailPage })));
 const DocumentDetailPage = lazy(() => import("./pages/DocumentDetail").then((m) => ({ default: m.DocumentDetailPage })));
+const DayPage = lazy(() => import("./pages/Today").then((m) => ({ default: m.DayPage })));
 const InboxPage = lazy(() => import("./pages/Inbox").then((m) => ({ default: m.InboxPage })));
 const LedgerPage = lazy(() => import("./pages/LedgerPage").then((m) => ({ default: m.LedgerPage })));
 const SettingsPage = lazy(() => import("./pages/Settings").then((m) => ({ default: m.SettingsPage })));
@@ -85,6 +86,7 @@ export function App() {
                     <Route path="map" element={<MapTab />} />
                     <Route path="events/:eventId" element={<EventDetailPage />} />
                   </Route>
+                  <Route path="trips/:id/day/:date" element={<DayPage />} />
                   <Route path="documents/:id" element={<DocumentDetailPage />} />
                   <Route path="inbox" element={<InboxPage />} />
                   <Route path="ledgers/:id" element={<LedgerPage />} />

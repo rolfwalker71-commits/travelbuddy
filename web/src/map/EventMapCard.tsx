@@ -70,7 +70,15 @@ export function EventMapCard({
       {maps === true ? (
         <MapView points={points} label={`Karte zu ${event.title}`} height={260} route={points.length > 1} onResolve={onResolve} onSearch={setSearch} />
       ) : maps === false ? (
-        points.length > 1 ? <RouteArc events={[event]} title={`Strecke: ${event.title}`} height={180} /> : null
+        points.filter((p) => p.lat != null).length > 1 ? (
+          <RouteArc events={[event]} title={`Strecke: ${event.title}`} height={180} />
+        ) : (
+          <p className="muted small eventmap__note">
+            {serverBusy
+              ? "Adresse wird gesucht …"
+              : "Für diese Orte liegen noch keine Koordinaten vor. «In Karten öffnen» sucht die Adresse in Apple Karten."}
+          </p>
+        )
       ) : (
         <div className="map-card map-card--compact" style={{ height: 120 }}>
           <p className="map-card__status muted small">Karte wird geladen …</p>

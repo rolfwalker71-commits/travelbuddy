@@ -59,17 +59,21 @@ export function placesOfEvent(e: TripEvent): EventPlace[] {
       add("start", dtext(e, "departureAirport"), null);
       add("end", dtext(e, "arrivalAirport"), null);
       break;
+    // Katalog Version 2: Adressfeld je Ort (`pickupAddress`, `returnAddress`, `originAddress`, …)
     case "Mietauto":
-      add("pickup", dtext(e, "pickupPlace"), e.address);
-      add("return", dtext(e, "returnPlace"), null);
+      add("pickup", dtext(e, "pickupPlace"), dtext(e, "pickupAddress") || e.address);
+      add("return", dtext(e, "returnPlace"), dtext(e, "returnAddress") || null);
       break;
     case "Transfer":
     case "Zugreisen":
-      add("start", dtext(e, "originPlace"), null);
-      add("end", dtext(e, "destinationPlace"), null);
+      add("start", dtext(e, "originPlace"), dtext(e, "originAddress") || null);
+      add("end", dtext(e, "destinationPlace"), dtext(e, "destinationAddress") || null);
       break;
     case "Veranstaltung":
-      add("venue", dtext(e, "venue") || e.location || "", e.address, e.lat, e.lon);
+      add("venue", dtext(e, "venue") || e.location || "", dtext(e, "venueAddress") || e.address, e.lat, e.lon);
+      break;
+    case "Kreuzfahrt":
+      add("venue", dtext(e, "terminal") || e.location || "", dtext(e, "terminalAddress") || e.address, e.lat, e.lon);
       break;
     default:
       add("venue", e.location ?? "", e.address, e.lat, e.lon);

@@ -3,6 +3,7 @@ import type { Traveler, TripEvent } from "../api/types";
 import { getType, type Catalog } from "../lib/catalog";
 import { formatDate } from "../lib/dates";
 import { keyFacts, referenceOf, routeOf, summaryLine, timeLine } from "../lib/eventUi";
+import { shownLabel, shownTime } from "../lib/today";
 import { Chip } from "../ui/Chip";
 import { catalogIcon, eventIcon } from "../ui/Icon";
 import { TicketCard } from "../ui/TicketCard";
@@ -62,8 +63,26 @@ export function EventTicket({
   const sum = summaryLine(catalog, e);
   const facts = keyFacts(catalog, e, { meId, travelers, max: maxFacts });
   const multi = e.endDate && e.startDate && e.endDate !== e.startDate;
+  const role = e.dayRole;
+  const label = shownLabel(e);
+  const time = shownTime(e);
+  const roleZone = role === "end" ? tl.endZone : role === "start" ? tl.startZone : null;
+  // Mehrtägige Ereignisse in der Tagesansicht: nur der Zeitpunkt dieses Tages («Check-out 12:00»), sonst «Aufenthalt»
   const main =
-    tl.start || tl.end || route ? (
+    role === "middle" ? (
+      <small className="ticket__state">{label}</small>
+    ) : role === "start" || role === "end" ? (
+      <>
+        {label ? <small className="ticket__rolelabel">{label}</small> : null}
+        {time ? <span>{time}</span> : null}
+        {roleZone ? <small>Ortszeit {roleZone}</small> : null}
+        {route ? (
+          <small className="num">
+            {route.from} → {route.to}
+          </small>
+        ) : null}
+      </>
+    ) : tl.start || tl.end || route ? (
       <>
         {tl.start ? <span>{tl.start}</span> : null}
         {tl.start && tl.end ? <span className="sep">→</span> : null}

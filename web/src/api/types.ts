@@ -212,6 +212,9 @@ export type TripComment = {
   createdAt: string;
 };
 
+/** Rolle eines (mehrtägigen) Ereignisses an einem betrachteten Tag (`/v1/today`, `/v1/trips/:id/day/:date`). */
+export type DayRole = "single" | "start" | "middle" | "end";
+
 export type TripEvent = {
   id: number;
   tripId: number;
@@ -251,6 +254,10 @@ export type TripEvent = {
   fieldsMeta?: Record<string, FieldMeta>;
   sourceDocumentId?: number | null;
   places?: EventPlace[];
+  /** Nur in Tagesantworten: Rolle am Tag, anzuzeigende Zeit und Beschriftung («Check-out», «Aufenthalt»). */
+  dayRole?: DayRole;
+  displayTime?: string | null;
+  displayLabel?: string | null;
 };
 
 export type Traveler = {
@@ -402,11 +409,17 @@ export type Airport = { iata: string; name: string; city: string; country: strin
 
 /* ───── Konto, Einstellungen ───── */
 
+/** Ruhezeiten: Mitteilungen ausserhalb von `from`–`to` (Ortszeit des Empfängers, über Mitternacht erlaubt). */
+export type QuietHours = { enabled: boolean; from: string; to: string };
+
 /** Vorlaufzeiten der Mitteilungen (Server: `leadTimes`). */
 export type LeadTimes = { departHours: number[]; checkoutMinutes: number; deadlineDays: number; todayBriefing: string };
 
 /** Schalter je Mitteilungsart (camelCase: tripToday, …) plus `leadTimes`; weitere Schlüssel erscheinen mit ihrem Namen. */
-export type NotificationPrefs = Record<string, boolean | number | string | LeadTimes | null | undefined> & { leadTimes?: LeadTimes };
+export type NotificationPrefs = Record<string, boolean | number | string | LeadTimes | QuietHours | null | undefined> & {
+  leadTimes?: LeadTimes;
+  quietHours?: QuietHours;
+};
 
 export type DirectoryUser = { id: number; displayName: string };
 

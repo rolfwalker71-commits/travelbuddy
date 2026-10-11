@@ -65,6 +65,7 @@ export class MockServer {
     ledgerExpense: true,
     ledgerSettlement: true,
     leadTimes: { departHours: [24, 3, 1], checkoutMinutes: 60, deadlineDays: 3, todayBriefing: "07:30" },
+    quietHours: { enabled: true, from: "22:30", to: "06:30" },
   };
 
   constructor(today: string) {
@@ -175,8 +176,18 @@ export class MockServer {
     };
   }
 
-  private todayState(date: string) {
-    const t = this.db.trips.find((x) => this.phaseOf(x) === "active");
+  /** Tagesrolle wie der Server (Vertrag «Tagesrolle mehrtägiger Ereignisse»). */
+  private withRole(e: TripEvent, date: string): TripEvent {
+    const multi = e.endDate && e.startDate && e.endDate > e.startDate && ["Hotel", "Unterkunft", "Mietauto", "Visum"].includes(e.type);
+    if (!multi) return { ...e, dayRole: "single", displayTime: e.startTime, displayLabel: null };
+    const stay = e.type === "Hotel" || e.type === "Unterkunft";
+    if (date === e.startDate) return { ...e, dayRole: "start", displayTime: e.startTime, displayLabel: stay ? "Check-in" : "Abholung" };
+    if (date === e.endDate) return { ...e, dayRole: "end", displayTime: e.endTime, displayLabel: stay ? "Check-out" : "Rückgabe" };
+    return { ...e, dayRole: "middle", displayTime: null, displayLabel: stay ? "Aufenthalt" : "Unterwegs" };
+  }
+
+  private todayState(date: string, tripId?: number) {
+    const t = tripId != null ? this.trip(tripId) : this.db.trips.find((x) => this.phaseOf(x) === "active");
     const now = new Date();
     if (!t) {
       const up = this.db.trips.filter((x) => x.startDate && x.startDate > date).sort((a, b) => (a.startDate! < b.startDate! ? -1 : 1))[0];
@@ -196,17 +207,22 @@ export class MockServer {
       };
     }
     const confirmed = t.events.filter((e) => !e.status || e.status === "confirmed");
+    const touches = (e: TripEvent, d: string) => e.startDate === d || (e.startDate != null && e.endDate != null && e.startDate <= d && d <= e.endDate);
     const events = confirmed
-      .filter((e) => e.startDate === date || (e.type === "Hotel" && e.endDate === date))
-      .sort((a, b) => ((a.startTime ?? "99") < (b.startTime ?? "99") ? -1 : 1));
+      .filter((e) => touches(e, date))
+      .map((e) => this.withRole(e, date))
+      .sort((a, b) => {
+        if ((a.dayRole === "middle") !== (b.dayRole === "middle")) return a.dayRole === "middle" ? 1 : -1;
+        return (a.displayTime ?? "00") < (b.displayTime ?? "00") ? -1 : 1;
+      });
     const nowMin = now.getHours() * 60 + now.getMinutes();
     const toMin = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
     // Für die Demo steht «jetzt» mindestens zwei Stunden vor dem ersten Termin, damit ein Countdown läuft.
-    const withTime = events.filter((e) => e.startTime);
-    let next: TripEvent | null = withTime.find((e) => toMin(e.startTime!) >= nowMin) ?? withTime[withTime.length - 1] ?? null;
+    const withTime = events.filter((e) => e.displayTime);
+    let next: TripEvent | null = withTime.find((e) => toMin(e.displayTime!) >= nowMin) ?? withTime[withTime.length - 1] ?? null;
     let secs: number | null = null;
     if (next) {
-      const diff = (toMin(next.startTime!) - nowMin) * 60 - now.getSeconds();
+      const diff = (toMin(next.displayTime!) - nowMin) * 60 - now.getSeconds();
       secs = diff >= 0 ? diff : 2 * 3600 + 40 * 60;
     }
     if (next && secs === null) next = null;
@@ -230,7 +246,7 @@ export class MockServer {
       next,
       nextInSeconds: secs,
       events,
-      tomorrow: confirmed.filter((e) => e.startDate === addDays(date, 1)),
+      tomorrow: confirmed.filter((e) => touches(e, addDays(date, 1))).map((e) => this.withRole(e, addDays(date, 1))),
       tasks: confirmed.filter((e) => e.type === "Aufgabe" && e.details.done !== true).map((e) => ({ eventId: e.id, title: e.title, dueDate: e.startDate })),
       deadlines: confirmed.filter((e) => e.cancelUntil).map((e) => ({ eventId: e.id, title: `${e.title}: kostenlos stornierbar`, kind: "cancel" as const, date: e.cancelUntil! })),
       review: t.events.filter((e) => e.status && e.status !== "confirmed").length,
@@ -290,6 +306,10 @@ export class MockServer {
 
     // Heute, Eingang
     if (method === "GET" && path === "/v1/today") return ok(this.todayState(q.get("date") ?? this.today));
+    if ((r = m(/^\/v1\/trips\/(\d+)\/day\/(\d{4}-\d{2}-\d{2})$/)) && method === "GET") {
+      if (!this.trip(Number(r[1]))) return err(404, "not_found", "Reise nicht gefunden.");
+      return ok(this.todayState(r[2]!, Number(r[1])));
+    }
     if (method === "GET" && path === "/v1/inbox") {
       const review = this.db.trips.flatMap((t) =>
         t.events.filter((e) => e.status && e.status !== "confirmed").map((event) => ({ tripId: t.id, tripTitle: t.title, event }))

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { errorMessage } from "../api/client";
 import { account, meta, misc } from "../api/endpoints";
-import type { Device, LeadTimes, NotificationPrefs, ServerVersion } from "../api/types";
+import type { Device, LeadTimes, NotificationPrefs, QuietHours, ServerVersion } from "../api/types";
 import { useFormErrors } from "../hooks/useFormErrors";
 import { checkNewPassword } from "../lib/password";
-import { formatTimestamp } from "../lib/dates";
+import { CLOCK, formatTimestamp } from "../lib/dates";
 import { Sheet } from "../ui/Sheet";
 import { TextField } from "../ui/Field";
 import { UsersCard } from "./UserAdmin";
@@ -250,6 +250,11 @@ function DevicesCard() {
   );
 }
 
+/** `hh:mm` (24 h)? */
+export function isClock(v: string): boolean {
+  return CLOCK.test(v.trim());
+}
+
 /** Beschriftung der Mitteilungsarten (Server: camelCase); unbekannte Schlüssel erscheinen mit ihrem Namen. */
 const PREF_LABELS: Record<string, { label: string; description: string }> = {
   tripToday: { label: "Morgenbriefing", description: "Der Tag auf einen Blick, zur eingestellten Uhrzeit in Reisezeit" },
@@ -296,6 +301,19 @@ function PrefsCard({ isAdmin }: { isAdmin: boolean }) {
     }
   };
 
+  const quiet = prefs?.quietHours;
+  const [quietErr, setQuietErr] = useState<{ from?: string; to?: string }>({});
+  const saveQuiet = (next: Partial<QuietHours>) => {
+    if (!quiet) return;
+    const merged = { ...quiet, ...next };
+    void save({ quietHours: merged }, { quietHours: merged });
+  };
+  const checkQuiet = (key: "from" | "to", value: string) => {
+    const ok = isClock(value);
+    setQuietErr((e) => ({ ...e, [key]: ok ? undefined : "Uhrzeit als hh:mm eingeben (z. B. 22:30)" }));
+    if (ok) saveQuiet({ [key]: value });
+  };
+
   const lead = prefs?.leadTimes;
   const [hours, setHours] = useState("");
   useEffect(() => {
@@ -326,6 +344,40 @@ function PrefsCard({ isAdmin }: { isAdmin: boolean }) {
                   onChange={(v) => void save({ [k]: v }, { [k]: v })}
                 />
               ))}
+              {quiet ? (
+                <fieldset className="fieldset quiettimes">
+                  <legend>Ruhezeiten</legend>
+                  <SwitchField
+                    label="Ruhezeiten einhalten"
+                    description="In dieser Zeit kommen keine Mitteilungen; sie werden danach zugestellt."
+                    checked={quiet.enabled}
+                    onChange={(v) => saveQuiet({ enabled: v })}
+                  />
+                  <div className="form-row">
+                    <TextField
+                      label="Von"
+                      value={quiet.from}
+                      placeholder="22:30"
+                      inputMode="numeric"
+                      maxLength={5}
+                      error={quietErr.from}
+                      onChange={(v) => setPrefs((p) => (p ? { ...p, quietHours: { ...quiet, from: v } } : p))}
+                      onBlur={() => checkQuiet("from", quiet.from)}
+                    />
+                    <TextField
+                      label="Bis"
+                      value={quiet.to}
+                      placeholder="06:30"
+                      inputMode="numeric"
+                      maxLength={5}
+                      error={quietErr.to}
+                      onChange={(v) => setPrefs((p) => (p ? { ...p, quietHours: { ...quiet, to: v } } : p))}
+                      onBlur={() => checkQuiet("to", quiet.to)}
+                    />
+                  </div>
+                  <p className="field__hint">Ortszeit, über Mitternacht möglich. Standard 22:30 bis 06:30.</p>
+                </fieldset>
+              ) : null}
               {lead ? (
                 <fieldset className="fieldset leadtimes">
                   <legend>Vorlaufzeiten</legend>

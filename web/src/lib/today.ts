@@ -96,6 +96,17 @@ export function buildDayBand(events: TripEvent[], dayDate: string, tripTz: strin
     const start = at(e.startDate, e.startTime, sz);
     const end = at(e.endDate ?? e.startDate, e.endTime, ez);
     const base = { color, eventId: e.id };
+    // Mehrtägig (Server liefert die Rolle): Beginn und Ende sind Punkte am jeweiligen Tag, dazwischen nichts
+    if (e.dayRole === "middle") continue;
+    if (e.dayRole === "start" || e.dayRole === "end") {
+      const t = e.displayTime ?? (e.dayRole === "start" ? e.startTime : e.endTime);
+      const m = t ? minutesOnDay(dayDate, t, e.dayRole === "start" ? sz : ez, dayDate, tripTz) : null;
+      if (m != null) {
+        const label = e.displayLabel ? `${e.displayLabel} ${e.title}` : e.title;
+        items.push({ ...base, id: `dr-${e.id}`, kind: "point", from: m, to: null, label });
+      }
+      continue;
+    }
     if (e.type === "Flug") {
       const ciOpen = at(e.startDate, detail(e, "checkInOpens"), sz);
       const ciClose = at(e.startDate, detail(e, "checkInCloses"), sz);
@@ -189,12 +200,38 @@ export function splitByNow(events: TripEvent[], nowMin: number): { past: TripEve
   const past: TripEvent[] = [];
   const rest: TripEvent[] = [];
   for (const e of events) {
-    const end = e.endTime ?? e.startTime;
+    // Mit Tagesrolle zählt der angezeigte Zeitpunkt (Check-out am Endtag), «middle» ist nie vergangen
+    const end = e.dayRole === "end" || e.dayRole === "start" ? e.displayTime : e.endTime ?? e.startTime;
     const endMin = end ? Number(end.slice(0, 2)) * 60 + Number(end.slice(3, 5)) : null;
-    // Ereignisse über mehrere Tage gelten nie als vergangen
-    const multi = e.endDate && e.startDate && e.endDate !== e.startDate;
-    if (!multi && endMin != null && endMin < nowMin - 30 && e.startTime) past.push(e);
+    // Ereignisse über mehrere Tage ohne Rolle gelten nie als vergangen
+    const multi = e.dayRole === undefined && e.endDate && e.startDate && e.endDate !== e.startDate;
+    const hasTime = e.dayRole === "end" || e.dayRole === "start" ? Boolean(e.displayTime) : Boolean(e.startTime);
+    if (e.dayRole !== "middle" && !multi && endMin != null && endMin < nowMin - 30 && hasTime) past.push(e);
     else rest.push(e);
   }
   return { past, rest };
+}
+
+/* ─ Tagesrolle mehrtägiger Ereignisse ─ */
+
+/** Anzuzeigende Zeit: `displayTime` des Servers (Check-out am Endtag), sonst `startTime`. `middle` hat keine Zeit. */
+export function shownTime(e: Pick<TripEvent, "dayRole" | "displayTime" | "startTime">): string | null {
+  if (e.dayRole === "middle") return null;
+  if (e.dayRole !== undefined && e.displayTime !== undefined) return e.displayTime;
+  return e.startTime;
+}
+
+/** Beschriftung zur Zeit («Check-out», «Abholung») oder «Aufenthalt»/«Unterwegs» für `middle`; sonst `null`. */
+export function shownLabel(e: Pick<TripEvent, "dayRole" | "displayLabel" | "type">): string | null {
+  if (e.dayRole === "middle") return e.displayLabel || (e.type === "Hotel" || e.type === "Unterkunft" ? "Aufenthalt" : "Unterwegs");
+  if (e.dayRole === "single" || e.dayRole === undefined) return null;
+  return e.displayLabel ?? null;
+}
+
+/** `middle`-Einträge (Aufenthalt, Unterwegs) werden unten gruppiert, ohne Zeit. */
+export function splitOngoing(events: TripEvent[]): { timed: TripEvent[]; ongoing: TripEvent[] } {
+  const timed: TripEvent[] = [];
+  const ongoing: TripEvent[] = [];
+  for (const e of events) (e.dayRole === "middle" ? ongoing : timed).push(e);
+  return { timed, ongoing };
 }

@@ -60,6 +60,7 @@ verwalten, Teilnehmer und Links** zeigt der Client nur Administratoren.
 | `/trips`, `/trips/:id` | Reisen, Plan |
 | `/trips/:id/{documents,ledger,team,map}` | Dokumente, Kasse, Team, Karte |
 | `/trips/:id/events/:eventId` | Ereignis-Detail mit Karte oberhalb der Buchungsdaten |
+| `/trips/:id/day/:date` | Vorschau eines Reisetags (`GET /v1/trips/:id/day/:date`) mit Tag-Navigation |
 | `/documents/:id` | Dokument, erkannte Adressen mit Karten-Vorschau |
 | `/inbox`, `/ledgers/:id`, `/settings` | Zu prüfen (alle Reisen), Direktlink Reisekasse, Konto |
 | `/t/:token`, `/g/:token` | Gäste: Reise, Reisekasse (derselbe Token) |
@@ -88,12 +89,20 @@ participants/participant; `pattern` und `transform` werden vor der Prüfung ange
 (`fieldsMeta`; gefüllt = aus Dokument, Ring = von Hand; Klick zeigt Zitat und Seite und öffnet das PDF an der Stelle).
 «In Reisekasse übernehmen» öffnet die Ausgabe mit Vorbelegung und setzt `tripEventId`.
 
+## Heute und Tagesrolle
+
+Ereignisse der Tagesantworten tragen `dayRole` (single, start, middle, end), `displayTime` und `displayLabel`. Der Client
+zeigt sie statt `startTime`: am Endtag eines Hotels «Check-out 12:00», am Starttag «Check-in 15:00»; `middle` ohne Zeit
+unten als «Aufenthalt und Unterwegs». Das gilt für «Als Nächstes», Tagesliste, Tagesband (Punkt nach `displayTime`)
+und die Folgetag-Vorschau. Zonen erscheinen nur, wenn die Uhr tatsächlich anders geht (Zürich und Madrid gelten als gleich).
+
 ## Dokumente
 
 Upload per Drag-and-drop und Dateiauswahl (`POST /v1/trips/:id/documents`, optional `eventId`), Fortschritt (XHR),
 Analysestatus-Polling (`GET /v1/documents/:id`, 2 bis 8 s, höchstens 5 Minuten). «Zu prüfen»: Vorschläge
 (`status != confirmed`) mit Quellenausschnitt, Sicherheit; Übernehmen (`confirm`), Bearbeiten, Zusammenführen (`merge`,
-mit Kandidaten nach Referenz/Nummer/Tag), Verwerfen (`DELETE`). PDF-Anzeige mit pdf.js (eigener Chunk, Worker
+mit Kandidaten nach Referenz/Nummer/Tag), Verwerfen (`DELETE`). «Dem Ereignis zuordnen» hängt das Dokument per
+`POST /v1/trips/:id/events/:eventId/documents { documentId }` an (nur Admin). PDF-Anzeige mit pdf.js (eigener Chunk, Worker
 same-origin).
 
 ## Karten

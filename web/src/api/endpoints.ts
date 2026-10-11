@@ -185,6 +185,9 @@ export const trips = {
 export const today = {
   get: (p: { date: string; tz: string }, signal?: AbortSignal) =>
     api<TodayState>(`/v1/today${q({ date: p.date, tz: p.tz })}`, { signal }),
+  /** Tagesansicht einer Reise (gleiche Form wie `today`), z. B. als Vorschau eines Reisetags. */
+  day: (tripId: number, date: string, tz?: string, signal?: AbortSignal) =>
+    api<TodayState>(`/v1/trips/${tripId}/day/${date}${q({ tz })}`, { signal }),
 };
 
 export const inbox = {

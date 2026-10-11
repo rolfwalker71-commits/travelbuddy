@@ -141,3 +141,10 @@ export function formatYearSpan(from: string | null | undefined, to: string | nul
   if (y1 && y2 && y1 !== y2) return `${y1}/${y2}`;
   return y1 || y2;
 }
+
+/** ISO-Datum um `n` Tage verschoben (Kalenderrechnung über UTC). */
+export function addDaysIso(iso: string, n: number): string {
+  const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return `${pad(dt.getUTCFullYear(), 4)}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
+}

@@ -181,3 +181,24 @@ describe("Navigation und Plan", () => {
     expect(groupEventsByDay([c, a, b]).map((g) => g.events.map((e) => e.id))).toEqual([[1, 2, 3]]);
   });
 });
+
+describe("Adressfelder je Ort (Katalog 2)", () => {
+  it("Mietauto: Abholung und Rückgabe mit eigener Adresse als zwei Orte", () => {
+    const car = ev({
+      type: "Mietauto",
+      title: "Mietwagen",
+      details: { pickupPlace: "Hertz MIA", pickupAddress: "2100 NW 42nd Ave, Miami", returnPlace: "Hertz FLL", returnAddress: "100 Terminal Dr, Fort Lauderdale" },
+    });
+    const pts = eventMapPoints([car]);
+    expect(pts.map((p) => [p.role, p.address])).toEqual([
+      ["pickup", "2100 NW 42nd Ave, Miami"],
+      ["return", "100 Terminal Dr, Fort Lauderdale"],
+    ]);
+    expect(pts[0]!.query).toBe("2100 NW 42nd Ave, Miami");
+  });
+  it("Veranstaltung, Kreuzfahrt, Zug: Adresse aus dem Ortsfeld", () => {
+    expect(placesOfEvent(ev({ type: "Veranstaltung", details: { venue: "Opernhaus", venueAddress: "Falkenstrasse 1" } }))[0]).toMatchObject({ role: "venue", address: "Falkenstrasse 1" });
+    expect(placesOfEvent(ev({ type: "Kreuzfahrt", details: { terminal: "Port Nou", terminalAddress: "Moll Adossat" } }))[0]).toMatchObject({ address: "Moll Adossat" });
+    expect(placesOfEvent(ev({ type: "Zugreisen", details: { originPlace: "Zürich HB", originAddress: "Bahnhofplatz", destinationPlace: "Bern" } })).map((p) => p.role)).toEqual(["start", "end"]);
+  });
+});

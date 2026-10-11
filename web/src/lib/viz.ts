@@ -221,7 +221,7 @@ export function buildTimeBand(events: TripEvent[], span: TripSpan | null, todayI
       lane,
       from: Math.max(0, from),
       to: Math.min(span.days - 1, to),
-      label: e.title,
+      label: lane === "ship" ? String(e.details?.routeName || e.details?.ship || e.title) : e.title,
       color: colorKey(e),
     });
   }

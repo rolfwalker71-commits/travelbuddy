@@ -90,3 +90,12 @@ describe("Datumsanzeige (vollständig, nie verkürzt)", () => {
     expect(formatYearSpan("2026-10-23", "2026-11-20")).toBe("2026");
   });
 });
+
+import { addDaysIso } from "./dates";
+describe("addDaysIso", () => {
+  it("verschiebt über Monats- und Jahresgrenzen", () => {
+    expect(addDaysIso("2026-10-31", 1)).toBe("2026-11-01");
+    expect(addDaysIso("2026-01-01", -1)).toBe("2025-12-31");
+    expect(addDaysIso("2028-02-28", 1)).toBe("2028-02-29");
+  });
+});

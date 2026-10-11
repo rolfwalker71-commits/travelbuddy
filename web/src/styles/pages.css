@@ -266,3 +266,8 @@
 .daydots--s { display: flex; margin-top: 6px; gap: 2px; }
 .daydots--s i { height: 4px; }
 .todaymap { display: flex; flex-direction: column; gap: 10px; }
+
+.daynav { display: inline-flex; gap: 6px; align-items: center; }
+.ongoing { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+.day__view { margin-left: auto; padding: 0; }
+.day__view + .day__add { margin-left: 8px; }

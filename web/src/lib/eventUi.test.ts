@@ -92,3 +92,16 @@ describe("Detailansicht", () => {
     expect(flat["Wifi"]).toBeUndefined();
   });
 });
+
+import { zoneDiffers, timeLine } from "./eventUi";
+describe("Zonenhinweis", () => {
+  it("nur bei tatsächlich anderer Uhrzeit", () => {
+    // Zürich und Madrid gehen gleich; Miami nicht
+    expect(zoneDiffers("Europe/Madrid", "Europe/Zurich", "2026-10-25", "12:00")).toBe(false);
+    expect(zoneDiffers("America/New_York", "Europe/Zurich", "2026-10-25", "12:00")).toBe(true);
+    const e = ev({ type: "Hotel", startDate: "2026-10-23", startTime: "15:00", endDate: "2026-10-25", endTime: "12:00", startTz: "Europe/Madrid", endTz: "America/New_York" });
+    const t = timeLine(e, "Europe/Zurich");
+    expect(t.startZone).toBeNull();
+    expect(t.endZone).toBe("New York");
+  });
+});

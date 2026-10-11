@@ -123,7 +123,7 @@ export function BalanceChart({ balances, currency }: { balances: Balance[]; curr
           const label = `${b.netMinor > 0 ? "+" : b.netMinor < 0 ? "−" : ""}${formatMinor(Math.abs(b.netMinor), currency)}`;
           return (
             <g key={b.memberId}>
-              <text x={cx + (b.side === "neg" ? 8 : -8)} y={y + 12} textAnchor={b.side === "neg" ? "start" : "end"} className="viz__name">
+              <text x={cx + (b.side === "neg" ? 8 : -8)} y={y + 13} textAnchor={b.side === "neg" ? "start" : "end"} className="viz__name">
                 {b.name}
               </text>
               <rect x={x} y={y + 16} width={Math.max(b.w, 2)} height={10} rx={2} className={`viz__bal viz__bal--${b.side}`} />
