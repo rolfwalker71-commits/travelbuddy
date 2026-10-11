@@ -1,0 +1,42 @@
+{
+  "name": "travelbuddy-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "user:create": "tsx scripts/create-user.ts",
+    "user:password": "tsx scripts/set-password.ts",
+    "airports:build": "tsx scripts/build-airports.ts",
+    "import:homebuddy": "tsx scripts/import-homebuddy.ts",
+    "build": "rm -rf dist && esbuild src/index.ts scripts/create-user.ts scripts/set-password.ts scripts/import-homebuddy.ts --bundle --platform=node --format=esm --target=node22 --packages=external --entry-names=[name] --out-extension:.js=.mjs --outdir=dist && mkdir -p dist/migrations dist/data && cp src/db/migrations/*.sql dist/migrations/ && cp src/meta/airports.json dist/data/airports.json",
+    "start:prod": "node dist/index.mjs",
+    "user:create:prod": "node dist/create-user.mjs",
+    "import:homebuddy:prod": "node dist/import-homebuddy.mjs",
+    "dev:live": "tsx watch --env-file=.env src/index.ts",
+    "start:live": "tsx --env-file=.env src/index.ts",
+    "eval:ingest": "tsx scripts/eval-ingest.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "better-sqlite3": "^12.0.0",
+    "hono": "^4.6.0",
+    "pdf-lib": "^1.17.1",
+    "tz-lookup": "^6.1.25",
+    "unpdf": "^1.8.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.12",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
