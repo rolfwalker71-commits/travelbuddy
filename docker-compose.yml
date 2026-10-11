@@ -57,6 +57,10 @@ services:
       # Geokodierung: auto (Apple, sonst Nominatim) | apple | nominatim | off
       TRAVELBUDDY_GEOCODER: ${TRAVELBUDDY_GEOCODER:-}
       TRAVELBUDDY_GEOCODER_CONTACT: ${TRAVELBUDDY_GEOCODER_CONTACT:-}
+      # Fehlende Koordinaten im Hintergrund nachholen: auto | on | off
+      TRAVELBUDDY_GEOCODE_BACKFILL: ${TRAVELBUDDY_GEOCODE_BACKFILL:-}
+      # Eigener Schlüssel nur für KI-Bilder (sonst OPENAI_API_KEY)
+      OPENAI_IMAGE_API_KEY: ${OPENAI_IMAGE_API_KEY:-}
     ports:
       - "${TRAVELBUDDY_BIND:-127.0.0.1}:${TRAVELBUDDY_PORT:-7780}:7780"
     volumes:
