@@ -18,10 +18,10 @@
 .trip-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
 .trip-main, .trip-side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .triphead { display: flex; flex-direction: column; gap: 12px; }
-/* Titelbild der Reise: deutlich höher als ein flaches Banner und auf die untere Bildhälfte ausgerichtet,
-   damit Horizont, Gebäude und Schiffe (das Hauptmotiv) vollständig zu sehen sind. */
-.triphead .media--cover { border-radius: var(--r-l); height: clamp(190px, 34vw, 420px); }
-.triphead .media--cover img { object-position: center 68%; }
+/* Titelbild der Reise: im natürlichen Seitenverhältnis, nichts wird abgeschnitten (Hauptmotiv bleibt ganz sichtbar).
+   Sehr hohe Bilder werden auf 480 px begrenzt und mittig, ohne Zuschnitt, eingepasst. */
+.triphead .media--cover { border-radius: var(--r-l); height: auto; min-height: 140px; }
+.triphead .media--cover img { width: 100%; height: auto; max-height: 480px; object-fit: contain; }
 .triphead__review { display: flex; align-items: center; margin-left: auto; }
 .trip-summary { margin-top: 8px; white-space: pre-line; }
 .plan { display: flex; flex-direction: column; gap: 20px; }
