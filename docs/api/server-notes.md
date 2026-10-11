@@ -184,3 +184,20 @@ Zone des Ereignisses.
   resolved, notFound, failed } | null, open, due, resolved, notFound, failed }`.
 - **Tagesrolle:** `displayLabel` an `middle`-Tagen: «Gültig» (Visum), «Versichert» (Versicherung), «Aufenthalt»
   (Unterkünfte), sonst «Unterwegs».
+
+## 6. Zuordnung der Ereignis-Adresse, Suchbegriff, Bereinigung (11.10.2026)
+
+- **Adresse des Ereignisses** (`address`) gehört bei Zugreisen/Transfer (Start/Ziel) und Mietauto (Abholung/Rückgabe)
+  nur Orten **ohne eigenes Adressfeld** (`originAddress`, `destinationAddress`, `pickupAddress`, `returnAddress`),
+  und zwar dem Ort, dessen Name dazu passt (normalisiert: Gross/Klein, Umlaute, Zeichen egal, einer enthält den
+  anderen; bei mehreren der längste Name). Passt keiner, gehört sie bei Zug/Transfer dem **Ziel** (die Importdaten
+  führen die Adresse des Ziels), beim Mietauto der **Abholung** (wie bisher). Gibt es nur einen freien Ort, gehört sie
+  ihm. Entspricht sie der eigenen Adresse eines Ortes, bekommt kein weiterer Ort sie. Nie dieselbe Adresse an zwei Orten.
+- **Suchbegriff** = Adresse, sonst Ortsname. Das Reiseziel wird **nicht** mehr angehängt. Hafentage: Titel ohne
+  «Abfahrt/Ankunft …».
+- **Migration `022_geocode_reset.sql`** (läuft einmalig beim Start): verwirft per Geokodierung entstandene Koordinaten
+  (`fieldsMeta.lat.source = "geocoded"`, `place_coords[rolle].source = "geocoded"`) bei Zugreisen, Transfer, Mietauto
+  und Kreuzfahrt-Hafentagen und löscht deren Merker in `geocode_backfill`; der Nachtrag holt sie mit den korrekten
+  Suchbegriffen neu. Von Hand gesetzte oder herkunftslose Koordinaten bleiben. Andere Typen (Hotel, Ausflug …)
+  behalten ihre Ergebnisse.
+

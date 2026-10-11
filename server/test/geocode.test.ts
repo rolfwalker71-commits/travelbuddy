@@ -63,8 +63,8 @@ test("geokodierung: Route löst alle Orte auf, schreibt lat/lon und fieldsMeta, 
   });
   await background.idle();
   const id = created.body.eventId as number;
-  // Rückgabe wird mit dem Reiseziel als Kontext gesucht
-  assert.deepEqual(fake.queries, ["2100 NW 42nd Ave, Miami", "Hertz Fort Lauderdale, Miami"]);
+  // Suchbegriff = Adresse, sonst Ortsname (ohne Reiseziel als Anhang)
+  assert.deepEqual(fake.queries, ["2100 NW 42nd Ave, Miami", "Hertz Fort Lauderdale"]);
 
   const kept = await call("POST", `/v1/trips/${tripId}/events/${id}/geocode`, { token: anna, json: {} });
   assert.equal(kept.status, 200);

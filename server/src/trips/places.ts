@@ -52,8 +52,11 @@ export function derivePlaces(ev: PlaceSource, context: { destination?: string | 
   const d = ev.details;
   const out: PlaceWithQuery[] = [];
 
+  // Suchbegriff = Adresse, sonst Ortsname. Das Reiseziel wird nicht angehängt: «Altdorf UR, Kreuzfahrt / Florida»
+  // verfälscht die Suche (Hafentage tragen das Land meist im Titel).
+  void context;
   const fromText = (role: PlaceRole, label: string | null, address: string | null): PlaceWithQuery => {
-    const query = address ?? (label ? (context.destination && !label.includes(context.destination) ? `${label}, ${context.destination}` : label) : null);
+    const query = address ?? label;
     return { role, label, address, lat: null, lon: null, source: null, query, isAirport: false };
   };
   const fromAirport = (role: PlaceRole, code: string | null): PlaceWithQuery | null => {
@@ -92,11 +95,34 @@ export function derivePlaces(ev: PlaceSource, context: { destination?: string | 
     if (a) out.push(a);
     if (b) out.push(b);
   } else if (pickup || ret || pickupAddr || returnAddr) {
-    if (pickup || pickupAddr) out.push(fromText("pickup", pickup, pickupAddr ?? ev.address));
-    if (ret || returnAddr) out.push(fromText("return", ret, returnAddr));
+    // Adresse des Ereignisses: gehört dem Ort, dessen Name dazu passt; sonst der Abholung (wie bisher).
+    const hasP = Boolean(pickup || pickupAddr);
+    const hasR = Boolean(ret || returnAddr);
+    const owner = eventAddressOwner(
+      [
+        hasP ? { key: "pickup", label: pickup, own: pickupAddr } : null,
+        hasR ? { key: "return", label: ret, own: returnAddr } : null,
+      ],
+      ev.address,
+      "first"
+    );
+    if (hasP) out.push(fromText("pickup", pickup, pickupAddr ?? (owner === "pickup" ? ev.address : null)));
+    if (hasR) out.push(fromText("return", ret, returnAddr ?? (owner === "return" ? ev.address : null)));
   } else if (origin || dest || originAddr || destAddr) {
-    if (origin || originAddr) out.push(fromText("start", origin, originAddr ?? ev.address));
-    if (dest || destAddr) out.push(fromText("end", dest, destAddr));
+    // Adresse des Ereignisses: gehört dem Ort, dessen Name dazu passt; sonst dem Ziel (Importdaten führen die
+    // Adresse des Ziels). Nie dieselbe Adresse an beiden Orten.
+    const hasO = Boolean(origin || originAddr);
+    const hasD = Boolean(dest || destAddr);
+    const owner = eventAddressOwner(
+      [
+        hasO ? { key: "start", label: origin, own: originAddr } : null,
+        hasD ? { key: "end", label: dest, own: destAddr } : null,
+      ],
+      ev.address,
+      "last"
+    );
+    if (hasO) out.push(fromText("start", origin, originAddr ?? (owner === "start" ? ev.address : null)));
+    if (hasD) out.push(fromText("end", dest, destAddr ?? (owner === "end" ? ev.address : null)));
   } else if (venue || venueAddr) {
     out.push(fromText("venue", venue, venueAddr ?? ev.address));
   } else if (ev.type === "Kreuzfahrt" && (str(d.entryKind) === "Seetag" || str(d.entryKind) === "Reise")) {
@@ -127,6 +153,43 @@ export function derivePlaces(ev: PlaceSource, context: { destination?: string | 
     }
   });
   return out;
+}
+
+const fold = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+/** Stimmen Ortsname und Adresse überein (normalisiert, einer enthält den anderen)? */
+export function labelMatchesAddress(label: string | null, address: string | null): boolean {
+  if (!label || !address) return false;
+  const a = fold(label);
+  const b = fold(address);
+  return Boolean(a && b && (a.includes(b) || b.includes(a)));
+}
+
+/**
+ * Welchem Ort gehört die Adresse des Ereignisses? Nur Orte ohne eigene Adresse kommen in Frage. Passt der Name
+ * eines Ortes zur Adresse (bei mehreren der längste Name), gehört sie ihm; gibt es nur einen Kandidaten, ihm;
+ * sonst `fallback` (`first` = erster Ort, `last` = letzter, also das Ziel).
+ */
+function eventAddressOwner(
+  slots: Array<{ key: string; label: string | null; own: string | null } | null>,
+  address: string | null,
+  fallback: "first" | "last"
+): string | null {
+  if (!address) return null;
+  // Ist die Adresse schon die eigene Adresse eines Ortes, gehört sie nicht zusätzlich einem anderen.
+  if (slots.some((s) => s?.own && fold(s.own) === fold(address))) return null;
+  const free = slots.filter((s): s is { key: string; label: string | null; own: string | null } => s != null && !s.own);
+  if (free.length === 0) return null;
+  const matching = free.filter((s) => labelMatchesAddress(s.label, address)).sort((a, b) => (b.label?.length ?? 0) - (a.label?.length ?? 0));
+  if (matching.length) return matching[0]!.key;
+  if (free.length === 1) return free[0]!.key;
+  return (fallback === "first" ? free[0] : free[free.length - 1])!.key;
 }
 
 function normalizeSource(s: string | null): CoordSource | null {

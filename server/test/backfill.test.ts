@@ -35,7 +35,7 @@ async function boot(table: Record<string, [number, number]>) {
 const ev = async (s: Awaited<ReturnType<typeof boot>>, id: number) =>
   (await s.call("GET", `/v1/trips/${s.tripId}`, { token: s.anna })).body.events.find((e: any) => e.id === id);
 
-test("nachtrag: Hafentage über Titel + Ziel, Seetag und Reise nie, Transfer/Mietwagen getrennt, fieldsMeta geocoded", async () => {
+test("nachtrag: Hafentage über den Titel, Seetag und Reise nie, Transfer/Mietwagen getrennt, fieldsMeta geocoded", async () => {
   const s = await boot({ "Palma de Mallorca": [39.57, 2.65], "Hafen Olbia": [40.92, 9.5], "Hotel Gabbiano": [40.93, 9.52], "Hertz Palma": [39.55, 2.73], "Flughafen Palma": [39.55, 2.73] });
   const port = await s.mk({ type: "Kreuzfahrt", title: "Palma de Mallorca", startDate: "2026-10-27", details: { entryKind: "Hafen" } });
   const departure = await s.mk({ type: "Kreuzfahrt", title: "Abfahrt Palma de Mallorca", startDate: "2026-10-27", details: { entryKind: "Hafen" } });
@@ -52,15 +52,15 @@ test("nachtrag: Hafentage über Titel + Ziel, Seetag und Reise nie, Transfer/Mie
   assert.equal(r.resolved, 6);
   assert.equal(r.notFound, 0);
   assert.ok(!s.geocoder.queries.some((q) => /Seetag|MSC Mittelmeer|Via Roma/.test(q)), s.geocoder.queries.join(" | "));
-  assert.ok(s.geocoder.queries.includes("Palma de Mallorca, Spain"));
-  assert.ok(s.geocoder.queries.includes("Palma de Mallorca, Spain"), "«Abfahrt …» wird auf den Hafennamen gekürzt");
-  assert.equal(s.geocoder.queries.filter((q) => q === "Palma de Mallorca, Spain").length, 2);
+  assert.ok(s.geocoder.queries.includes("Palma de Mallorca"), "Suchbegriff = Titel, ohne Reiseziel-Anhang");
+  assert.ok(!s.geocoder.queries.some((q) => q.includes("Spain")), "kein Reiseziel im Suchbegriff");
+  assert.equal(s.geocoder.queries.filter((q) => q === "Palma de Mallorca").length, 2, "«Abfahrt …» wird auf den Hafennamen gekürzt");
 
   const p = await ev(s, port);
   assert.deepEqual([p.lat, p.lon], [39.57, 2.65]);
   assert.equal(p.fieldsMeta.lat.source, "geocoded");
   assert.equal(p.fieldsMeta.lon.source, "geocoded");
-  assert.equal(p.fieldsMeta.lat.quote, "Palma de Mallorca, Spain (aufgelöst)");
+  assert.equal(p.fieldsMeta.lat.quote, "Palma de Mallorca (aufgelöst)");
   assert.equal((await ev(s, seaDay)).lat, null);
   assert.equal((await ev(s, whole)).lat, null);
   const t = await ev(s, transfer);
