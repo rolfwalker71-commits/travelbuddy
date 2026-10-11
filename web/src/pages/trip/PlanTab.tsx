@@ -181,7 +181,7 @@ export function PlanTab() {
           <section className="card viz-card" aria-label="Routenbogen">
             <h3 className="label">Route</h3>
             {maps === true && routePoints.length > 0 ? (
-              <MapView points={routePoints} route numbered compact height={280} label={`Karte der Reise ${trip.title}`} />
+              <MapView points={routePoints} route bare compact height={280} label={`Karte der Reise ${trip.title}`} />
             ) : (
               <RouteArc events={events} />
             )}

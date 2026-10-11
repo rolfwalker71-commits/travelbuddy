@@ -32,6 +32,8 @@ export type MapViewProps = {
   compact?: boolean;
   /** Marker mit Ordnungsnummer beschriften (Reise-Karte) statt ohne. */
   numbered?: boolean;
+  /** Nur Marker und Linien, ohne Nummern und Beschriftungen (kleine Übersichtskarte). */
+  bare?: boolean;
   /** Fehlende Koordinaten wurden per Suche aufgelöst (zum Speichern). */
   onResolve?: (r: ResolvedPlace) => void;
   /** Suche läuft / Orte, die nicht gefunden wurden. */
@@ -46,13 +48,13 @@ export type MapViewProps = {
  * Apple Karten (MapKit JS): Marker in Typfarbe, Route in Reihenfolge. Koordinaten am Ort haben Vorrang;
  * fehlende werden per Suche im Browser aufgelöst und über `onResolve` gemeldet (der Aufrufer speichert sie).
  */
-export function MapView({ points, label, height = 360, route = false, compact = false, numbered = false, onResolve, onSearch, onUnavailable, onStatus }: MapViewProps) {
+export function MapView({ points, label, height = 360, route = false, compact = false, numbered = false, bare = false, onResolve, onSearch, onUnavailable, onStatus }: MapViewProps) {
   const el = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<Status>("loading");
   const cb = useRef({ onResolve, onSearch, onUnavailable, onStatus });
   cb.current = { onResolve, onSearch, onUnavailable, onStatus };
   const theme = typeof document !== "undefined" ? document.documentElement.dataset.theme : undefined;
-  const key = JSON.stringify([points.map((p) => [p.id, p.title, p.lat, p.lon, p.query, p.color, p.order]), route, numbered, compact, theme]);
+  const key = JSON.stringify([points.map((p) => [p.id, p.title, p.lat, p.lon, p.query, p.color, p.order]), route, numbered, bare, compact, theme]);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,7 +108,7 @@ export function MapView({ points, label, height = 360, route = false, compact = 
         }
         placed.push({ p, c });
       }
-      addItems(mapkit, map, placed, { route, numbered, compact });
+      addItems(mapkit, map, placed, { route, numbered: numbered && !bare, compact, bare });
       setStatus("ready");
       cb.current.onStatus?.("ready");
       cb.current.onSearch?.({ resolving: false, notFound });
@@ -138,7 +140,7 @@ function addItems(
   mapkit: Mapkit,
   map: InstanceType<Mapkit["Map"]>,
   placed: { p: MapPoint; c: MkCoordinate }[],
-  opts: { route: boolean; numbered: boolean; compact: boolean }
+  opts: { route: boolean; numbered: boolean; compact: boolean; bare?: boolean }
 ): void {
   if (placed.length === 0) return;
   const annotations: MkAnnotation[] = placed.map(({ p, c }) =>
@@ -147,6 +149,8 @@ function addItems(
       subtitle: [p.roleLabel, p.address].filter(Boolean).join(" · ") || undefined,
       color: cssColor(p.color),
       ...(opts.numbered ? { glyphText: String(p.order) } : {}),
+      // Übersichtskarte: keine Beschriftungen, nur die Marker
+      ...(opts.bare ? { titleVisibility: "hidden", subtitleVisibility: "hidden", glyphText: "" } : {}),
     })
   );
   map.addAnnotations(annotations);
