@@ -143,15 +143,26 @@ function addItems(
   opts: { route: boolean; numbered: boolean; compact: boolean; bare?: boolean }
 ): void {
   if (placed.length === 0) return;
+  // Übersichtskarte: nur kleine Punkte in Typfarbe, ohne Marker, Zahl oder Beschriftung.
+  const CustomAnnotation = (mapkit as unknown as {
+    Annotation?: new (c: MkCoordinate, factory: () => HTMLElement, opts?: Record<string, unknown>) => MkAnnotation;
+  }).Annotation;
+  const dot = (color: string) => () => {
+    const d = document.createElement("div");
+    d.style.cssText = `width:10px;height:10px;border-radius:50%;background:${color};border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.35)`;
+    return d;
+  };
   const annotations: MkAnnotation[] = placed.map(({ p, c }) =>
-    new mapkit.MarkerAnnotation(c, {
-      title: p.title,
-      subtitle: [p.roleLabel, p.address].filter(Boolean).join(" · ") || undefined,
-      color: cssColor(p.color),
-      ...(opts.numbered ? { glyphText: String(p.order) } : {}),
-      // Übersichtskarte: keine Beschriftungen, nur die Marker
-      ...(opts.bare ? { titleVisibility: "hidden", subtitleVisibility: "hidden", glyphText: "" } : {}),
-    })
+    opts.bare && CustomAnnotation
+      ? new CustomAnnotation(c, dot(cssColor(p.color)), { size: { width: 10, height: 10 }, enabled: false })
+      : new mapkit.MarkerAnnotation(c, {
+          title: p.title,
+          subtitle: [p.roleLabel, p.address].filter(Boolean).join(" · ") || undefined,
+          color: cssColor(p.color),
+          ...(opts.numbered ? { glyphText: String(p.order) } : {}),
+          // Rückfall der Übersichtskarte: keine Beschriftungen, nur die Marker
+          ...(opts.bare ? { titleVisibility: "hidden", subtitleVisibility: "hidden", glyphText: "" } : {}),
+        })
   );
   map.addAnnotations(annotations);
   const overlays: unknown[] = [];
