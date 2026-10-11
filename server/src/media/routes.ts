@@ -6,8 +6,8 @@ import type { AppEnv } from "../app";
 import type { ModuleDeps } from "../lib/module-deps";
 import { HttpError, badRequest, forbidden, notFound } from "../lib/errors";
 import { parseWith } from "../lib/validate";
-import { GENERATABLE_KINDS, getMedia, isMediaKind, mediaFilePath, mediaUrl, ownerExists, TRAVELER_KINDS, tripIdOfOwner, type MediaKind, type MediaRow } from "./store";
-import { DEFAULT_PER_RUN, MediaService } from "./generate";
+import { clearMedia, GENERATABLE_KINDS, getMedia, MAX_MEDIA_BYTES, saveMedia, sniffImage, isMediaKind, mediaFilePath, mediaUrl, ownerExists, TRAVELER_KINDS, tripIdOfOwner, type MediaKind, type MediaRow } from "./store";
+import { DEFAULT_PER_RUN, MAX_IMAGE_ATTEMPTS, MediaService } from "./generate";
 
 const ownerSchema = z.coerce.number().int().positive();
 
@@ -151,6 +151,7 @@ export function mediaRoutes(deps: ModuleDeps) {
     const { kind, ownerId } = target(c);
     const text = await c.req.text();
     let prompt: string | null = null;
+    let extra: string | null = null;
     if (text.trim()) {
       let raw: unknown;
       try {
@@ -158,7 +159,12 @@ export function mediaRoutes(deps: ModuleDeps) {
       } catch {
         throw new HttpError(400, "invalid_json", "Ungültiger JSON-Body");
       }
-      prompt = parseWith(raw, z.object({ prompt: z.string().trim().min(1).max(4000).nullish() })).prompt ?? null;
+      const body = parseWith(
+        raw,
+        z.object({ prompt: z.string().trim().min(1).max(4000).nullish(), extra: z.string().trim().max(1000).nullish() })
+      );
+      prompt = body.prompt ?? null;
+      extra = body.extra || null;
     }
     if (!service.enabled) {
       throw new HttpError(409, "images_disabled", "Die KI-Bilderzeugung ist nicht aktiv (kein Schlüssel oder abgeschaltet)");
@@ -167,7 +173,37 @@ export function mediaRoutes(deps: ModuleDeps) {
       throw new HttpError(409, "not_generatable", "Dieses Bild wird nicht erzeugt, nur importiert");
     }
     if (!ownerExists(db, kind, ownerId)) throw notFound("Besitzer des Bildes");
-    const row = await service.generate(kind, ownerId, { force: true, prompt });
+    const row = await service.generate(kind, ownerId, { force: true, prompt, extra });
+    return c.json({ media: serializeMedia(row) });
+  });
+
+  /** Eigenes Bild hochladen (Admin, multipart `file`): ersetzt ein vorhandenes, wird nie automatisch überschrieben. */
+  r.put("/v1/media/:kind/:ownerId", async (c) => {
+    admin(c);
+    const { kind, ownerId } = target(c);
+    if (!ownerExists(db, kind, ownerId)) throw notFound("Besitzer des Bildes");
+    let form: FormData;
+    try {
+      form = await c.req.formData();
+    } catch {
+      throw badRequest("Erwartet multipart/form-data mit dem Feld «file»");
+    }
+    const file = form.get("file");
+    if (!(file instanceof File)) throw badRequest("Datei fehlt (Feld «file»)");
+    if (file.size === 0) throw badRequest("Die Datei ist leer");
+    if (file.size > MAX_MEDIA_BYTES) throw new HttpError(413, "too_large", "Das Bild ist grösser als 20 MB");
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    if (!sniffImage(bytes)) throw new HttpError(415, "unsupported_image", "Nur JPEG, PNG, WebP oder GIF sind möglich");
+    const row = saveMedia(db, deps.mediaDir, { kind, ownerId, bytes, source: "uploaded", prompt: null, now: deps.now() });
+    return c.json({ media: serializeMedia(row) });
+  });
+
+  /** Bild entfernen; es wird dafür nicht automatisch neu erzeugt (nur auf Wunsch). */
+  r.delete("/v1/media/:kind/:ownerId", (c) => {
+    admin(c);
+    const { kind, ownerId } = target(c);
+    if (!ownerExists(db, kind, ownerId)) throw notFound("Besitzer des Bildes");
+    const row = clearMedia(db, kind, ownerId, MAX_IMAGE_ATTEMPTS, deps.now());
     return c.json({ media: serializeMedia(row) });
   });
 

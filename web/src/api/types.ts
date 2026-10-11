@@ -242,6 +242,8 @@ export type TripEvent = {
   documents?: { id: number; title: string | null }[];
   comments: TripComment[];
   imageUrl?: string | null;
+  /** Herkunft des Ereignisbildes: erzeugt (KI), hochgeladen oder importiert. */
+  imageSource?: "generated" | "uploaded" | "imported" | null;
   mapUrl?: string | null;
   status?: EventStatus;
   participantIds?: number[];

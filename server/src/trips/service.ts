@@ -1069,7 +1069,7 @@ export function eventViews(db: Db, trip: TripRow, opts: EventViewOpts = {}, only
       ...(opts.withTitles ? { documents: eventDocs.map((d) => ({ id: d.document_id, title: d.title })) } : {}),
       comments: comments.filter((c) => c.trip_event_id === e.id).map(serializeComment),
       // Medien-URLs nur für angemeldete Benutzer (Gäste haben kein Token, um sie zu öffnen).
-      ...(media ? { imageUrl: media.images.get(e.id) ?? null, mapUrl: null } : {}),
+      ...(media ? { imageUrl: media.images.get(e.id) ?? null, imageSource: media.sources.get(e.id) ?? null, mapUrl: null } : {}),
     };
   });
 }

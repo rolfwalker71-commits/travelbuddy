@@ -25,6 +25,7 @@ import { Icon } from "../ui/Icon";
 import { MediaImage } from "../ui/MediaImage";
 import { CoverIllustration } from "../ui/IllustrationCard";
 import { coverIdFor } from "../lib/illustrations";
+import { ImageTools } from "../ui/ImageTools";
 import { Menu } from "../ui/Menu";
 import { useToast } from "../ui/Toast";
 import { PageHeader } from "../ui/bits";
@@ -234,6 +235,11 @@ function TripShell({ data, apply, reload }: { data: TripDetail; apply: (next: Tr
       />
 
       <div className="triphead">
+        {isAdmin ? (
+          <div className="triphead__tools">
+            <ImageTools kind="trip_cover" ownerId={trip.id} hasImage={Boolean(trip.coverUrl)} onChanged={reload} label="Titelbild ändern" />
+          </div>
+        ) : null}
         {trip.coverUrl ? (
           <MediaImage src={trip.coverUrl} variant="cover" lazy={false} className="triphead__cover" />
         ) : (

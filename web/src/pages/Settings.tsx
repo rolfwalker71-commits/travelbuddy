@@ -15,6 +15,7 @@ import { useConfirm } from "../ui/Confirm";
 import { Banner, Skeleton } from "../ui/Feedback";
 import { SwitchField } from "../ui/Field";
 import { Badge, PageHeader, Section, Segmented } from "../ui/bits";
+import { readShowGeneratedEventImages, setShowGeneratedEventImages } from "../lib/prefs";
 import { THEME_LABEL, readThemePreference, setThemePreference, type ThemePreference } from "../lib/theme";
 import { useToast } from "../ui/Toast";
 import { KeyValue } from "../ledger/LedgerParts";
@@ -23,6 +24,7 @@ import { APP_BUILD, APP_VERSION, majorMismatch, versionLine } from "../lib/versi
 /** System (Standard), Hell «Papier» oder Dunkel «Nachtpapier»; gilt für diesen Browser. */
 function ThemeCard() {
   const [pref, setPref] = useState<ThemePreference>(readThemePreference);
+  const [showImages, setShowImages] = useState(readShowGeneratedEventImages);
   return (
     <div className="card">
       <Segmented<ThemePreference>
@@ -37,6 +39,15 @@ function ThemeCard() {
       <p className="muted small" style={{ marginTop: 12 }}>
         «System» folgt der Einstellung deines Geräts. Die Wahl gilt nur für diesen Browser.
       </p>
+      <SwitchField
+        checked={showImages}
+        onChange={(v) => {
+          setShowImages(v);
+          setShowGeneratedEventImages(v);
+        }}
+        label="KI-Bilder bei Ereignissen anzeigen"
+        description="Blendet die automatisch erzeugten Bilder im Ereignis aus. Eigene, hochgeladene Bilder bleiben sichtbar. Gilt nur für diesen Browser."
+      />
     </div>
   );
 }

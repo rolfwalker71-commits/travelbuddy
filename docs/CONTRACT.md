@@ -286,3 +286,15 @@ Unsichere Importfälle (Zeitzone nicht ableitbar, Typ unbekannt) werden `status 
 - `fieldsMeta[feld]` kennt zusätzlich `needsReview: true` (Prüfmarkierung am einzelnen Feld, z. B. bei Widerspruch zwischen Barcode und KI).
 - Umgebungsvariablen: `TRAVELBUDDY_AUTO_CONFIRM_MIN` (0.92; `> 1` = Automatik aus), `TRAVELBUDDY_TRIP_TOLERANCE_DAYS` (7),
   `TRAVELBUDDY_AI_CHUNK_CHARS` (24000), `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `TRAVELBUDDY_AI_MODEL_TEXT`, `TRAVELBUDDY_AI_MODEL_VISION`.
+
+## Bilder: Titelbild und Ereignisbild
+
+- `GET /v1/media/:kind/:ownerId` (kind `trip_cover` | `event_image`): Bild ausliefern (wie bisher).
+- `PUT /v1/media/:kind/:ownerId` (Admin, multipart `file`, JPEG/PNG/WebP/GIF bis 20 MB): eigenes Bild setzen, Herkunft `uploaded`.
+  Eigene Bilder werden nie automatisch überschrieben. Fehler: `415 unsupported_image`, `413 too_large`.
+- `POST /v1/media/:kind/:ownerId/regenerate` (Admin): KI-Bild neu erzeugen; Body optional `{ prompt?, extra? }`.
+  `extra` sind Zusatzhinweise für diese Erzeugung (max. 1000 Zeichen). `409 images_disabled` ohne Schlüssel.
+- `DELETE /v1/media/:kind/:ownerId` (Admin): Bild entfernen; wird danach nicht automatisch neu erzeugt.
+- Ereignis: `imageUrl` und `imageSource` (`generated` | `uploaded` | `imported` | `null`). Clients dürfen erzeugte Bilder
+  ausblenden (Web: Einstellung «KI-Bilder bei Ereignissen anzeigen»), `uploaded` bleibt sichtbar.
+- Prompt der Ereignisbilder: Vorlage der alten App (familybrain), Logos und Marken sind erlaubt.

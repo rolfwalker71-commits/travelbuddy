@@ -16,6 +16,9 @@ import { useConfirm } from "../../ui/Confirm";
 import { Banner, EmptyState } from "../../ui/Feedback";
 import { Icon } from "../../ui/Icon";
 import { IllustrationCard } from "../../ui/IllustrationCard";
+import { ImageTools } from "../../ui/ImageTools";
+import { MediaImage } from "../../ui/MediaImage";
+import { eventImageVisible, useShowGeneratedEventImages } from "../../lib/prefs";
 import { Provenance, ProvenanceLegend } from "../../ui/Provenance";
 import { TicketCard } from "../../ui/TicketCard";
 import { useToast } from "../../ui/Toast";
@@ -33,6 +36,7 @@ export function EventDetailPage() {
   const e = data.events.find((x) => x.id === Number(eventId));
   const [showUpload, setShowUpload] = useState(false);
   useDocumentTitle(e?.title ?? "Ereignis");
+  const showGenerated = useShowGeneratedEventImages();
 
   if (!e) {
     return (
@@ -146,7 +150,16 @@ export function EventDetailPage() {
                 {seats ? <p className="small"><span className="label">Sitze</span> {seats}</p> : null}
               </div>
             ) : null}
-            <IllustrationCard id={`type-${getType(catalog, e.type)?.id ?? e.type}`} decorative compact className="evhero__illu" />
+            <div className="evhero__illu evhero__media">
+              {e.imageUrl && eventImageVisible(e.imageSource, showGenerated) ? (
+                <MediaImage src={e.imageUrl} variant="full" alt="" lazy={false} className="evhero__img" />
+              ) : (
+                <IllustrationCard id={`type-${getType(catalog, e.type)?.id ?? e.type}`} decorative compact />
+              )}
+              {isAdmin ? (
+                <ImageTools kind="event_image" ownerId={e.id} hasImage={Boolean(e.imageUrl)} onChanged={ctx.reload} />
+              ) : null}
+            </div>
           </TicketCard>
 
           <EventMapCard

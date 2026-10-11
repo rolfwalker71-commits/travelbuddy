@@ -183,3 +183,69 @@ test("betrieb: Status nur für Admins; Mitteilungsbilder als Erweiterungspunkt",
   assert.equal((await call("GET", "/v1/media/notification/..%2Fsecret", { token: anna })).status, 404);
   assert.equal((await call("GET", "/v1/media/notification/notif-today")).status, 401);
 });
+
+test("bilder: eigenes Bild hochladen, entfernen, mit Zusatzhinweis neu erzeugen (nur Admin)", async () => {
+  const { gen, prompts } = fakeImages();
+  const { call, anna, tokens, db, mediaDir } = await mediaSetup(gen);
+  const ben = await tokens.ben();
+  const t = await call("POST", "/v1/trips", { token: anna, json: { title: "Meer", destination: "Barcelona" } });
+  const tripId = t.body.trip.id as number;
+  const ev = await call("POST", `/v1/trips/${tripId}/events`, {
+    token: anna,
+    json: { type: "Flug", title: "Zürich → Barcelona", startDate: "2026-10-23", startTime: "08:30", details: { airline: "Beispiel Air" } },
+  });
+  const eventId = ev.body.eventId as number;
+
+  const upload = (token: string, bytes: Uint8Array | string, name = "x.png") => {
+    const form = new FormData();
+    form.append("file", new File([bytes as BlobPart], name));
+    return call("PUT", `/v1/media/event_image/${eventId}`, { token, form });
+  };
+
+  // Nur Admins; Nicht-Bilder werden abgewiesen
+  assert.equal((await upload(ben, PNG)).status, 403);
+  assert.equal((await upload(anna, "kein bild")).status, 415);
+  const ok = await upload(anna, PNG2);
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.media.source, "uploaded");
+  assert.equal(getMedia(db, "event_image", eventId)!.source, "uploaded");
+  const d1 = await call("GET", `/v1/trips/${tripId}`, { token: anna });
+  const e1 = d1.body.events.find((e: any) => e.id === eventId);
+  assert.equal(e1.imageSource, "uploaded");
+  assert.ok(e1.imageUrl);
+
+  // Neu erzeugen: Zusatzhinweis hängt am erzeugten Prompt; der Prompt der alten App (Logos erlaubt)
+  const regen = await call("POST", `/v1/media/event_image/${eventId}/regenerate`, { token: anna, json: { extra: "bei Sonnenuntergang" } });
+  assert.equal(regen.status, 200);
+  assert.equal(regen.body.media.source, "generated");
+  const used = prompts.at(-1)!;
+  assert.match(used, /Square travel illustration/);
+  assert.match(used, /bei Sonnenuntergang/);
+  assert.match(used, /Logos and brand marks/);
+  assert.doesNotMatch(used, /No logos/);
+  assert.equal((await call("POST", `/v1/media/event_image/${eventId}/regenerate`, { token: ben })).status, 403);
+
+  // Entfernen: Datei weg, keine automatische Neuerzeugung
+  const file = mediaFilePath(mediaDir, "event_image", getMedia(db, "event_image", eventId)!.file_name!)!;
+  const del = await call("DELETE", `/v1/media/event_image/${eventId}`, { token: anna });
+  assert.equal(del.status, 200);
+  assert.equal(del.body.media.url, null);
+  purgeTrash(db, mediaDir);
+  assert.equal(fs.existsSync(file), false);
+  const svc = new MediaService({ db, mediaDir, images: gen, now: () => new Date() });
+  const before = prompts.length;
+  await svc.runBatch({ limit: 10 });
+  assert.equal(getMedia(db, "event_image", eventId)!.file_name, null, "entferntes Bild wird nicht automatisch ersetzt");
+  void before;
+});
+
+test("prompt: Vorlage der alten App mit Beleg, Logos erlaubt", () => {
+  const p = buildEventImagePrompt({
+    type: "Hotel", title: "Hotel Brickell", startDate: "2026-11-19", endDate: null, startTime: null, endTime: null,
+    location: "Miami", address: null, provider: "Beispiel Hotels", bookingReference: null, phone: null, website: null,
+    notes: null, details: {}, documentNotes: "Bestätigung für 5 Nächte",
+  });
+  assert.match(p, /Receipt context: Bestätigung für 5 Nächte\./);
+  assert.match(p, /Scene idea: welcoming hotel/);
+  assert.match(p, /Logos and brand marks/);
+});

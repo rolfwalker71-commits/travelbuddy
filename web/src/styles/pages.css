@@ -284,3 +284,10 @@
 .day__view { margin-left: auto; padding: 0; }
 .day__view + .day__add { margin-left: 8px; }
 .hero { overflow-x: clip; }
+
+/* Bild ändern: Titelbild der Reise und Ereignisbild */
+.triphead { position: relative; }
+.triphead__tools { position: absolute; top: 10px; right: 10px; z-index: 3; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); }
+.imagetools { display: inline-flex; align-items: center; gap: 8px; }
+.evhero__media { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.evhero__media .evhero__img, .evhero__media .media--full { width: 100%; border-radius: var(--r-m); }

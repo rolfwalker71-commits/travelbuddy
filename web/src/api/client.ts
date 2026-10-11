@@ -188,7 +188,7 @@ export type UploadProgress = (loaded: number, total: number) => void;
 export function apiUpload<T>(
   path: string,
   form: FormData,
-  opts: { onProgress?: UploadProgress; signal?: AbortSignal } = {}
+  opts: { onProgress?: UploadProgress; signal?: AbortSignal; method?: "POST" | "PUT" } = {}
 ): Promise<T> {
   if (fetchHook) {
     // Mocks: kein XHR; Fortschritt wird simuliert.
@@ -201,7 +201,7 @@ export function apiUpload<T>(
       const token = tokenStore.get();
       const headers: Record<string, string> = { Accept: "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await doFetch(path, { method: "POST", headers, body: form });
+      const res = await doFetch(path, { method: opts.method ?? "POST", headers, body: form });
       if (!res.ok) {
         let body: ErrorBody | null = null;
         try {
@@ -216,7 +216,7 @@ export function apiUpload<T>(
   }
   return new Promise<T>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", path);
+    xhr.open(opts.method ?? "POST", path);
     xhr.setRequestHeader("Accept", "application/json");
     const token = tokenStore.get();
     if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);

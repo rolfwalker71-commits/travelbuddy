@@ -253,19 +253,43 @@ function eventDetails(e: EventPromptInput): string {
   return parts.join("; ");
 }
 
-export function buildEventImagePrompt(e: EventPromptInput): string {
+/**
+ * Vorlage der alten App (familybrain, `lib/trips/event-image-prompt.ts`), Platzhalter in `{{…}}`.
+ * Abweichung auf Wunsch: Logos und Marken dürfen vorkommen (dort stand «No logos»).
+ */
+export const DEFAULT_EVENT_IMAGE_PROMPT = `Square travel illustration (not photorealistic) for a «{{type}}» activity.
+Title: {{title}}.
+Activity details: {{details}}.
+Traveler notes: {{notes}}.
+Receipt context: {{beleg}}.
+Scene idea: {{scene}}.
+Style: clean modern editorial illustration, soft flat colors with gentle shading, friendly travel poster vibe. Any text in the image must be spelled correctly and clearly readable. Logos and brand marks of airlines, hotels, ships and other providers may appear. No watermarks, prices, or UI chrome. Suitable as a small card thumbnail.
+Timing rule: Only depict clock times, schedules, Abfahrt, Ankunft, departure or arrival times if Activity details explicitly list them. If details say Tagesausflug / all-day / no clock times, show NO times at all on the image.`;
+
+function applyTemplate(template: string, vars: Record<string, string>): string {
+  let out = template;
+  for (const [key, value] of Object.entries(vars)) out = out.split(`{{${key}}}`).join(value || "—");
+  return out.replace(/\s+/g, " ").trim();
+}
+
+export function buildEventImagePrompt(e: EventPromptInput & { documentNotes?: string | null }, template: string = DEFAULT_EVENT_IMAGE_PROMPT): string {
   const allDay = !(e.startTime?.trim() || e.endTime?.trim());
   const cabin = typeof e.details.cabinClass === "string" ? e.details.cabinClass : null;
-  const notes = clip(e.notes, 180);
-  return [
-    `Square travel illustration (not photorealistic) for a «${e.type}» activity.`,
-    `Title: ${e.title}.`,
-    `Activity details: ${eventDetails(e) || "—"}.`,
-    `Traveler notes: ${notes || "—"}.`,
-    `Scene idea: ${sceneForType(e.type, cabin, allDay)}.`,
-    "Style: clean modern editorial illustration, soft flat colors with gentle shading, friendly travel poster vibe. Any text in the image must be spelled correctly and clearly readable. No logos, watermarks, prices, or UI chrome. Suitable as a small card thumbnail.",
-    "Timing rule: Only depict clock times, schedules, Abfahrt, Ankunft, departure or arrival times if Activity details explicitly list them. If details say Tagesausflug / all-day / no clock times, show NO times at all on the image.",
-  ].join(" ");
+  const beleg = clip((e.documentNotes || "").replace(/[#|*_`>-]/g, " "), 160);
+  return applyTemplate(template.trim() || DEFAULT_EVENT_IMAGE_PROMPT, {
+    type: e.type,
+    title: e.title,
+    details: eventDetails(e),
+    notes: clip(e.notes, 180),
+    beleg,
+    scene: sceneForType(e.type, cabin, allDay),
+  });
+}
+
+/** Zusatzhinweise des Benutzers an einen erzeugten Prompt hängen. */
+export function withExtraInstructions(prompt: string, extra: string | null | undefined): string {
+  const t = (extra ?? "").replace(/\s+/g, " ").trim();
+  return t ? `${prompt} Additional instructions from the user (take precedence): ${t}` : prompt;
 }
 
 /* ───────────── Erzeugung ───────────── */
@@ -296,8 +320,15 @@ export function buildSpec(db: Db, kind: MediaKind, ownerId: number): Spec | null
       } catch {
         details = {};
       }
+      const doc = db
+        .prepare(
+          `SELECT d.summary FROM documents d JOIN trip_event_documents x ON x.document_id = d.id
+            WHERE x.trip_event_id = ? AND d.summary IS NOT NULL AND d.summary <> '' ORDER BY d.id LIMIT 1`
+        )
+        .get(ownerId) as { summary: string } | undefined;
       return {
         prompt: buildEventImagePrompt({
+          documentNotes: doc?.summary ?? null,
           type: e.event_type,
           title: e.title,
           startDate: e.start_date,
@@ -360,7 +391,7 @@ export class MediaService {
    * Bild für einen Besitzer erzeugen. Ohne `force` bleibt ein vorhandenes Bild unberührt.
    * Wirft bei Fehlern (und vermerkt sie in der Tabelle mit Backoff).
    */
-  async generate(kind: MediaKind, ownerId: number, opts: { force?: boolean; prompt?: string | null } = {}): Promise<MediaRow> {
+  async generate(kind: MediaKind, ownerId: number, opts: { force?: boolean; prompt?: string | null; extra?: string | null } = {}): Promise<MediaRow> {
     const { db, mediaDir, images } = this.deps;
     if (!images) throw conflict("Die KI-Bilderzeugung ist nicht aktiv (kein Schlüssel oder abgeschaltet)", "images_disabled");
     if (!GENERATABLE_KINDS.includes(kind)) {
@@ -376,7 +407,7 @@ export class MediaService {
     const job = (async (): Promise<MediaRow> => {
       const spec = buildSpec(db, kind, ownerId);
       if (!spec) throw notFound("Besitzer des Bildes");
-      const prompt = opts.prompt?.trim() || spec.prompt;
+      const prompt = withExtraInstructions(opts.prompt?.trim() || spec.prompt, opts.extra);
       try {
         const out = await images.generate({ ...spec.request, prompt });
         if (!ownerExists(db, kind, ownerId)) throw notFound("Besitzer des Bildes"); // inzwischen gelöscht

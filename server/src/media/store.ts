@@ -101,18 +101,37 @@ export function mediaUrls(db: Db, kind: MediaKind, ownerIds: number[]): Map<numb
   return out;
 }
 
-/** Bild-URLs aller Ereignisse einer Reise (Illustration). */
-export function tripEventMediaUrls(db: Db, tripId: number): { images: Map<number, string> } {
+/** Bild-URLs und Herkunft aller Ereignisse einer Reise. */
+export function tripEventMediaUrls(db: Db, tripId: number): { images: Map<number, string>; sources: Map<number, MediaSource> } {
   const rows = db
     .prepare(
-      `SELECT m.owner_id, m.updated_at FROM media m
+      `SELECT m.owner_id, m.updated_at, m.source FROM media m
         WHERE m.kind = 'event_image' AND m.file_name IS NOT NULL
           AND m.owner_id IN (SELECT id FROM trip_events WHERE trip_id = ?)`
     )
-    .all(tripId) as Array<{ owner_id: number; updated_at: string }>;
+    .all(tripId) as Array<{ owner_id: number; updated_at: string; source: MediaSource }>;
   const images = new Map<number, string>();
-  for (const r of rows) images.set(r.owner_id, mediaUrl("event_image", r.owner_id, r.updated_at));
-  return { images };
+  const sources = new Map<number, MediaSource>();
+  for (const r of rows) {
+    images.set(r.owner_id, mediaUrl("event_image", r.owner_id, r.updated_at));
+    sources.set(r.owner_id, r.source);
+  }
+  return { images, sources };
+}
+
+/**
+ * Bild entfernen und die automatische Erzeugung dafür abstellen (Zeile bleibt ohne Datei, ohne Wiederholung).
+ * Die Datei landet über den Trigger im Papierkorb.
+ */
+export function clearMedia(db: Db, kind: MediaKind, ownerId: number, maxAttempts: number, now: Date = new Date()): MediaRow {
+  const ts = iso(now);
+  db.prepare(
+    `INSERT INTO media (kind, owner_id, source, attempts, created_at, updated_at) VALUES (?, ?, 'generated', ?, ?, ?)
+     ON CONFLICT (kind, owner_id) DO UPDATE SET
+       file_name = NULL, content_type = NULL, bytes = NULL, sha256 = NULL, prompt = NULL, source = 'generated',
+       error = NULL, attempts = excluded.attempts, next_retry_at = NULL, updated_at = excluded.updated_at`
+  ).run(kind, ownerId, maxAttempts, ts, ts);
+  return getMedia(db, kind, ownerId)!;
 }
 
 export function getMedia(db: Db, kind: MediaKind, ownerId: number): MediaRow | undefined {

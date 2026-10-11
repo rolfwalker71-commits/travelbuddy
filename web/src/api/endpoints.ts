@@ -265,3 +265,23 @@ export const account = {
 export const currencies = {
   list: () => api<{ currencies: Currency[] }>("/v1/currencies").then((r) => r.currencies),
 };
+
+/* ─ Bilder: Reise-Titelbild und Ereignisbild ─ */
+export type MediaKind = "trip_cover" | "event_image";
+export const mediaApi = {
+  /** Eigenes Bild hochladen (Admin); ersetzt ein vorhandenes. */
+  upload: (kind: MediaKind, ownerId: number, file: File) => {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    return apiUpload<{ media: { url: string | null; source: string } }>(`/v1/media/${kind}/${ownerId}`, form, { method: "PUT" });
+  },
+  /** KI-Bild neu erzeugen, optional mit zusätzlichen Hinweisen (kann gut eine Minute dauern). */
+  regenerate: (kind: MediaKind, ownerId: number, extra?: string) =>
+    api<{ media: { url: string | null; source: string } }>(`/v1/media/${kind}/${ownerId}/regenerate`, {
+      method: "POST",
+      body: extra && extra.trim() ? { extra: extra.trim() } : {},
+    }),
+  /** Bild entfernen (wird nicht automatisch neu erzeugt). */
+  remove: (kind: MediaKind, ownerId: number) =>
+    api<{ media: { url: string | null } }>(`/v1/media/${kind}/${ownerId}`, { method: "DELETE" }),
+};
