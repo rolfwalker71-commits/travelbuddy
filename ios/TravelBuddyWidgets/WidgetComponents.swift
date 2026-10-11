@@ -3,7 +3,8 @@ import WidgetKit
 
 // MARK: - Hintergrund (Papier, Ticket mit Kerben) und Rendering-Modi
 
-/// Ticket-Hintergrund: Papierfläche mit Perforationskerben nur im Vollfarb-Modus; akzentuiert/vibrant übernimmt das System.
+/// Glas-Hintergrund mit Ticket-Kerben: Material (Hintergrund scheint weichgezeichnet durch), leichte Papiertönung,
+/// Lichtkante oben links und feiner Rand. Nur im Vollfarb-Modus; akzentuiert/vibrant übernimmt das System.
 struct TicketBackground: View {
     var axis: Axis = .horizontal
     var fraction: CGFloat = 0.64
@@ -12,10 +13,21 @@ struct TicketBackground: View {
 
     var body: some View {
         if mode == .fullColor {
-            if notched {
-                TBTicketShape(fraction: fraction, axis: axis, cornerRadius: 0, notchRadius: 8).fill(TB.Palette.surface)
-            } else {
-                TB.Palette.surface
+            ZStack {
+                Rectangle().fill(.regularMaterial)
+                TB.Palette.surface.opacity(0.42)
+                LinearGradient(colors: [.white.opacity(0.28), .white.opacity(0.04), .clear],
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                ContainerRelativeShape()
+                    .strokeBorder(LinearGradient(colors: [.white.opacity(0.65), .white.opacity(0.10), .white.opacity(0.30)],
+                                                 startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.2)
+            }
+            .mask {
+                if notched {
+                    TBTicketShape(fraction: fraction, axis: axis, cornerRadius: 0, notchRadius: 8)
+                } else {
+                    Rectangle()
+                }
             }
         } else {
             Color.clear
@@ -153,14 +165,25 @@ struct EventTimeText: View {
     let event: SharedSummary.Event
     let day: String
     var size: CGFloat = 28
+    /// Endzeit (`10:11`), die hinter der Startzeit auf derselben Grundlinie steht.
+    var endText: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(event.timeText ?? "ganztags")
-                .font(TB.Font.mono(event.hasTime ? size : size * 0.55, weight: .semibold, relativeTo: .title))
-                .foregroundStyle(TB.Palette.ink)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(event.timeText ?? "ganztags")
+                    .font(TB.Font.mono(event.hasTime ? size : size * 0.55, weight: .semibold, relativeTo: .title))
+                    .foregroundStyle(TB.Palette.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                if let endText {
+                    Text("→ \(endText)")
+                        .font(TB.Font.mono(max(11, size * 0.42), weight: .medium, relativeTo: .footnote))
+                        .foregroundStyle(TB.Palette.mute)
+                        .lineLimit(1)
+                        .layoutPriority(-1)
+                }
+            }
             if event.shownDate != day, !event.dateText.isEmpty {
                 Text(SharedFormat.weekdayShortDate(event.shownDate))
                     .font(TB.Font.mono(10.5, weight: .medium, relativeTo: .caption2))

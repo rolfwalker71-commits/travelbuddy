@@ -193,7 +193,7 @@ enum TravelTimeline {
 
     /// Eintragszeitpunkte: jetzt, an jedem Ereignisbeginn (und 15 Minuten danach, wenn «Jetzt» endet), kurz nach
     /// Mitternacht der Reisezone (Tag x von y wechselt) und ab Stundenwechseln, solange ein Countdown läuft.
-    static func dates(now: Date, snapshot: TravelSnapshot?, horizon: TimeInterval = 36 * 3600, limit: Int = 24) -> [Date] {
+    static func dates(now: Date, snapshot: TravelSnapshot?, horizon: TimeInterval = 36 * 3600, limit: Int = 48) -> [Date] {
         var set: Set<Date> = [now]
         guard let snapshot else { return [now] }
         let end = now.addingTimeInterval(horizon)
@@ -206,6 +206,18 @@ enum TravelTimeline {
         if let midnight = cal.nextDate(after: now, matching: DateComponents(hour: 0, minute: 0, second: 5),
                                        matchingPolicy: .nextTime), midnight < end {
             set.insert(midnight)
+        }
+        // Tagesband-Marke «jetzt» und «Jetzt»-Zustand: Viertelstundentakt in den nächsten drei Stunden, danach stündlich
+        // bis zwölf Stunden (Einträge sind vorberechnet und belasten das Reload-Budget nicht).
+        var tick = (now.timeIntervalSinceReferenceDate / 900).rounded(.up) * 900
+        let endTick = end.timeIntervalSinceReferenceDate
+        while tick < endTick {
+            let date = Date(timeIntervalSinceReferenceDate: tick)
+            let ahead = date.timeIntervalSince(now)
+            if ahead <= 3 * 3600 || (ahead <= 12 * 3600 && tick.truncatingRemainder(dividingBy: 3600) == 0) {
+                set.insert(date)
+            }
+            tick += 900
         }
         // Statische «in 3 Tagen»-Texte: an den Tagesgrenzen vor dem nächsten Ereignis neu zeichnen.
         if let next = snapshot.nextEvent(at: now), let s = next.start(fallback: snapshot.zone) {
