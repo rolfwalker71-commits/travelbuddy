@@ -1,10 +1,11 @@
 import type { TripEvent } from "../api/types";
 import type { TripSpan } from "../lib/plan";
+import { formatInt } from "../lib/money";
 import { fmtDuration } from "../lib/today";
 import { tripNumbers } from "../lib/viz";
 import { Stat } from "../ui/Stat";
 
-const nf = new Intl.NumberFormat("de-CH");
+const nf = { format: formatInt };
 
 /** «Reise in Zahlen»: Tage, Nächte, Kilometer, Flugzeit, Häfen, Länder. */
 export function TripNumbersCard({ events, span }: { events: TripEvent[]; span: TripSpan | null }) {

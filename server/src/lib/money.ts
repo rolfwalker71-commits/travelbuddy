@@ -38,11 +38,16 @@ export function convertMinor(
   return roundHalfAway(Number((amountMinor * factor).toPrecision(15)));
 }
 
-/** «CHF 1’234.50» (de-CH). Nur für Anzeigetexte, nie zum Rechnen. */
+/**
+ * «CHF 1’234.50» (de-CH). Nur für Anzeigetexte, nie zum Rechnen.
+ * Bewusst ohne `Intl.NumberFormat`: Je nach ICU-Version liefert de-CH einen geraden (') oder typografischen (’)
+ * Apostroph als Tausendertrenner. Hier ist das Ergebnis auf jeder Plattform gleich.
+ */
 export function formatMoney(amountMinor: number, currency: string): string {
   const exp = currencyExponent(currency);
-  const n = new Intl.NumberFormat("de-CH", { minimumFractionDigits: exp, maximumFractionDigits: exp }).format(
-    amountMinor / 10 ** exp
-  );
-  return `${currency.toUpperCase()} ${n}`;
+  const factor = 10 ** exp;
+  const abs = Math.abs(Math.round(amountMinor));
+  const whole = String(Math.floor(abs / factor)).replace(/\B(?=(\d{3})+(?!\d))/g, "’");
+  const frac = exp > 0 ? `.${String(abs % factor).padStart(exp, "0")}` : "";
+  return `${currency.toUpperCase()} ${amountMinor < 0 ? "−" : ""}${whole}${frac}`;
 }

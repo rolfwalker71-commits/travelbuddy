@@ -111,6 +111,13 @@ function groupThousands(digits: string): string {
   return out;
 }
 
+/** Ganzzahl mit Tausenderapostroph («12’345»), unabhängig von der ICU-Version des Browsers. */
+export function formatInt(n: number): string {
+  const v = Math.round(n);
+  const g = groupThousands(String(Math.abs(v)));
+  return v < 0 ? MINUS + g : g;
+}
+
 /** «1’234.50» – rein ganzzahlig, ohne Währung. Negativ mit echtem Minuszeichen. */
 export function formatMinor(minor: number, currency: string, opts: { sign?: "auto" | "always" } = {}): string {
   const exp = currencyExponent(currency);

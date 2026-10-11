@@ -143,3 +143,11 @@ describe("formatTotals", () => {
     expect(formatTotals({})).toBe("–");
   });
 });
+
+import { formatInt } from "./money";
+it("formatInt: Tausenderapostroph unabhängig von ICU", () => {
+  expect(formatInt(1234)).toBe("1’234");
+  expect(formatInt(1234567)).toBe("1’234’567");
+  expect(formatInt(12)).toBe("12");
+  expect(formatInt(-1500)).toBe("−1’500");
+});
