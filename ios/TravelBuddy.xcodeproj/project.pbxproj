@@ -60,6 +60,7 @@
 		45457DF2BC1C8EBA6B3A0981 /* SharedFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F30D14613B0B24EF725F24A /* SharedFormat.swift */; };
 		48064342D7915F9CF58B8E4D /* TravelActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF9BC5367984197754D5E4F /* TravelActivityAttributes.swift */; };
 		48AEF7B739B986A19DE50417 /* ServerURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1BF20E4178300ABBCBC28E /* ServerURL.swift */; };
+		4ABEB799725447D74006BE2A /* event-types.json in Resources */ = {isa = PBXBuildFile; fileRef = 712890C7BCA6678AFC4C651F /* event-types.json */; };
 		4FE04D5194FFF2EF6B8046B9 /* TripListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0FBA8B045AA95C013A22F6 /* TripListView.swift */; };
 		502A6ECC527862F35BE48A7A /* SharedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53A9AA0FF0B3F5166998974 /* SharedSession.swift */; };
 		50987F85DADCCCF845555C7D /* SummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20B8D18CDDA5AC1987E7F45 /* SummaryModels.swift */; };
@@ -88,6 +89,7 @@
 		7326310CC4E56999930E6970 /* SharedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53A9AA0FF0B3F5166998974 /* SharedSession.swift */; };
 		73557B7A43B7ECC16FC46B9A /* AppClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95815A415A0D5368F86F1236 /* AppClock.swift */; };
 		74B0012F488EF8E8353979F1 /* TravelActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF9BC5367984197754D5E4F /* TravelActivityAttributes.swift */; };
+		75018FE9B1EA08004B4F2C40 /* LedgerExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457D3D3167DC9E99708F92A6 /* LedgerExportView.swift */; };
 		77BD2E09832AE58ADC157D51 /* TripModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E74DB9639C263850EA87CE /* TripModels.swift */; };
 		7820D27A9A49B10A795D0A2A /* ShareUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33229FF0FCD596DB1955AB27 /* ShareUploader.swift */; };
 		7CC552023DF4D4C904E2D6EE /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D122DAE021763D4E6F17B49 /* LiveActivityManager.swift */; };
@@ -150,7 +152,6 @@
 		E212B0551D2D64620BD5A4A0 /* DemoAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6158344C33EB059855193D /* DemoAPI.swift */; };
 		E3D85AF565759E971640AA8F /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = E67C3029AECB5AB25CBA0ED3 /* DesignTokens.swift */; };
 		E503E76E15538B3EE5AEA465 /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D1E7C2A37C304BDAA9568DF /* WidgetData.swift */; };
-		E6DC735A43DE5167C9B77C5C /* event-types.json in Resources */ = {isa = PBXBuildFile; fileRef = A418200C290A152F90025872 /* event-types.json */; };
 		E7A39236702917EA8FFAC490 /* TravelBuddyWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04751433128A189283EDFF2 /* TravelBuddyWidgetsBundle.swift */; };
 		EA0FB0010BE3CF16531F3995 /* SharedConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9D45857C88DB5C42A866A6 /* SharedConfig.swift */; };
 		EADED8BF81BD07564397E20F /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = E67C3029AECB5AB25CBA0ED3 /* DesignTokens.swift */; };
@@ -158,6 +159,7 @@
 		EB79176C22976BA105D730BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4163DCC52425E1112E37DE /* APIClient.swift */; };
 		ECCC2CA6CFC2F18AAB982413 /* SharedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAB444F15DF4FE48B3FD067 /* SharedAPI.swift */; };
 		EFDFE1AD751772C6D9A97490 /* EventFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A70CB88AA201F9DD38AAD /* EventFormView.swift */; };
+		F03FD67EC564F9F85B4B24F3 /* UserAdminView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8AB89B1557617D21DE2FC1 /* UserAdminView.swift */; };
 		F040CC2F8DE64DB2D089C42E /* EventImageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96FEB2C8A2B2421D70CED075 /* EventImageViews.swift */; };
 		F0759F948974DDDA181B5247 /* SummarySync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88BF6FC40542CF8146280347 /* SummarySync.swift */; };
 		F10782C194C605D1E450AC60 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E1D7B5B9507C114F847D8D /* PlanView.swift */; };
@@ -261,6 +263,7 @@
 		3DBE2D7BFE5F7717BD2F3443 /* TravelBuddyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelBuddyApp.swift; sourceTree = "<group>"; };
 		3F53D73D639F2E33951B4FC6 /* ShareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareModel.swift; sourceTree = "<group>"; };
 		40B192DFE64F1965FF2FD9BA /* TravelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelStore.swift; sourceTree = "<group>"; };
+		457D3D3167DC9E99708F92A6 /* LedgerExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerExportView.swift; sourceTree = "<group>"; };
 		498EA00FAA9A5554473A8C61 /* TripFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripFormView.swift; sourceTree = "<group>"; };
 		4C1A70CB88AA201F9DD38AAD /* EventFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventFormView.swift; sourceTree = "<group>"; };
 		53662A1FE07B254ADD18B820 /* TravelNotificationPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelNotificationPayload.swift; sourceTree = "<group>"; };
@@ -272,12 +275,14 @@
 		60A4449D604A9BC8A590BC65 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		620006F4143C943400355607 /* TravelLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelLiveActivity.swift; sourceTree = "<group>"; };
 		705B91E411B2815513130D19 /* MapSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSupport.swift; sourceTree = "<group>"; };
+		712890C7BCA6678AFC4C651F /* event-types.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "event-types.json"; sourceTree = "<group>"; };
 		74EE40F66137021DCD0AC022 /* BalancePhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalancePhrase.swift; sourceTree = "<group>"; };
 		76A4C5A5A654046CF3B1556A /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		778DA3F4A9E390CA56DF9FDA /* TicketContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketContent.swift; sourceTree = "<group>"; };
 		7869D7683E9880026F0234CB /* ExpenseDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseDraft.swift; sourceTree = "<group>"; };
 		7B4163DCC52425E1112E37DE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		7CA1691B38E888492DE9C247 /* LedgerWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerWidget.swift; sourceTree = "<group>"; };
+		7F8AB89B1557617D21DE2FC1 /* UserAdminView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAdminView.swift; sourceTree = "<group>"; };
 		81D0249834FBE81ECBC517DA /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
 		88BF6FC40542CF8146280347 /* SummarySync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarySync.swift; sourceTree = "<group>"; };
 		8BDF4F19C56C257B38C0BB65 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
@@ -293,7 +298,6 @@
 		9BF9BC5367984197754D5E4F /* TravelActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelActivityAttributes.swift; sourceTree = "<group>"; };
 		9D218A5458952B422A249A52 /* FileSniffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSniffer.swift; sourceTree = "<group>"; };
 		9F30D14613B0B24EF725F24A /* SharedFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedFormat.swift; sourceTree = "<group>"; };
-		A418200C290A152F90025872 /* event-types.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "event-types.json"; sourceTree = "<group>"; };
 		A459F9D1DE90A41823CD2FEC /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		A569BF6AC51FD545D8F50B65 /* Ticket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ticket.swift; sourceTree = "<group>"; };
 		A8F6E8DF7BC8DCD3384682FB /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
@@ -358,6 +362,7 @@
 			isa = PBXGroup;
 			children = (
 				014980A2DFD75FF6BB3C07C4 /* ExpenseFormView.swift */,
+				457D3D3167DC9E99708F92A6 /* LedgerExportView.swift */,
 				1919C17D3DC052CC72391F9C /* LedgerTakeover.swift */,
 				F68413A390E9D770182AD398 /* LedgerView.swift */,
 			);
@@ -498,6 +503,14 @@
 			path = Kit;
 			sourceTree = "<group>";
 		};
+		449BBBFBE3F5E36744B9FB8C /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				712890C7BCA6678AFC4C651F /* event-types.json */,
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
 		45DA0118E293C1D92F4FE87F /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -516,6 +529,7 @@
 			children = (
 				55CED4CE5501E43E3A1861C8 /* AccountView.swift */,
 				FC0B7B07F14AE9902BA096F0 /* LoginView.swift */,
+				7F8AB89B1557617D21DE2FC1 /* UserAdminView.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -592,12 +606,21 @@
 			path = TravelBuddyNotificationService;
 			sourceTree = "<group>";
 		};
+		9DE83C56B947EF08D470CB47 /* travelbuddy */ = {
+			isa = PBXGroup;
+			children = (
+				449BBBFBE3F5E36744B9FB8C /* shared */,
+			);
+			name = travelbuddy;
+			path = ..;
+			sourceTree = "<group>";
+		};
 		AD6D0E903AC0D935220360CB = {
 			isa = PBXGroup;
 			children = (
 				23B1025885A076E1CCB5D918 /* Shared */,
 				2A08DB2BF28456B6218EF372 /* TravelBuddy */,
-				C186ABCBB5092ED0983AA79E /* TravelBuddy */,
+				9DE83C56B947EF08D470CB47 /* travelbuddy */,
 				5D2066962F9EEB4C6E9B6FDB /* TravelBuddyNotificationContent */,
 				9B384C056A0FE6870401A0FD /* TravelBuddyNotificationService */,
 				E618AA2CD07B2A7613B33354 /* TravelBuddyShare */,
@@ -605,15 +628,6 @@
 				337A2EA5463CA0745FCA1D0E /* TravelBuddyWidgets */,
 				45DA0118E293C1D92F4FE87F /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		C186ABCBB5092ED0983AA79E /* TravelBuddy */ = {
-			isa = PBXGroup;
-			children = (
-				E2BC32B9099CB71927781A8E /* shared */,
-			);
-			name = TravelBuddy;
-			path = ..;
 			sourceTree = "<group>";
 		};
 		DB92FD3BEEB1297B79C9B863 /* Features */ = {
@@ -628,14 +642,6 @@
 				2026CCBCEA9968EA9B0E71C1 /* Trips */,
 			);
 			path = Features;
-			sourceTree = "<group>";
-		};
-		E2BC32B9099CB71927781A8E /* shared */ = {
-			isa = PBXGroup;
-			children = (
-				A418200C290A152F90025872 /* event-types.json */,
-			);
-			path = shared;
 			sourceTree = "<group>";
 		};
 		E618AA2CD07B2A7613B33354 /* TravelBuddyShare */ = {
@@ -832,7 +838,7 @@
 				63FF5713981BBCC1A9498013 /* Assets.xcassets in Resources */,
 				1737F814B501A9C9AE69C17E /* Fonts in Resources */,
 				2F10DA0EE1E273758B726424 /* Illustrations.xcassets in Resources */,
-				E6DC735A43DE5167C9B77C5C /* event-types.json in Resources */,
+				4ABEB799725447D74006BE2A /* event-types.json in Resources */,
 				A5E82AC139AC80322D3AD048 /* help-cards.json in Resources */,
 				31DCC15E360820E67E7126B0 /* illustrations-manifest.json in Resources */,
 			);
@@ -1011,6 +1017,7 @@
 				10150A9BF65E217E6A47F51B /* Fonts.swift in Sources */,
 				2874CF123CB36EF2ACBA2B12 /* Illustrations.swift in Sources */,
 				2BEB78F608FEDC55F547499A /* JSONValue.swift in Sources */,
+				75018FE9B1EA08004B4F2C40 /* LedgerExportView.swift in Sources */,
 				D349162577608398946A63CD /* LedgerModel.swift in Sources */,
 				00A0E494B6B708691AD2A865 /* LedgerModels.swift in Sources */,
 				A68EFFE4C4FA2EF3F33F3694 /* LedgerTakeover.swift in Sources */,
@@ -1055,6 +1062,7 @@
 				D95EF01A90A84F617F023939 /* TripFormView.swift in Sources */,
 				4FE04D5194FFF2EF6B8046B9 /* TripListView.swift in Sources */,
 				77BD2E09832AE58ADC157D51 /* TripModels.swift in Sources */,
+				F03FD67EC564F9F85B4B24F3 /* UserAdminView.swift in Sources */,
 				14C0A55772507CE3978790CE /* Visuals.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

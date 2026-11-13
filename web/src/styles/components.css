@@ -459,3 +459,6 @@ dialog.sheet[data-state="closing"] .sheet__panel { animation: sheet-fly-out var(
 }
 
 .tabs__item > svg { flex: none; }
+
+/* Reisekasse: Werkzeugzeile (PDF-Export) */
+.ledger__tools { display: flex; justify-content: flex-end; }

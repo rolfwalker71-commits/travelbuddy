@@ -221,6 +221,13 @@ final class APIClient: TravelAPI, Sendable {
         return (r.data, r.filename ?? "reise.ics")
     }
 
+    func ledgerExportPDF(ledgerID: Int, grouping: LedgerExportGrouping, participantID: Int?) async throws -> (data: Data, filename: String) {
+        var query = [URLQueryItem(name: "groupBy", value: grouping.rawValue)]
+        if grouping == .person, let participantID { query.append(URLQueryItem(name: "participantId", value: String(participantID))) }
+        let r = try await rawData("/v1/ledgers/\(ledgerID)/export.pdf", query: query, accept: "application/pdf")
+        return (r.data, r.filename ?? "ausgaben.pdf")
+    }
+
     // MARK: Ereignisse
 
     func createEvent(tripID: Int, _ body: EventBody) async throws -> TripDetail {
@@ -430,6 +437,22 @@ final class APIClient: TravelAPI, Sendable {
     }
 
     func revokeDevice(id: Int) async throws { try await sendVoid(.delete, "/v1/me/devices/\(id)") }
+
+    func managedUsers() async throws -> [ManagedUser] {
+        let r: ManagedUsersResponse = try await send(.get, "/v1/users")
+        return r.users
+    }
+
+    func createUser(username: String, displayName: String, password: String) async throws -> ManagedUser {
+        let r: ManagedUserResponse = try await send(.post, "/v1/users", body: CreateUserRequest(username: username, displayName: displayName, password: password))
+        return r.user
+    }
+
+    func setUserPassword(id: Int, password: String) async throws {
+        try await sendVoid(.patch, "/v1/users/\(id)", body: SetUserPasswordRequest(password: password))
+    }
+
+    func deleteUser(id: Int) async throws { try await sendVoid(.delete, "/v1/users/\(id)") }
 
     func changePassword(current: String, new: String) async throws {
         try await sendVoid(.post, "/v1/me/password", body: ChangePasswordRequest(currentPassword: current, newPassword: new))

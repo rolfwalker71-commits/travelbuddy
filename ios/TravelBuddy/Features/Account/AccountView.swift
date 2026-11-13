@@ -37,6 +37,9 @@ struct AccountView: View {
             Section {
                 NavigationLink { DevicesView() } label: { Label("Geräte", systemImage: "iphone").tbText(16) }.touchTarget()
                 NavigationLink { ChangePasswordView() } label: { Label("Passwort ändern", systemImage: "key").tbText(16) }.touchTarget()
+                if store.user.isAdmin {
+                    NavigationLink { UserAdminView() } label: { Label("Benutzer verwalten", systemImage: "person.2").tbText(16) }.touchTarget()
+                }
                 NavigationLink { HelpListView() } label: { Label("Hilfe", systemImage: "questionmark.circle").tbText(16) }.touchTarget()
             } header: { TBLabel("Sicherheit und Hilfe") }.tbRow()
 

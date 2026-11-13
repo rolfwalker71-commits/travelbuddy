@@ -137,6 +137,16 @@ final class DemoAPI: TravelAPI, @unchecked Sendable {
         let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TravelBuddy//Demo//DE\r\nEND:VCALENDAR\r\n"
         return (Data(ics.utf8), "reise-\(tripID).ics")
     }
+    func ledgerExportPDF(ledgerID: Int, grouping: LedgerExportGrouping, participantID: Int?) async throws -> (data: Data, filename: String) {
+        try check()
+        let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 595, height: 842))
+        let data = renderer.pdfData { ctx in
+            ctx.beginPage()
+            ("Ausgaben (Demo) – " + (grouping == .date ? "nach Datum" : "nach Person") as NSString)
+                .draw(at: CGPoint(x: 40, y: 40), withAttributes: [.font: UIFont.boldSystemFont(ofSize: 18)])
+        }
+        return (data, "Ausgaben-Demo-\(grouping == .date ? "nach-Datum" : "nach-Person").pdf")
+    }
 
     private func mutate(_ tripID: Int, _ change: (inout TripDetail) -> Void) throws -> TripDetail {
         try with {
@@ -387,6 +397,17 @@ final class DemoAPI: TravelAPI, @unchecked Sendable {
     }
     func revokeDevice(id: Int) async throws { try check() }
     func changePassword(current: String, new: String) async throws { try check() }
+    func managedUsers() async throws -> [ManagedUser] {
+        try check()
+        return [ManagedUser(id: 1, username: "rolf", displayName: "Rolf", email: nil, isAdmin: true, active: true),
+                ManagedUser(id: 2, username: "eliane", displayName: "Eliane", email: nil, isAdmin: false, active: true)]
+    }
+    func createUser(username: String, displayName: String, password: String) async throws -> ManagedUser {
+        try check()
+        return ManagedUser(id: 99, username: username, displayName: displayName, email: nil, isAdmin: false, active: true)
+    }
+    func setUserPassword(id: Int, password: String) async throws { try check() }
+    func deleteUser(id: Int) async throws { try check() }
     func registerLiveActivity(id: String, _ registration: LiveActivityRegistration) async throws { try check() }
     func unregisterLiveActivity(id: String) async throws { try check() }
 }

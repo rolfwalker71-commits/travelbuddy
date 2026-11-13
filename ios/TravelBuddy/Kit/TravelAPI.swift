@@ -28,6 +28,8 @@ protocol TravelAPI: Sendable {
     func revokeTravelerShare(tripID: Int, travelerID: Int) async throws -> TripDetail
     func userDirectory() async throws -> [DirectoryUser]
     func tripICS(tripID: Int) async throws -> (data: Data, filename: String)
+    /// Ausgaben-Protokoll der Reisekasse als PDF (`GET /v1/ledgers/:id/export.pdf`).
+    func ledgerExportPDF(ledgerID: Int, grouping: LedgerExportGrouping, participantID: Int?) async throws -> (data: Data, filename: String)
 
     // MARK: Ereignisse
     func createEvent(tripID: Int, _ body: EventBody) async throws -> TripDetail
@@ -80,6 +82,12 @@ protocol TravelAPI: Sendable {
     func devices() async throws -> [UserDevice]
     func revokeDevice(id: Int) async throws
     func changePassword(current: String, new: String) async throws
+
+    // MARK: Benutzerverwaltung (Administrator)
+    func managedUsers() async throws -> [ManagedUser]
+    func createUser(username: String, displayName: String, password: String) async throws -> ManagedUser
+    func setUserPassword(id: Int, password: String) async throws
+    func deleteUser(id: Int) async throws
     func registerLiveActivity(id: String, _ registration: LiveActivityRegistration) async throws
     func unregisterLiveActivity(id: String) async throws
 }

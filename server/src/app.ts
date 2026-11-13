@@ -18,6 +18,7 @@ import { HttpError, badRequest, forbidden } from "./lib/errors";
 import { bodyLimit } from "hono/body-limit";
 import { parseWith, readJson } from "./lib/validate";
 import * as L from "./ledgers/service";
+import { buildLedgerReport, renderLedgerReportPdf, reportFileName } from "./ledgers/report";
 import { fetchEcbRate, type FetchLike } from "./ledgers/fx";
 import { createBackground, type Background } from "./lib/background";
 import { tripRoutes } from "./trips/routes";
@@ -844,6 +845,32 @@ export function createApp(deps: AppDeps) {
   app.get("/v1/ledgers/:id/expenses", (c) =>
     c.json({ expenses: L.listExpenses(db, ledgerAccess(c)) })
   );
+
+  /* Ausgaben-Protokoll als PDF: ?groupBy=date|person[&participantId=…] */
+  app.get("/v1/ledgers/:id/export.pdf", async (c) => {
+    const ledgerId = ledgerAccess(c);
+    const q = z
+      .object({
+        groupBy: z.enum(["date", "person"]).default("date"),
+        participantId: z.coerce.number().int().positive().optional(),
+      })
+      .safeParse(Object.fromEntries(new URL(c.req.url).searchParams));
+    if (!q.success) throw badRequest("groupBy (date|person) und optional participantId erforderlich");
+    let data;
+    try {
+      data = buildLedgerReport(db, ledgerId, { ...q.data, now: clock() });
+    } catch (err) {
+      if (err instanceof RangeError) throw badRequest("participantId gehört nicht zu dieser Abrechnung");
+      throw err;
+    }
+    const pdf = await renderLedgerReportPdf(data);
+    const name = reportFileName(data.title, data.groupBy);
+    return c.body(new Uint8Array(pdf), 200, {
+      "content-type": "application/pdf",
+      "content-disposition": `attachment; filename="${name}"; filename*=UTF-8''${encodeURIComponent(name)}`,
+      "cache-control": "no-store",
+    });
+  });
 
   app.post("/v1/ledgers/:id/expenses", async (c) => {
     const ledgerId = ledgerAccess(c);

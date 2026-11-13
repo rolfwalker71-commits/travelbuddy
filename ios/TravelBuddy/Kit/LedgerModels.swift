@@ -272,3 +272,10 @@ struct SettlementBody: Encodable, Sendable {
     var note: String?
     var settledAt: String?
 }
+
+/// Gliederung des PDF-Protokolls der Reisekasse (Server: `groupBy`).
+enum LedgerExportGrouping: String, CaseIterable, Identifiable, Sendable {
+    case date, person
+    var id: String { rawValue }
+    var title: String { self == .date ? "Nach Datum" : "Nach Person" }
+}

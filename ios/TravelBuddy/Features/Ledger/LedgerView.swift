@@ -37,6 +37,7 @@ struct LedgerView: View {
     @State private var settleTarget: Transfer?
     @State private var errorMessage: String?
     @State private var pendingDelete: Expense?
+    @State private var showExport = false
 
     private enum ExpenseTarget: Identifiable {
         case new
@@ -49,6 +50,10 @@ struct LedgerView: View {
             if let model { content(model) } else { ProgressView() }
         }
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showExport = true } label: { Image(systemName: "square.and.arrow.up") }
+                    .disabled(model?.overview == nil).accessibilityLabel("Ausgaben als PDF exportieren")
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { editor = .new } label: { Image(systemName: "plus") }
                     .disabled(model?.overview == nil).accessibilityLabel("Ausgabe erfassen")
@@ -68,6 +73,11 @@ struct LedgerView: View {
                 case .new: ExpenseFormView(model: model, editing: nil)
                 case .edit(let e): ExpenseFormView(model: model, editing: e)
                 }
+            }
+        }
+        .sheet(isPresented: $showExport) {
+            if let overview = model?.overview {
+                LedgerExportView(ledgerID: ledgerID, title: tripTitle ?? overview.ledger.title, members: overview.members.filter { !$0.hidden })
             }
         }
         .sheet(item: $settleTarget) { t in

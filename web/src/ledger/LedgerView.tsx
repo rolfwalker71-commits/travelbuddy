@@ -17,6 +17,7 @@ import { BalanceChip, Section, Segmented, Tabs } from "../ui/bits";
 import { BalanceChart, CostByCategory, CostByDay, SettlementArrows } from "../viz/CostCharts";
 import { ExpenseDetailSheet } from "./ExpenseDetail";
 import { ExpenseSheet } from "./ExpenseSheet";
+import { ExportSheet } from "./ExportSheet";
 import { BalanceList, ExpenseGroups, SettlementList, TransferList } from "./LedgerParts";
 import { SettlementSheet, type SettlementPrefill } from "./SettlementSheet";
 
@@ -70,6 +71,7 @@ function LedgerBody({ data, reload, refreshing }: { data: Data; reload: () => vo
   const [editing, setEditing] = useState<Expense | null>(null);
   const [detail, setDetail] = useState<Expense | null>(null);
   const [settleOpen, setSettleOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [prefill, setPrefill] = useState<SettlementPrefill | null>(null);
 
   const me = members.find((m) => m.id === overview.myMemberId) ?? members.find((m) => m.userId === user?.id) ?? null;
@@ -155,6 +157,12 @@ function LedgerBody({ data, reload, refreshing }: { data: Data; reload: () => vo
             </Button>
           </div>
         ) : null}
+      </div>
+
+      <div className="ledger__tools">
+        <Button size="s" icon="download" onClick={() => setExportOpen(true)}>
+          PDF
+        </Button>
       </div>
 
       <Tabs<TabKey>
@@ -354,6 +362,14 @@ function LedgerBody({ data, reload, refreshing }: { data: Data; reload: () => vo
           setDetail(null);
           await run(() => L.settleCouple(ledger.id, e.id), "Paar-Ausgleich gebucht");
         }}
+      />
+
+      <ExportSheet
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        ledgerId={ledger.id}
+        title={ledger.title}
+        members={members}
       />
 
       <SettlementSheet

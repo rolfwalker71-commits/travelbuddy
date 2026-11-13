@@ -396,3 +396,42 @@ test("Mitteilungs-Einstellungen: Arten und Vorlaufzeiten", async () => {
   const bad = await call("PUT", "/v1/me/notification-prefs", { token: ben, json: { leadTimes: { todayBriefing: "7 Uhr" } } });
   assert.equal(bad.status, 422);
 });
+
+test("Reisekasse: PDF-Export nach Datum und nach Person", async () => {
+  const { call, tokens } = await setup();
+  const anna = await tokens.anna();
+  const ben = await tokens.ben();
+  const created = await call("POST", "/v1/ledgers", {
+    token: anna,
+    json: { title: "Sardinien Äpfel", members: [{ displayName: "Ben" }, { displayName: "Cleo" }] },
+  });
+  const ledgerId = created.body.ledger.id as number;
+  const mAnna = created.body.members.find((m: any) => m.displayName === "Anna").id as number;
+  await call("POST", `/v1/ledgers/${ledgerId}/expenses`, {
+    token: anna,
+    json: { paidByMemberId: mAnna, amountMinor: 10000, currency: "CHF", description: "Mietwagen", expenseDate: "2026-09-12", split: { mode: "equal" } },
+  });
+
+  const pdf = async (qs: string, token = anna) => {
+    const r = await call("GET", `/v1/ledgers/${ledgerId}/export.pdf${qs}`, { token });
+    return { r, bytes: Buffer.from(await r.raw.arrayBuffer()) };
+  };
+
+  const byDate = await pdf("?groupBy=date");
+  assert.equal(byDate.r.status, 200);
+  assert.equal(byDate.r.headers.get("content-type"), "application/pdf");
+  assert.match(byDate.r.headers.get("content-disposition") ?? "", /Ausgaben-Sardinien-Apfel-nach-Datum\.pdf/);
+  assert.equal(byDate.bytes.subarray(0, 5).toString(), "%PDF-");
+
+  const byPerson = await pdf(`?groupBy=person&participantId=${mAnna}`);
+  assert.equal(byPerson.r.status, 200);
+  assert.equal(byPerson.bytes.subarray(0, 5).toString(), "%PDF-");
+
+  // ohne Parameter = nach Datum; fremde Person und ungültige Werte werden abgelehnt
+  assert.equal((await pdf("")).r.status, 200);
+  assert.equal((await pdf("?groupBy=person&participantId=999999")).r.status, 400);
+  assert.equal((await pdf("?groupBy=quatsch")).r.status, 400);
+  // ohne Zugriff auf die Abrechnung kein PDF
+  assert.notEqual((await pdf("?groupBy=date", ben)).r.status, 200);
+  assert.equal((await call("GET", `/v1/ledgers/${ledgerId}/export.pdf`)).status, 401);
+});

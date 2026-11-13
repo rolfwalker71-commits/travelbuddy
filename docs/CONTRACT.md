@@ -302,3 +302,15 @@ Unsichere Importfälle (Zeitzone nicht ableitbar, Typ unbekannt) werden `status 
   `all`: alle ausser eigenen, hochgeladenen Bildern. Läuft nacheinander im Hintergrund; `409 already_running`, `409 images_disabled`.
 - `GET /v1/trips/:id/event-images/status` (Admin): `{ enabled, job: { total, done, failed, running } | null }`.
 - Prompt der Ereignisbilder: ein passendes Motiv und das Logo des Anbieters, sonst kein Text im Bild (Angaben nur als Kontext).
+
+
+## Ausgaben-Protokoll als PDF (Reisekasse)
+
+`GET /v1/ledgers/:id/export.pdf?groupBy=date|person[&participantId=<id>]`
+
+- Antwort: `application/pdf` (A4), `Content-Disposition: attachment` (`Ausgaben-<Titel>-nach-Datum|nach-Person.pdf`).
+- `groupBy=date` (Standard): alle Ausgaben und Ausgleichszahlungen chronologisch, je Tag gruppiert, mit Tagessumme, Summen und Salden.
+- `groupBy=person`: je Teilnehmer bezahlte Ausgaben, Anteile, Ausgleichszahlungen und Saldo. Mit `participantId` nur diese Person
+  (muss zur Abrechnung gehören, sonst `400`).
+- Zugriff wie `GET /v1/ledgers/:id` (Bearer-Token; ohne Zugriff auf die Abrechnung kein PDF). Darstellung: `dd.mm.yyyy`, `hh:mm`, de-CH.
+- Clients laden das PDF mit Token und geben es weiter (Web: Download, iOS: Teilen-Menü).

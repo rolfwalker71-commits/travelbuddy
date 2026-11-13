@@ -382,3 +382,33 @@ struct AirportsResponse: Decodable, Sendable {
 struct TimezoneResponse: Decodable, Sendable {
     let tz: String
 }
+
+// MARK: Benutzerverwaltung (nur Administratoren)
+
+/// Konto in `GET /v1/users`.
+struct ManagedUser: Decodable, Equatable, Sendable, Identifiable {
+    let id: Int
+    let username: String
+    let displayName: String
+    let email: String?
+    let isAdmin: Bool
+    let active: Bool
+}
+
+struct ManagedUsersResponse: Decodable, Sendable { let users: [ManagedUser] }
+struct ManagedUserResponse: Decodable, Sendable { let user: ManagedUser }
+
+struct CreateUserRequest: Encodable, Sendable {
+    let username: String
+    let displayName: String
+    let password: String
+}
+
+struct SetUserPasswordRequest: Encodable, Sendable { let password: String }
+
+enum UsernamePolicy {
+    /// Wie der Server: mindestens 2 Zeichen, nur Buchstaben, Ziffern, `.` `_` `-`.
+    static func isValid(_ name: String) -> Bool {
+        name.count >= 2 && name.count <= 60 && name.unicodeScalars.allSatisfy { CharacterSet.alphanumerics.contains($0) || "._-".unicodeScalars.contains($0) }
+    }
+}
