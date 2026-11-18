@@ -435,3 +435,10 @@ test("Reisekasse: PDF-Export nach Datum und nach Person", async () => {
   assert.notEqual((await pdf("?groupBy=date", ben)).r.status, 200);
   assert.equal((await call("GET", `/v1/ledgers/${ledgerId}/export.pdf`)).status, 401);
 });
+
+test("PDF-Export: Texte werden WinAnsi-tauglich bereinigt (Emojis weg, Umlaute und «ß» bleiben)", async () => {
+  const { clean } = await import("../src/ledgers/report");
+  assert.equal(clean("Ferien 🏖️ in Zürich ✈️ Straße"), "Ferien in Zürich Straße");
+  assert.equal(clean("  Café – 5 € "), "Café – 5 €");
+  assert.equal(clean("日本"), "");
+});

@@ -33,27 +33,40 @@ export type LedgerReportData = {
   totals: Overview["totals"];
 };
 
+/** Die Standardschrift (Helvetica) kennt nur WinAnsi; alles andere (Emojis, Sonderzeichen) wird entfernt. */
+const WINANSI_EXTRA = new Set("€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ".split(""));
+export function clean(text: string): string {
+  const out = [...text.normalize("NFC")]
+    .filter((ch) => {
+      const c = ch.codePointAt(0)!;
+      return (c >= 0x20 && c <= 0x7e) || (c >= 0xa0 && c <= 0xff) || WINANSI_EXTRA.has(ch);
+    })
+    .join("");
+  return out.replace(/\s{2,}/g, " ").trim();
+}
+const cleanOrNull = (t: string | null | undefined) => (t == null ? t ?? null : clean(t));
+
 export function buildLedgerReport(
   db: Db,
   ledgerId: number,
   opts: { groupBy: ReportGroupBy; participantId?: number | null; now?: Date }
 ): LedgerReportData {
   const overview = L.ledgerOverview(db, ledgerId);
-  const members = overview.members.map((m) => ({ id: m.id, displayName: m.displayName, colorIndex: m.colorIndex }));
+  const members = overview.members.map((m) => ({ id: m.id, displayName: clean(m.displayName) || "?", colorIndex: m.colorIndex }));
   if (opts.participantId != null && !members.some((m) => m.id === opts.participantId)) {
     throw new RangeError("participant_not_in_ledger");
   }
   return {
-    title: overview.ledger.title,
+    title: clean(overview.ledger.title) || "Reisekasse",
     currency: overview.ledger.baseCurrency,
     groupBy: opts.groupBy,
     generatedAt: opts.now ?? new Date(),
     members,
     onlyMemberId: opts.groupBy === "person" ? opts.participantId ?? null : null,
-    expenses: L.listExpenses(db, ledgerId),
-    settlements: L.listSettlements(db, ledgerId),
-    balances: overview.balances,
-    transfers: overview.suggestedTransfers,
+    expenses: L.listExpenses(db, ledgerId).map((e) => ({ ...e, description: cleanOrNull(e.description), category: cleanOrNull(e.category), note: cleanOrNull(e.note) })),
+    settlements: L.listSettlements(db, ledgerId).map((x) => ({ ...x, note: cleanOrNull(x.note) })),
+    balances: overview.balances.map((b) => ({ ...b, displayName: clean(b.displayName) || "?" })),
+    transfers: overview.suggestedTransfers.map((t) => ({ ...t, fromName: clean(t.fromName) || "?", toName: clean(t.toName) || "?" })),
     totals: overview.totals,
   };
 }
@@ -230,6 +243,15 @@ class Writer {
     d.y = y + 38;
   }
 
+  /** Kürzt `text` mit «…» auf die Breite `max` (in der aktuellen Schrift). */
+  private fit(text: string, max: number): string {
+    const d = this.doc;
+    if (d.widthOfString(text) <= max) return text;
+    let t = text;
+    while (t.length > 1 && d.widthOfString(`${t}…`) > max) t = t.slice(0, -1);
+    return `${t.trimEnd()}…`;
+  }
+
   /** Farbiges Kopfband mit Titel, Untertitel und Ticket-Symbol. */
   header(title: string, sub: string) {
     const d = this.doc;
@@ -241,8 +263,12 @@ class Writer {
     drawIcon(d, "ticket", w - 64, 38, 17, "#FFFFFF");
     d.restore();
     d.font("Helvetica-Bold").fontSize(9).fillColor("#FFFFFF").opacity(0.85).text("TRAVELBUDDY · REISEKASSE", this.left, 22, { characterSpacing: 1.2, width: w - 140 });
-    d.opacity(1).font("Helvetica-Bold").fontSize(23).fillColor("#FFFFFF").text(title, this.left, 36, { width: w - 140, lineBreak: false, ellipsis: true });
-    d.font("Helvetica").fontSize(9.5).fillColor("#FFFFFF").text(sub, this.left, 66, { width: w - 80, lineBreak: false, ellipsis: true });
+    const titleW = w - 2 * this.left - 70; // rechts bleibt Platz für das Ticket-Symbol
+    let size = 23;
+    d.opacity(1).font("Helvetica-Bold");
+    while (size > 13 && d.fontSize(size).widthOfString(title) > titleW) size -= 1;
+    d.fontSize(size).fillColor("#FFFFFF").text(this.fit(title, titleW), this.left, 41 - size * 0.25, { lineBreak: false });
+    d.font("Helvetica").fontSize(9.5).fillColor("#FFFFFF").text(this.fit(sub, w - 2 * this.left), this.left, 66, { lineBreak: false });
     d.y = 108;
   }
 
@@ -507,13 +533,21 @@ function renderByDate(w: Writer, data: LedgerReportData) {
     }
   }
 
-  w.ensure(data.balances.length * 24 + 40);
+  renderBalancePage(w, data, null);
+}
+
+/** Salden und «Wer schuldet wem»: immer auf einer eigenen Seite. */
+function renderBalancePage(w: Writer, data: LedgerReportData, onlyMemberId: number | null) {
+  const person = (id: number) => data.members.find((m) => m.id === id);
+  w.doc_addPage();
   w.heading("Salden", { kind: "coin", color: ACCENT });
   w.balanceBars(
-    data.balances.map((b) => ({ name: b.displayName, colorIndex: person(b.memberId)?.colorIndex ?? 0, netMinor: b.netMinor })),
-    cur
+    data.balances
+      .filter((b) => onlyMemberId == null || b.memberId === onlyMemberId)
+      .map((b) => ({ name: b.displayName, colorIndex: person(b.memberId)?.colorIndex ?? 0, netMinor: b.netMinor })),
+    data.currency
   );
-  w.transfers(null);
+  w.transfers(onlyMemberId);
 }
 
 function renderByPerson(w: Writer, data: LedgerReportData) {
@@ -570,7 +604,7 @@ function renderByPerson(w: Writer, data: LedgerReportData) {
     }
   });
 
-  w.transfers(data.onlyMemberId);
+  renderBalancePage(w, data, data.onlyMemberId);
 }
 
 export function renderLedgerReportPdf(data: LedgerReportData): Promise<Buffer> {
